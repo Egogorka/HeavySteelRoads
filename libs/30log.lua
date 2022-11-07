@@ -4,6 +4,8 @@
 --- DateTime: 23.10.2022 17:07
 ---
 
+--- https://github.com/Yonaba/30log
+
 local next         = next
 local assert       = assert
 local pairs        = pairs
