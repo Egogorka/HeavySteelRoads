@@ -3,6 +3,9 @@
 --- Created by Meevere.
 --- DateTime: 16.10.2022 16:11
 ---
+
+--- https://github.com/bakpakin/tiny-ecs
+
 --[[
 Copyright (c) 2016 Calvin Rose
 
