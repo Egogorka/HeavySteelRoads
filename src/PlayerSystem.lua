@@ -4,16 +4,17 @@
 --- DateTime: 16.10.2022 16:41
 ---
 
-local Vector = require('utility/vector')
+local Vector2, Vector3 = unpack(require('utility/vector'))
 local tiny = require("libs/tiny")
 
 
 local PlayerControlSystem = tiny.processingSystem()
-PlayerControlSystem.filter = tiny.requireAll("player", "body", "graphics")
+PlayerControlSystem.filter = tiny.requireAll("player", "body", "graphics", "depth")
 
 function PlayerControlSystem:process(entity, dt)
-    local velocity = Vector:new()
+    local velocity = Vector2()
     local type = "idle"
+    local depth = entity.depth
     if love.keyboard.isDown("up") then
         velocity = velocity + {0,-100}
         type = "move"
@@ -30,8 +31,16 @@ function PlayerControlSystem:process(entity, dt)
         velocity = velocity + {100,0}
         type = "move"
     end
+    if love.keyboard.isDown("q") then
+        depth = depth / 0.95
+    end
+    if love.keyboard.isDown("e") then
+        depth = depth * 0.95
+    end
+
     entity.body:setLinearVelocity(velocity:x(), velocity:y())
     entity.graphics:set(type)
+    entity.depth = depth
 end
 
 return PlayerControlSystem

@@ -5,14 +5,37 @@
 ---
 
 local tiny = require("libs/tiny")
+local Vector2 = require("utility/vector")[1]
 
 local GraphicsSystem = tiny.processingSystem()
 GraphicsSystem.filter = tiny.requireAll("graphics", "body")
 
+GraphicsSystem.focus_z = 1
+GraphicsSystem.focus_pos = Vector2(0,0)
+GraphicsSystem.focus_entity = nil
+
+function GraphicsSystem:preWrap(dt)
+    if (self.focus_entity ~= nil) and (self.focus_entity.body ~= nil) then
+        self.focus_pos = Vector2(self.focus_entity.body:getPosition())
+    end
+end
+
 function GraphicsSystem:process(entity, dt)
     local animation, image = entity.graphics:current()
+    local depth = self.focus_z
+    if (entity.depth ~= nil ) then
+        depth = entity.depth.z
+    end
+    local position = Vector2(entity.body:getPosition())
+
+    local scale  = self.focus_z / depth
+    local pos = self.focus_pos - scale * (self.focus_pos - position)
+    if( entity.depth ~= nil and entity.depth.scalable == false ) then
+        scale = 1
+    end
+
     animation:update(dt)
-    animation:draw(image, entity.body:getX(), entity.body:getY())
+    animation:draw(image, pos[1], pos[2], 0, scale, scale)
 end
 
 return GraphicsSystem

@@ -5,11 +5,21 @@
 ---
 
 local anim8 = require("libs/anim8")
+local class = require("libs/30log")
 
-local Graphics = {
+local Graphics = class("Graphics", {
     animations = nil,
     current_animation = nil
-}
+})
+
+local Depth = class("Depth", {
+    z = 1,
+    scalable = true
+})
+
+function Depth:init(z, scalable)
+    self.z = z; self.scalable = scalable or true
+end
 
 --- To make proper behavioral animations we need to define
 --- several behaviors and give then as an argument somehow
@@ -34,21 +44,16 @@ local Graphics = {
 ---    current = "idle"
 ---}
 ---
-function Graphics:new(o)
+function Graphics:init(o)
     if( o["type"] ~= nil and o:type() == "Image") then
         local grid = anim8.newGrid(o:getWidth(), o:getHeight(), o:getWidth(), o:getHeight())
-        out = {
-            animations = {
+        self.animations = {
                 idle = {anim8.newAnimation(grid(1,1), 1), o}
-            },
-            current_animation = "idle"
-        }
-        return Graphics:new(out)
+            }
+        self.current_animation = "idle"
     else
-        out = o or {}
-        setmetatable(o, self)
-        self.__index = self
-        return o
+        self.current_animation = o.current_animation
+        self.animations = o.animations
     end
 end
 
@@ -65,4 +70,4 @@ function Graphics:current()
     return temp[1], temp[2]
 end
 
-return Graphics
+return {Graphics, Depth}
