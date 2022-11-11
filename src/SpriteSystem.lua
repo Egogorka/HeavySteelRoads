@@ -7,21 +7,21 @@
 local tiny = require("libs/tiny")
 local Vector2 = require("utility/vector")[1]
 
-local GraphicsSystem = tiny.processingSystem()
-GraphicsSystem.filter = tiny.requireAll("graphics", "body")
+local SpriteSystem = tiny.processingSystem()
+SpriteSystem.filter = tiny.requireAll("sprite", "body")
 
-GraphicsSystem.focus_z = 1
-GraphicsSystem.focus_pos = Vector2(0,0)
-GraphicsSystem.focus_entity = nil
+SpriteSystem.focus_z = 1
+SpriteSystem.focus_pos = Vector2(0,0)
+SpriteSystem.focus_entity = nil
 
-function GraphicsSystem:preWrap(dt)
+function SpriteSystem:preWrap(dt)
     if (self.focus_entity ~= nil) and (self.focus_entity.body ~= nil) then
         self.focus_pos = Vector2(self.focus_entity.body:getPosition())
     end
 end
 
-function GraphicsSystem:process(entity, dt)
-    local animation, image = entity.graphics:current()
+function SpriteSystem:process(entity, dt)
+    local animation, image = entity.sprite:current()
     local depth = self.focus_z
     if (entity.depth ~= nil ) then
         depth = entity.depth.z
@@ -46,4 +46,4 @@ function GraphicsSystem:process(entity, dt)
     end
 end
 
-return GraphicsSystem
+return SpriteSystem

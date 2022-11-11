@@ -7,7 +7,7 @@
 local anim8 = require("libs/anim8")
 local class = require("libs/30log")
 
-local Graphics = class("Graphics", {
+local Sprite = class("Sprite", {
     animations = nil,
     current_animation = nil
 })
@@ -36,16 +36,16 @@ end
 --- For example, we have a player, it has several animations, like idle, run and jump
 --- We need to be able to do something like this:
 ---
----     graphics.set("running");
+---     sprite.set("running");
 ---
 --- and something like
 ---
----     graphics.set("jump", 1);
+---     sprite.set("jump", 1);
 ---
 
 
 ---
----entity_graphics = {
+---entity_sprite = {
 ---    animations = {
 ---        idle = anim8.newAnimation(grid(1,1), 1),
 ---        move = anim8.newAnimation(grid(1,'1-4'), 0.2)
@@ -53,7 +53,7 @@ end
 ---    current = "idle"
 ---}
 ---
-function Graphics:init(o)
+function Sprite:init(o)
     if( o["type"] ~= nil and o:type() == "Image") then
         local grid = anim8.newGrid(o:getWidth(), o:getHeight(), o:getWidth(), o:getHeight())
         self.animations = {
@@ -66,7 +66,7 @@ function Graphics:init(o)
     end
 end
 
-function Graphics:set(type)
+function Sprite:set(type)
     if( self.animations[type] == nil or self.current_animation == type) then
         return
     end
@@ -74,9 +74,9 @@ function Graphics:set(type)
     self.current_animation = type
 end
 
-function Graphics:current()
+function Sprite:current()
     local temp = self.animations[self.current_animation]
     return temp[1], temp[2]
 end
 
-return {Graphics, Depth}
+return {Sprite, Depth}

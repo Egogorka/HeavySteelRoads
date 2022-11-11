@@ -11,20 +11,20 @@ local tiny = require("libs/tiny")
 local Vector2, Vector3 = unpack(require('utility/vector'))
 
 
-local Graphics, Depth = unpack(require('src/Graphics'))
-local GraphicsSystem = require("src/GraphicsSystem")
+local Sprite, Depth = unpack(require('src/Sprite'))
+local SpriteSystem = require("src/SpriteSystem")
 
 local PlayerControlSystem = require("src/PlayerSystem")
 
 local world = tiny.world()
 world:addSystem(PlayerControlSystem)
-world:addSystem(GraphicsSystem)
+world:addSystem(SpriteSystem)
 
 local window_w, window_h, flags = love.window.getMode()
 
 local image = love.graphics.newImage("assets/player/TankBody.png")
 local grid = anim8.newGrid(47, 20, image:getWidth(), image:getHeight(), -4, -4, 4)
-local entity_graphics = Graphics({
+local entity_sprite = Sprite({
     animations = {
         idle = {
             anim8.newAnimation(grid(1,1), 1), image
@@ -46,41 +46,41 @@ function love.load()
     p_world = love.physics.newWorld(0,0,true)
 
     local sky = {
-        graphics = Graphics(love.graphics.newImage("assets/background/Sky.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Sky.png")),
         body = love.physics.newBody(p_world, 0, 0),
         depth = Depth(1000, false, false)
     }
     world:addEntity(sky)
 
     local sun = {
-        graphics = Graphics(love.graphics.newImage("assets/background/Sun.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Sun.png")),
         body = love.physics.newBody(p_world, 0, 0),
         depth = Depth(1000, false, false)
     }
     world:addEntity(sun)
 
     local road = {
-        graphics = Graphics(love.graphics.newImage("assets/background/Road1.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Road1.png")),
         body = love.physics.newBody(p_world, 0, window_h/2)
     }
     world:addEntity(road)
 
     local forest_back2 = {
-        graphics = Graphics(love.graphics.newImage("assets/background/Forest4.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Forest4.png")),
         body = love.physics.newBody(p_world, -10, window_h/2 - 86 - 20 - 20),
         depth = Depth(1.4, false)
     }
     world:addEntity(forest_back2)
 
     local forest_back1 = {
-        graphics = Graphics(love.graphics.newImage("assets/background/Forest4.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Forest4.png")),
         body = love.physics.newBody(p_world, 0, window_h/2 - 86 - 20),
         depth = Depth(1.2, false)
     }
     world:addEntity(forest_back1)
 
     local forest_front = {
-        graphics = Graphics(love.graphics.newImage("assets/background/Forest.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Forest.png")),
         body = love.physics.newBody(p_world, 0, window_h/2 - 166)
     }
     world:addEntity(forest_front)
@@ -93,7 +93,7 @@ function love.load()
     --world:addEntity(roadTopBlock)
 
     player = {
-        graphics = entity_graphics,
+        sprite = entity_sprite,
         player = 1,
         depth = Depth(1)
     }
@@ -103,14 +103,14 @@ function love.load()
     player.fixture = love.physics.newFixture(player.body, player.shape)
 
     world:addEntity(player)
-    --GraphicsSystem.focus_entity = player
+    --SpriteSystem.focus_entity = player
 end
 
 function love.update(dt)
     p_world:update(dt)
 
     camera:update(dt)
-    GraphicsSystem.focus_pos = Vector2(camera.x,camera.y)
+    SpriteSystem.focus_pos = Vector2(camera.x,camera.y)
     camera:follow(player.body:getX(), player.body:getY())
 end
 

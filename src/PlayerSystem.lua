@@ -9,7 +9,7 @@ local tiny = require("libs/tiny")
 
 
 local PlayerControlSystem = tiny.processingSystem()
-PlayerControlSystem.filter = tiny.requireAll("player", "body", "graphics", "depth")
+PlayerControlSystem.filter = tiny.requireAll("player", "body", "sprite", "depth")
 
 function PlayerControlSystem:process(entity, dt)
     local velocity = Vector2()
@@ -39,7 +39,7 @@ function PlayerControlSystem:process(entity, dt)
     end
 
     entity.body:setLinearVelocity(velocity:x(), velocity:y())
-    entity.graphics:set(type)
+    entity.sprite:set(type)
     entity.depth.z = depth
 end
 

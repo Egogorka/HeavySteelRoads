@@ -7,10 +7,10 @@
 local tiny = require("libs/tiny")
 
 local PlayerControlSystem = require("src/PlayerSystem")
-local GraphicsSystem = require("src/GraphicsSystem")
+local SpriteSystem = require("src/SpriteSystem")
 
 local world = tiny.world()
 world:addSystem(PlayerControlSystem)
-world:addSystem(GraphicsSystem)
+world:addSystem(SpriteSystem)
 
 return world
