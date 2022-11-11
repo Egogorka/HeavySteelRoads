@@ -14,7 +14,7 @@ PlayerControlSystem.filter = tiny.requireAll("player", "body", "graphics", "dept
 function PlayerControlSystem:process(entity, dt)
     local velocity = Vector2()
     local type = "idle"
-    local depth = entity.depth
+    local depth = entity.depth.z
     if love.keyboard.isDown("up") then
         velocity = velocity + {0,-100}
         type = "move"
@@ -40,7 +40,7 @@ function PlayerControlSystem:process(entity, dt)
 
     entity.body:setLinearVelocity(velocity:x(), velocity:y())
     entity.graphics:set(type)
-    entity.depth = depth
+    entity.depth.z = depth
 end
 
 return PlayerControlSystem

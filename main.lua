@@ -8,6 +8,9 @@ local Camera = require("libs/Camera")
 local anim8 = require("libs/anim8")
 local tiny = require("libs/tiny")
 
+local Vector2, Vector3 = unpack(require('utility/vector'))
+
+
 local Graphics, Depth = unpack(require('src/Graphics'))
 local GraphicsSystem = require("src/GraphicsSystem")
 
@@ -18,7 +21,6 @@ world:addSystem(PlayerControlSystem)
 world:addSystem(GraphicsSystem)
 
 local window_w, window_h, flags = love.window.getMode()
-
 
 local image = love.graphics.newImage("assets/player/TankBody.png")
 local grid = anim8.newGrid(47, 20, image:getWidth(), image:getHeight(), -4, -4, 4)
@@ -42,6 +44,20 @@ function love.load()
     -- Initialize physics world
     love.physics.setMeter(64)
     p_world = love.physics.newWorld(0,0,true)
+
+    local sky = {
+        graphics = Graphics(love.graphics.newImage("assets/background/Sky.png")),
+        body = love.physics.newBody(p_world, 0, 0),
+        depth = Depth(1000, false, false)
+    }
+    world:addEntity(sky)
+
+    local sun = {
+        graphics = Graphics(love.graphics.newImage("assets/background/Sun.png")),
+        body = love.physics.newBody(p_world, 0, 15),
+        depth = Depth(1000, false, false)
+    }
+    world:addEntity(sun)
 
     local road = {
         graphics = Graphics(love.graphics.newImage("assets/background/Road1.png")),
@@ -87,13 +103,14 @@ function love.load()
     player.fixture = love.physics.newFixture(player.body, player.shape)
 
     world:addEntity(player)
-    GraphicsSystem.focus_entity = player
+    --GraphicsSystem.focus_entity = player
 end
 
 function love.update(dt)
     p_world:update(dt)
 
     camera:update(dt)
+    GraphicsSystem.focus_pos = Vector2(camera.x,camera.y)
     camera:follow(player.body:getX(), player.body:getY())
 end
 

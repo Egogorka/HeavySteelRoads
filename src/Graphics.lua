@@ -14,11 +14,15 @@ local Graphics = class("Graphics", {
 
 local Depth = class("Depth", {
     z = 1,
-    scalable = true
+    scalable = true,
 })
 
 function Depth:init(z, scalable)
-    self.z = z; self.scalable = scalable or true
+    self.z = z
+
+    if( scalable ~= nil ) then
+        self.scalable = scalable
+    end
 end
 
 --- To make proper behavioral animations we need to define
