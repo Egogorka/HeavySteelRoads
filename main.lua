@@ -54,7 +54,7 @@ function love.load()
 
     local sun = {
         graphics = Graphics(love.graphics.newImage("assets/background/Sun.png")),
-        body = love.physics.newBody(p_world, 0, 15),
+        body = love.physics.newBody(p_world, 0, 0),
         depth = Depth(1000, false, false)
     }
     world:addEntity(sun)

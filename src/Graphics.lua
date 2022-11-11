@@ -15,13 +15,18 @@ local Graphics = class("Graphics", {
 local Depth = class("Depth", {
     z = 1,
     scalable = true,
+    camera_affected = true
 })
 
-function Depth:init(z, scalable)
+function Depth:init(z, scalable, camera_affected)
     self.z = z
 
     if( scalable ~= nil ) then
         self.scalable = scalable
+    end
+
+    if( camera_affected ~= nil ) then
+        self.camera_affected = camera_affected
     end
 end
 

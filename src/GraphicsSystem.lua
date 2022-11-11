@@ -35,7 +35,15 @@ function GraphicsSystem:process(entity, dt)
     end
 
     animation:update(dt)
-    animation:draw(image, pos[1], pos[2], 0, scale, scale)
+
+    if (entity.depth ~= nil and entity.depth.camera_affected == false ) then
+        camera:detach()
+        pos = position;
+        animation:draw(image, pos[1], pos[2], 0, scale, scale)
+        camera:attach()
+    else
+        animation:draw(image, pos[1], pos[2], 0, scale, scale)
+    end
 end
 
 return GraphicsSystem
