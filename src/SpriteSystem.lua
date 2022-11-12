@@ -6,9 +6,10 @@
 
 local tiny = require("libs/tiny")
 local Vector2 = require("utility/vector")[1]
+local dump = require("utility/dump")
 
 local SpriteSystem = tiny.processingSystem()
-SpriteSystem.filter = tiny.requireAll("sprite", "body")
+SpriteSystem.filter = tiny.filter('(msprite|sprite)&body')
 
 SpriteSystem.focus_z = 1
 SpriteSystem.focus_pos = Vector2(0,0)
@@ -20,29 +21,45 @@ function SpriteSystem:preWrap(dt)
     end
 end
 
-function SpriteSystem:process(entity, dt)
-    local animation, image = entity.sprite:current()
-    local depth = self.focus_z
-    if (entity.depth ~= nil ) then
-        depth = entity.depth.z
-    end
-    local position = Vector2(entity.body:getPosition())
-
-    local scale  = self.focus_z / depth
-    local pos = self.focus_pos - scale * (self.focus_pos - position)
-    if( entity.depth ~= nil and entity.depth.scalable == false ) then
-        scale = 1
-    end
+function SpriteSystem:processSprite(sprite, position, dt, scale)
+    local animation, image = sprite:current()
+    local _scale = scale * sprite.scale
 
     animation:update(dt)
 
-    if (entity.depth ~= nil and entity.depth.camera_affected == false ) then
+    if(sprite.camera_affected == false) then
         camera:detach()
-        pos = position;
-        animation:draw(image, pos[1], pos[2], 0, scale, scale)
+        animation:draw(image, position[1], position[2], 0, _scale, _scale)
         camera:attach()
     else
-        animation:draw(image, pos[1], pos[2], 0, scale, scale)
+        animation:draw(image, position[1], position[2], 0, _scale, _scale)
+    end
+end
+
+function SpriteSystem:processMSprite(msprite, position, dt, scale)
+    for name, sprite in pairs(msprite.sprites) do
+        self:processSprite(sprite.sprite, position + sprite.placement.offset, dt, scale * msprite.scale)
+    end
+end
+
+function SpriteSystem:process(entity, dt)
+    local position = Vector2(entity.body:getPosition())
+    local scale = 1
+
+    -- Handle depth if it's not nil
+    if( entity.depth ~= nil ) then
+        local k = self.focus_z / entity.depth.z
+        position = self.focus_pos - k * ( self.focus_pos - position)
+        if ( entity.depth.scalable ) then
+            scale = scale * k
+        end
+    end
+
+    -- dispatch to processing different cases
+    if(entity.msprite ~= nil) then
+        SpriteSystem:processMSprite(entity.msprite, position, dt, scale)
+    else
+        SpriteSystem:processSprite(entity.sprite, position, dt, scale)
     end
 end
 

@@ -65,6 +65,18 @@ function Vector2.__mul(a, b)
     return out
 end
 
+function Vector2:magsqr()
+    return self[1]*self[1] + self[2]*self[2]
+end
+
+-- Returns the angle from x axis from in range [-pi,pi)
+function Vector2:angle()
+    local phi = math.acos(self[1]/math.sqrt(self:magsqr()))
+    if(self[2] < 0) then
+        phi = -phi
+    end
+    return phi
+end
 
 local Vector3 = Class("Vector3", {0, 0, 0})
 

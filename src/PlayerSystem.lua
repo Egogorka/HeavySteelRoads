@@ -6,15 +6,14 @@
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
 local tiny = require("libs/tiny")
-
+local dump = require('utility/dump')
 
 local PlayerControlSystem = tiny.processingSystem()
-PlayerControlSystem.filter = tiny.requireAll("player", "body", "sprite", "depth")
+PlayerControlSystem.filter = tiny.requireAll("player", "body", "msprite", "depth")
 
-function PlayerControlSystem:process(entity, dt)
+local function keyboard_handle()
     local velocity = Vector2()
     local type = "idle"
-    local depth = entity.depth.z
     if love.keyboard.isDown("up") then
         velocity = velocity + {0,-100}
         type = "move"
@@ -31,6 +30,45 @@ function PlayerControlSystem:process(entity, dt)
         velocity = velocity + {100,0}
         type = "move"
     end
+    return {velocity, type}
+end
+
+local function mouse_handle(entity)
+    local mouse_pos = Vector2(love.mouse.getPosition())
+    local position = Vector2(camera:toCameraCoords(entity.body:getX(), entity.body:getY()))
+    local phi = (mouse_pos - position):angle()/math.pi
+
+    if( phi > 7/8 ) then
+        return "left"
+    end
+    if( phi > 5/8) then
+        return "left_down"
+    end
+    if( phi > 3/8) then
+        return "down"
+    end
+    if( phi > 1/8) then
+        return "right_down"
+    end
+    if( phi > -1/8) then
+        return "right"
+    end
+    if( phi > -3/8) then
+        return "right_up"
+    end
+    if( phi > -5/8) then
+        return "up"
+    end
+    if( phi > -7/8) then
+        return "left_up"
+    end
+    return "left"
+end
+
+function PlayerControlSystem:process(entity, dt)
+    local velocity, type = unpack(keyboard_handle())
+    local orientation = mouse_handle(entity)
+    local depth = entity.depth.z
     if love.keyboard.isDown("q") then
         depth = depth / 0.95
     end
@@ -38,8 +76,11 @@ function PlayerControlSystem:process(entity, dt)
         depth = depth * 0.95
     end
 
+
+
     entity.body:setLinearVelocity(velocity:x(), velocity:y())
-    entity.sprite:set(type)
+    entity.msprite.sprites.body.sprite:set(type)
+    entity.msprite.sprites.tower.sprite:set(orientation)
     entity.depth.z = depth
 end
 

@@ -11,7 +11,7 @@ local tiny = require("libs/tiny")
 local Vector2, Vector3 = unpack(require('utility/vector'))
 
 
-local Sprite, Depth = unpack(require('src/Sprite'))
+local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
 local SpriteSystem = require("src/SpriteSystem")
 
 local PlayerControlSystem = require("src/PlayerSystem")
@@ -22,18 +22,50 @@ world:addSystem(SpriteSystem)
 
 local window_w, window_h, flags = love.window.getMode()
 
-local image = love.graphics.newImage("assets/player/TankBody.png")
-local grid = anim8.newGrid(47, 20, image:getWidth(), image:getHeight(), -4, -4, 4)
-local entity_sprite = Sprite({
+local body_image = love.graphics.newImage("assets/player/TankBody.png")
+local body_grid = anim8.newGrid(47, 20, body_image:getWidth(), body_image:getHeight(), -4, -4, 4)
+local body_sprite = Sprite({
     animations = {
         idle = {
-            anim8.newAnimation(grid(1,1), 1), image
+            anim8.newAnimation(body_grid(1, 1), 1), body_image
         },
         move = {
-            anim8.newAnimation(grid(1,'1-4'), 0.2), image
+            anim8.newAnimation(body_grid(1, '1-4'), 0.2), body_image
         }
     },
     current_animation = "idle"
+})
+
+local tower_image = love.graphics.newImage("assets/player/TankTower.png")
+local tower_grid  = anim8.newGrid(51, 29, tower_image:getWidth(), tower_image:getHeight())
+local tower_sprite = Sprite({
+    animations = {
+        right = {
+            anim8.newAnimation(tower_grid(1,1), 1), tower_image
+        },
+        right_up = {
+            anim8.newAnimation(tower_grid(1,2), 1), tower_image
+        },
+        up = {
+            anim8.newAnimation(tower_grid(1,3), 1), tower_image
+        },
+        left_up = {
+            anim8.newAnimation(tower_grid(1,4), 1), tower_image
+        },
+        left = {
+            anim8.newAnimation(tower_grid(1,5), 1), tower_image
+        },
+        left_down = {
+            anim8.newAnimation(tower_grid(1,6), 1), tower_image
+        },
+        down = {
+            anim8.newAnimation(tower_grid(1,7), 1), tower_image
+        },
+        right_down = {
+            anim8.newAnimation(tower_grid(1,8), 1), tower_image
+        }
+    },
+    current_animation = "right"
 })
 
 function love.load()
@@ -46,16 +78,16 @@ function love.load()
     p_world = love.physics.newWorld(0,0,true)
 
     local sky = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Sky.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Sky.png"), 1, false),
         body = love.physics.newBody(p_world, 0, 0),
-        depth = Depth(1000, false, false)
+        depth = Depth(1, false)
     }
     world:addEntity(sky)
 
     local sun = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Sun.png")),
+        sprite = Sprite(love.graphics.newImage("assets/background/Sun.png"), 1, false),
         body = love.physics.newBody(p_world, 0, 0),
-        depth = Depth(1000, false, false)
+        depth = Depth(1, false)
     }
     world:addEntity(sun)
 
@@ -93,7 +125,16 @@ function love.load()
     --world:addEntity(roadTopBlock)
 
     player = {
-        sprite = entity_sprite,
+        msprite = MSprite({
+            body = {
+                sprite = body_sprite,
+                placement = Placement()
+            },
+            tower = {
+                sprite = tower_sprite,
+                placement = Placement(Vector2(-5,-15))
+            },
+        }),
         player = 1,
         depth = Depth(1)
     }

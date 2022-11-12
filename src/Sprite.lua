@@ -6,63 +6,90 @@
 
 local anim8 = require("libs/anim8")
 local class = require("libs/30log")
+local Vector2, Vector3 = unpack(require("utility/vector"))
+
+-----------------------------------------
+--- Classes
+-----------------------------------------
 
 local Sprite = class("Sprite", {
-    animations = nil,
-    current_animation = nil
+    animations = {
+    },
+    current_animation = "default",
+    scale = 1,
+    camera_affected = true,
 })
 
+---
+--- z - value of depth
+--- scalable - determines if sprite would be scaled with depth
+---
 local Depth = class("Depth", {
     z = 1,
-    scalable = true,
-    camera_affected = true
+    scalable = true
 })
 
-function Depth:init(z, scalable, camera_affected)
+local Placement = class("Placement", {
+    offset = Vector2(0),
+    z_index = 0, -- higher - 'closer' to the screen in terms of order of sprites
+})
+
+-- Short for MultipleSprite
+local MSprite = class("MSprite", {
+    sprites = {
+        --default = {
+        --    sprite = Sprite(love.graphics.newImage("assets/placeholder.png")),
+        --    placement = Placement(),
+        --}
+    },
+    scale = 1
+})
+
+-----------------------------------------
+--- Depth implementation
+-----------------------------------------
+
+function Depth:init(z, scalable)
     self.z = z
 
     if( scalable ~= nil ) then
         self.scalable = scalable
     end
+end
 
-    if( camera_affected ~= nil ) then
-        self.camera_affected = camera_affected
+-----------------------------------------
+--- Placement implementation
+-----------------------------------------
+
+function Placement:init(offset, angle)
+    if(offset ~= nil) then
+        self.offset = offset
+    end
+    if(angle ~= nil) then
+        self.angle = angle
     end
 end
 
---- To make proper behavioral animations we need to define
---- several behaviors and give then as an argument somehow
----
---- For example, we have a player, it has several animations, like idle, run and jump
---- We need to be able to do something like this:
----
----     sprite.set("running");
----
---- and something like
----
----     sprite.set("jump", 1);
----
+-----------------------------------------
+--- Sprite implementation
+-----------------------------------------
 
-
----
----entity_sprite = {
----    animations = {
----        idle = anim8.newAnimation(grid(1,1), 1),
----        move = anim8.newAnimation(grid(1,'1-4'), 0.2)
----    },
----    current = "idle"
----}
----
-function Sprite:init(o)
+function Sprite:init(o, scale, camera_affected)
     if( o["type"] ~= nil and o:type() == "Image") then
         local grid = anim8.newGrid(o:getWidth(), o:getHeight(), o:getWidth(), o:getHeight())
         self.animations = {
-                idle = {anim8.newAnimation(grid(1,1), 1), o}
-            }
-        self.current_animation = "idle"
-    else
+            default = {anim8.newAnimation(grid(1,1), 1), o}
+        }
+        self.current_animation = "default"
+    elseif (o ~= nil) then
         self.current_animation = o.current_animation
         self.animations = o.animations
+    end
+    if(camera_affected ~= nil) then
+        self.camera_affected = camera_affected
+    end
+    if(scale ~= nil) then
+        self.scale = scale
     end
 end
 
@@ -79,4 +106,25 @@ function Sprite:current()
     return temp[1], temp[2]
 end
 
-return {Sprite, Depth}
+-----------------------------------------
+--- MSprite implementation
+-----------------------------------------
+
+function MSprite:init(o, scale)
+    if(o["type"] ~= nil and o:type() == "Image") then
+        self.sprites.default.sprite = Sprite(o)
+        self.sprites.default.placement = Placement()
+    elseif(o ~= nil) then
+        if(o.sprites ~= nil) then
+            self.sprites = o.sprites
+        else
+            self.sprites = o
+        end
+    end
+
+    if(scale ~= nil) then
+        self.scale = scale
+    end
+end
+
+return {Sprite, MSprite, Depth, Placement}
