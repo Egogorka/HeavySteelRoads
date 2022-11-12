@@ -37,7 +37,8 @@ function SpriteSystem:processSprite(sprite, position, dt, scale)
 end
 
 function SpriteSystem:processMSprite(msprite, position, dt, scale)
-    for name, sprite in pairs(msprite.sprites) do
+    for _, key in ipairs(msprite.sprites_order) do
+        local sprite = msprite.sprites[key]
         self:processSprite(sprite.sprite, position + sprite.placement.offset, dt, scale * msprite.scale)
     end
 end

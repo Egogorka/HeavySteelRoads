@@ -128,11 +128,11 @@ function love.load()
         msprite = MSprite({
             body = {
                 sprite = body_sprite,
-                placement = Placement()
+                placement = Placement(Vector2(), 1)
             },
             tower = {
                 sprite = tower_sprite,
-                placement = Placement(Vector2(-5,-15))
+                placement = Placement(Vector2(-5,-15), 2)
             },
         }),
         player = 1,

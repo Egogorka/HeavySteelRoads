@@ -37,11 +37,12 @@ local Placement = class("Placement", {
 -- Short for MultipleSprite
 local MSprite = class("MSprite", {
     sprites = {
-        --default = {
-        --    sprite = Sprite(love.graphics.newImage("assets/placeholder.png")),
-        --    placement = Placement(),
-        --}
+        default = {
+            sprite = Sprite(love.graphics.newImage("assets/placeholder.png")),
+            placement = Placement(),
+        }
     },
+    sprites_order = {"default"},
     scale = 1
 })
 
@@ -61,12 +62,12 @@ end
 --- Placement implementation
 -----------------------------------------
 
-function Placement:init(offset, angle)
+function Placement:init(offset, z_index)
     if(offset ~= nil) then
         self.offset = offset
     end
-    if(angle ~= nil) then
-        self.angle = angle
+    if(z_index ~= nil) then
+        self.z_index = z_index
     end
 end
 
@@ -110,6 +111,24 @@ end
 --- MSprite implementation
 -----------------------------------------
 
+local function my_sort(t, ord)
+    -- Construct table from keys and values => {key, value}
+    local temp = {}
+    for k, v in pairs(t) do
+        table.insert(temp, {key=k, value=v})
+    end
+    table.sort(temp, function(a, b) return ord(a.value, b.value) end)
+    local out = {}
+    for i, v in ipairs(temp) do
+        table.insert(out, i, v.key)
+    end
+    return out
+end
+
+function MSprite:sort()
+    self.sprites_order = my_sort(self.sprites, function(a, b) return a.placement.z_index < b.placement.z_index end)
+end
+
 function MSprite:init(o, scale)
     if(o["type"] ~= nil and o:type() == "Image") then
         self.sprites.default.sprite = Sprite(o)
@@ -125,6 +144,9 @@ function MSprite:init(o, scale)
     if(scale ~= nil) then
         self.scale = scale
     end
+
+    -- Presort sprites according to their placement z_index
+    self:sort()
 end
 
 return {Sprite, MSprite, Depth, Placement}
