@@ -12,26 +12,36 @@ local anim8 = require("libs/anim8")
 local tiny = require("libs/tiny")
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
-
+local window_w, window_h, flags = love.window.getMode()
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
 local SpriteSystem = require("src/SpriteSystem")
-
 local PlayerControlSystem = require("src/PlayerSystem")
+local ShapeSystem = require("src/ShapeDebug")
 
 local world = tiny.world()
 world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
+world:addSystem(ShapeSystem)
 
-local window_w, window_h, flags = love.window.getMode()
 
 local player
 local p_world = love.physics.newWorld(0,0,true)
 
-ForestLevel.load = function()
+
+local sprites = {}
+local animations = {}
+local load_sprites = function()
+
+    sprites.sky = Sprite(love.graphics.newImage("assets/background/Sky.png"), 1, false)
+    sprites.sun = Sprite(love.graphics.newImage("assets/background/Sun.png"), 1, false)
+    sprites.road = Sprite(love.graphics.newImage("assets/background/Road1.png"))
+    sprites.forest_front = Sprite(love.graphics.newImage("assets/background/Forest.png"))
+    sprites.forest_back = Sprite(love.graphics.newImage("assets/background/Forest4.png"))
+
     local body_image = love.graphics.newImage("assets/player/TankBody.png")
     local body_grid = anim8.newGrid(47, 20, body_image:getWidth(), body_image:getHeight(), -4, -4, 4)
-    local body_sprite = Sprite({
+    animations.body = Sprite({
         animations = {
             idle = {
                 anim8.newAnimation(body_grid(1, 1), 1), body_image
@@ -45,7 +55,7 @@ ForestLevel.load = function()
 
     local tower_image = love.graphics.newImage("assets/player/TankTower.png")
     local tower_grid  = anim8.newGrid(51, 29, tower_image:getWidth(), tower_image:getHeight())
-    local tower_sprite = Sprite({
+    animations.tower = Sprite({
         animations = {
             right = {
                 anim8.newAnimation(tower_grid(1,1), 1), tower_image
@@ -75,61 +85,67 @@ ForestLevel.load = function()
         current_animation = "right"
     })
 
+end
+
+ForestLevel.load = function()
+    load_sprites()
+
     local sky = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Sky.png"), 1, false),
+        sprite = sprites.sky,
         body = love.physics.newBody(p_world, 0, 0),
         depth = Depth(1, false)
     }
     world:addEntity(sky)
 
     local sun = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Sun.png"), 1, false),
+        sprite = sprites.sun,
         body = love.physics.newBody(p_world, 0, 0),
         depth = Depth(1, false)
     }
     world:addEntity(sun)
 
     local road = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Road1.png")),
+        sprite = sprites.road,
         body = love.physics.newBody(p_world, 0, window_h/2)
     }
     world:addEntity(road)
+    local roadTopBlock = {
+        body = love.physics.newBody(p_world, window_w/2, window_h/2 - 10/2),
+        shape = love.physics.newRectangleShape(window_w, 10)
+    }
+    roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
+    world:addEntity(roadTopBlock)
+
+
 
     local forest_back2 = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Forest4.png")),
+        sprite = sprites.forest_back,
         body = love.physics.newBody(p_world, -10, window_h/2 - 86 - 20 - 20),
         depth = Depth(1.4, false)
     }
     world:addEntity(forest_back2)
 
     local forest_back1 = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Forest4.png")),
+        sprite = sprites.forest_back,
         body = love.physics.newBody(p_world, 0, window_h/2 - 86 - 20),
         depth = Depth(1.2, false)
     }
     world:addEntity(forest_back1)
 
     local forest_front = {
-        sprite = Sprite(love.graphics.newImage("assets/background/Forest.png")),
+        sprite = sprites.forest_front,
         body = love.physics.newBody(p_world, 0, window_h/2 - 166)
     }
     world:addEntity(forest_front)
 
-    --local roadTopBlock = {
-    --    body = love.physics.newBody(p_world, window_w/2, window_h/2 - 10/2),
-    --    shape = love.physics.newRectangleShape(window_w, 10)
-    --}
-    --roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
-    --world:addEntity(roadTopBlock)
-
     player = {
         msprite = MSprite({
             body = {
-                sprite = body_sprite,
+                sprite = animations.body,
                 placement = Placement(Vector2(), 1)
             },
             tower = {
-                sprite = tower_sprite,
+                sprite = animations.tower,
                 placement = Placement(Vector2(-5,-15), 2)
             },
         }),
@@ -138,7 +154,8 @@ ForestLevel.load = function()
     }
 
     player.body = love.physics.newBody(p_world, 100, 100, "dynamic")
-    player.shape = love.physics.newRectangleShape(50,50)
+    player.body:setFixedRotation(true)
+    player.shape = love.physics.newPolygonShape(0,0, 50,0, 50,20, 0,20 )
     player.fixture = love.physics.newFixture(player.body, player.shape)
 
     world:addEntity(player)
