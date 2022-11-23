@@ -76,21 +76,25 @@ end
 -----------------------------------------
 
 function Sprite:init(o, scale, camera_affected)
+    if(camera_affected ~= nil) then
+        self.camera_affected = camera_affected
+    end
+    if(scale ~= nil) then
+        self.scale = scale
+    end
+    if not o then
+        return
+    end
+
     if( o["type"] ~= nil and o:type() == "Image") then
         local grid = anim8.newGrid(o:getWidth(), o:getHeight(), o:getWidth(), o:getHeight())
         self.animations = {
             default = {anim8.newAnimation(grid(1,1), 1), o}
         }
         self.current_animation = "default"
-    elseif (o ~= nil) then
+    else
         self.current_animation = o.current_animation
         self.animations = o.animations
-    end
-    if(camera_affected ~= nil) then
-        self.camera_affected = camera_affected
-    end
-    if(scale ~= nil) then
-        self.scale = scale
     end
 end
 
@@ -105,6 +109,26 @@ end
 function Sprite:current()
     local temp = self.animations[self.current_animation]
     return temp[1], temp[2]
+end
+
+function Sprite:size()
+    local anim = self:current()
+    local w, h = anim:getDimensions()
+    return Vector2(w, h)
+end
+
+function Sprite:clone()
+    local out = Sprite()
+    out.camera_affected = self.camera_affected
+    out.scale = self.scale
+    out.current_animation = self.current_animation
+    out.animations = {}
+
+    for k, v in pairs(self.animations) do
+        out.animations[k] = {v[1]:clone(), v[2]}
+    end
+
+    return out
 end
 
 -----------------------------------------

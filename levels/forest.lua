@@ -90,12 +90,20 @@ end
 ForestLevel.load = function()
     load_sprites()
 
-    local sky = {
+    -- Back-Background --
+    local sky1 = {
         sprite = sprites.sky,
         body = love.physics.newBody(p_world, 0, 0),
         depth = Depth(1, false)
     }
-    world:addEntity(sky)
+    world:addEntity(sky1)
+    local sky2 = {
+        sprite = sprites.sky,
+        body = love.physics.newBody(p_world, sprites.sky:size()[1], 0),
+        depth = Depth(1, false)
+    }
+    world:addEntity(sky2)
+
 
     local sun = {
         sprite = sprites.sun,
@@ -104,39 +112,39 @@ ForestLevel.load = function()
     }
     world:addEntity(sun)
 
-    local road = {
-        sprite = sprites.road,
-        body = love.physics.newBody(p_world, 0, window_h/2)
-    }
-    world:addEntity(road)
-    local roadTopBlock = {
-        body = love.physics.newBody(p_world, window_w/2, window_h/2 - 10/2),
-        shape = love.physics.newRectangleShape(window_w, 10)
-    }
-    roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
-    world:addEntity(roadTopBlock)
+    -- Background --
+    for i=0,10 do
+
+        local road = { sprite = sprites.road }
+        road.body = love.physics.newBody(p_world, i * road.sprite:size()[1], window_h/2)
+
+        world:addEntity(road)
+        local roadTopBlock = {
+            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 - 10/2),
+            shape = love.physics.newRectangleShape(window_w, 10)
+        }
+        roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
+        world:addEntity(roadTopBlock)
+        local roadBottomBlock = {
+            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 + road.sprite:size()[2] + 10/2),
+            shape = love.physics.newRectangleShape(window_w, 10)
+        }
+        roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
+        world:addEntity(roadBottomBlock)
 
 
+        local forest_back2 = { sprite = sprites.forest_back, depth = Depth(1.4, false) }
+        forest_back2.body = love.physics.newBody(p_world, -10 + i * sprites.forest_back:size()[1]*1.4, window_h/2 - 86 - 20 - 20),
+        world:addEntity(forest_back2)
 
-    local forest_back2 = {
-        sprite = sprites.forest_back,
-        body = love.physics.newBody(p_world, -10, window_h/2 - 86 - 20 - 20),
-        depth = Depth(1.4, false)
-    }
-    world:addEntity(forest_back2)
+        local forest_back1 = { sprite = sprites.forest_back, depth = Depth(1.2, false) }
+        forest_back1.body = love.physics.newBody(p_world, 0 + i * sprites.forest_back:size()[1]*1.2, window_h/2 - 86 - 20)
+        world:addEntity(forest_back1)
 
-    local forest_back1 = {
-        sprite = sprites.forest_back,
-        body = love.physics.newBody(p_world, 0, window_h/2 - 86 - 20),
-        depth = Depth(1.2, false)
-    }
-    world:addEntity(forest_back1)
-
-    local forest_front = {
-        sprite = sprites.forest_front,
-        body = love.physics.newBody(p_world, 0, window_h/2 - 166)
-    }
-    world:addEntity(forest_front)
+        local forest_front = { sprite = sprites.forest_front, }
+        forest_front.body = love.physics.newBody(p_world, 0 + i * sprites.forest_front:size()[1], window_h/2 - 166)
+        world:addEntity(forest_front)
+    end
 
     player = {
         msprite = MSprite({
@@ -153,12 +161,32 @@ ForestLevel.load = function()
         depth = Depth(1)
     }
 
-    player.body = love.physics.newBody(p_world, 100, 100, "dynamic")
-    player.body:setFixedRotation(true)
-    player.shape = love.physics.newPolygonShape(0,0, 50,0, 50,20, 0,20 )
-    player.fixture = love.physics.newFixture(player.body, player.shape)
+    local player2 = {
+        msprite = MSprite({
+            body = {
+                sprite = animations.body:clone(),
+                placement = Placement(Vector2(), 1)
+            },
+            tower = {
+                sprite = animations.tower:clone(),
+                placement = Placement(Vector2(-5,-15), 2)
+            },
+        }),
+        depth = Depth(1)
+    }
 
+    player.body = love.physics.newBody(p_world, 300, window_h/2 + sprites.road:size()[2]/2, "dynamic")
+    player.body:setFixedRotation(true)
+    player.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
+    player.fixture = love.physics.newFixture(player.body, player.shape)
     world:addEntity(player)
+
+    player2.body = love.physics.newBody(p_world, 400, window_h/2 + sprites.road:size()[2]/2, "dynamic")
+    player2.body:setFixedRotation(true)
+    player2.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
+    player2.fixture = love.physics.newFixture(player.body, player.shape)
+    world:addEntity(player2)
+
     --SpriteSystem.focus_entity = player
 end
 
@@ -167,7 +195,7 @@ ForestLevel.update = function(dt)
 
     camera:update(dt)
     SpriteSystem.focus_pos = Vector2(camera.x,camera.y)
-    camera:follow(player.body:getX(), player.body:getY())
+    camera:follow(player.body:getX(), 40)
 end
 
 ForestLevel.draw = function(dt)
