@@ -24,6 +24,16 @@ function Vector2:init(a, b)
     end
 end
 
+function Vector2.__tostring(v)
+    return 'Vector<'..tostring(v[1])..','..tostring(v[2])..'>'
+end
+
+function Vector2.fromPolar(r, phi)
+    local x = r * math.cos(phi)
+    local y = r * math.sin(phi)
+    return Vector2(x,y)
+end
+
 function Vector2:x()
     return self[1]
 end
@@ -65,8 +75,26 @@ function Vector2.__mul(a, b)
     return out
 end
 
+local function inverse(v)
+    return Vector2(1/v[1], 1/v[2])
+end
+
+function Vector2.__div(a, b)
+    local inv;
+    if type(b) == "table" then
+        inv = inverse(b)
+    else
+        inv = 1/b
+    end
+    return a * inv
+end
+
 function Vector2:magsqr()
     return self[1]*self[1] + self[2]*self[2]
+end
+
+function Vector2:mag()
+    return math.sqrt(self:magsqr())
 end
 
 -- Returns the angle from x axis from in range [-pi,pi)
@@ -77,6 +105,8 @@ function Vector2:angle()
     end
     return phi
 end
+
+
 
 local Vector3 = Class("Vector3", {0, 0, 0})
 

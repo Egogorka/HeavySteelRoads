@@ -21,7 +21,7 @@ function SpriteSystem:preWrap(dt)
     end
 end
 
-function SpriteSystem:processSprite(sprite, position, dt, scale)
+function SpriteSystem:processSprite(sprite, position, dt, scale, angle)
     local animation, image = sprite:current()
     local _scale = scale * sprite.scale
 
@@ -29,22 +29,23 @@ function SpriteSystem:processSprite(sprite, position, dt, scale)
 
     if(sprite.camera_affected == false) then
         camera:detach()
-        animation:draw(image, position[1], position[2], 0, _scale, _scale)
+        animation:draw(image, position[1], position[2], angle, _scale, _scale)
         camera:attach()
     else
-        animation:draw(image, position[1], position[2], 0, _scale, _scale)
+        animation:draw(image, position[1], position[2], angle, _scale, _scale)
     end
 end
 
-function SpriteSystem:processMSprite(msprite, position, dt, scale)
+function SpriteSystem:processMSprite(msprite, position, dt, scale, angle)
     for _, key in ipairs(msprite.sprites_order) do
         local sprite = msprite.sprites[key]
-        self:processSprite(sprite.sprite, position + sprite.placement.offset, dt, scale * msprite.scale)
+        self:processSprite(sprite.sprite, position + sprite.placement.offset, dt, scale * msprite.scale, angle)
     end
 end
 
 function SpriteSystem:process(entity, dt)
     local position = Vector2(entity.body:getPosition())
+    local angle = entity.body:getAngle()
     local scale = 1
 
     -- Handle depth if it's not nil
@@ -58,9 +59,9 @@ function SpriteSystem:process(entity, dt)
 
     -- dispatch to processing different cases
     if(entity.msprite ~= nil) then
-        SpriteSystem:processMSprite(entity.msprite, position, dt, scale)
+        SpriteSystem:processMSprite(entity.msprite, position, dt, scale, angle)
     else
-        SpriteSystem:processSprite(entity.sprite, position, dt, scale)
+        SpriteSystem:processSprite(entity.sprite, position, dt, scale, angle)
     end
 end
 

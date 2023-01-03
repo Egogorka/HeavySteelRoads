@@ -5,7 +5,7 @@
 ---
 
 local Camera = require("libs/Camera")
-ForestLevel = require("levels/forest")
+local ForestLevel = require("levels/forest")
 
 function love.load()
     camera = Camera()
@@ -25,3 +25,14 @@ function love.draw()
     ForestLevel.draw(dt)
 end
 
+function love.keypressed(key, scancode, is_repeat)
+    if ForestLevel.keypressed then
+        ForestLevel.keypressed(key, scancode, is_repeat)
+    end
+end
+
+function love.keyreleased(key, scancode)
+    if ForestLevel.keyreleased then
+        ForestLevel.keyreleased(key, scancode)
+    end
+end

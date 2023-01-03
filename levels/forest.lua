@@ -16,18 +16,21 @@ local window_w, window_h, flags = love.window.getMode()
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
 local SpriteSystem = require("src/SpriteSystem")
-local PlayerControlSystem = require("src/PlayerSystem")
+--local PlayerControlSystem = require("src/PlayerSystem")
 local ShapeSystem = require("src/ShapeDebug")
 
+local TankBehavior = require("src/behavior/TankBehavior")
+local PlayerController = require("src/controllers/PlayerController")
+
 local world = tiny.world()
-world:addSystem(PlayerControlSystem)
+--world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
 world:addSystem(ShapeSystem)
-
+world:addSystem(TankBehavior)
+world:addSystem(PlayerController)
 
 local player
 local p_world = love.physics.newWorld(0,0,true)
-
 
 local sprites = {}
 local animations = {}
@@ -157,9 +160,18 @@ ForestLevel.load = function()
                 placement = Placement(Vector2(-5,-15), 2)
             },
         }),
+        tank = {
+            aim = nil
+        },
         player = 1,
         depth = Depth(1)
     }
+
+    player.body = love.physics.newBody(p_world, 300, window_h/2 + sprites.road:size()[2]/2, "dynamic")
+    player.body:setFixedRotation(true)
+    player.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
+    player.fixture = love.physics.newFixture(player.body, player.shape)
+    world:addEntity(player)
 
     local player2 = {
         msprite = MSprite({
@@ -172,14 +184,11 @@ ForestLevel.load = function()
                 placement = Placement(Vector2(-5,-15), 2)
             },
         }),
+        tank = {
+            aim = nil
+        },
         depth = Depth(1)
     }
-
-    player.body = love.physics.newBody(p_world, 300, window_h/2 + sprites.road:size()[2]/2, "dynamic")
-    player.body:setFixedRotation(true)
-    player.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
-    player.fixture = love.physics.newFixture(player.body, player.shape)
-    world:addEntity(player)
 
     player2.body = love.physics.newBody(p_world, 400, window_h/2 + sprites.road:size()[2]/2, "dynamic")
     player2.body:setFixedRotation(true)
@@ -202,6 +211,20 @@ ForestLevel.draw = function(dt)
     camera:attach()
     world:update(dt)
     camera:detach()
+end
+
+ForestLevel.mousepressed = function(x, y, button, istouch, presses)
+    --- Just need to tell my brain that I need to make it at least somehow, not perfect at the start
+
+
+end
+
+function ForestLevel.keypressed(key, scancode, is_repeat)
+    PlayerController:keypressed(key, scancode, is_repeat)
+end
+
+function ForestLevel.keyreleased(key, scancode)
+    PlayerController:keyreleased(key, scancode)
 end
 
 return ForestLevel
