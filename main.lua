@@ -6,6 +6,12 @@
 
 local Camera = require("libs/Camera")
 local ForestLevel = require("levels/forest")
+local MainMenu = require("levels/main_menu")
+
+function CHANGE_LEVEL(level)
+    CURRENT_LEVEL = level
+    CURRENT_LEVEL.load()
+end
 
 function love.load()
     camera = Camera()
@@ -13,26 +19,28 @@ function love.load()
     camera.scale = 1.5
 
     love.physics.setMeter(64)
-    ForestLevel.load()
+
+    CURRENT_LEVEL = ForestLevel;
+    CURRENT_LEVEL.load()
 end
 
 function love.update(dt)
-    ForestLevel.update(dt)
+    CURRENT_LEVEL.update(dt)
 end
 
 function love.draw()
     local dt = love.timer.getDelta()
-    ForestLevel.draw(dt)
+    CURRENT_LEVEL.draw(dt)
 end
 
 function love.keypressed(key, scancode, is_repeat)
-    if ForestLevel.keypressed then
-        ForestLevel.keypressed(key, scancode, is_repeat)
+    if CURRENT_LEVEL.keypressed then
+        CURRENT_LEVEL.keypressed(key, scancode, is_repeat)
     end
 end
 
 function love.keyreleased(key, scancode)
-    if ForestLevel.keyreleased then
-        ForestLevel.keyreleased(key, scancode)
+    if CURRENT_LEVEL.keyreleased then
+        CURRENT_LEVEL.keyreleased(key, scancode)
     end
 end

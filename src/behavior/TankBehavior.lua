@@ -11,10 +11,13 @@
 
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
+local dump = require("utility/dump")
+
 local Sprite = require("src/Sprite")[1]
+local CategoryManager = require("src/CategoryManager")
+
 local tiny = require("libs/tiny")
 
-local dump = require("utility/dump")
 
 local TankBehavior = tiny.processingSystem()
 TankBehavior.filter = tiny.requireAll("tank", "body", "msprite")
@@ -127,9 +130,11 @@ function TankBehavior:_bullet(entity)
         sprite = Sprite(love.graphics.newImage("assets/player/Bullet1.png")),
         shape = love.physics.newRectangleShape(10, 10)
     }
-    bullet.body = love.physics.newBody(p_world, x, y, "dynamic")
+    bullet.body = love.physics.newBody(p_world, x+15, y, "kinematic")
     bullet.body:setFixedRotation(true)
     bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
+
+    CategoryManager.setBullet(bullet.fixture, CategoryManager.categories.player_bullets)
 
     print(dump(bullet, 2, 2))
     world:addEntity(bullet)
@@ -153,6 +158,7 @@ function TankBehavior:shoot(entity, dt)
 
     local bullet = self:_bullet(entity)
     bullet.body:setLinearVelocity(vel[1], vel[2])
+    bullet.body:setAngle(dx:angle())
 end
 
 return TankBehavior

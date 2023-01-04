@@ -4,28 +4,31 @@
 --- DateTime: 16.10.2022 17:40
 ---
 
-local Scene = require("src/SceneManager")
-
-local ForestLevel = Scene()
-
 local anim8 = require("libs/anim8")
 local tiny = require("libs/tiny")
+
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
 local window_w, window_h, flags = love.window.getMode()
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
+local CategoryManager = require("src/CategoryManager")
+
 local SpriteSystem = require("src/SpriteSystem")
 --local PlayerControlSystem = require("src/PlayerSystem")
 local ShapeSystem = require("src/ShapeDebug")
-
 local TankBehavior = require("src/behavior/TankBehavior")
 local PlayerController = require("src/controllers/PlayerController")
+
+
+local Scene = require("src/SceneManager")
+local ForestLevel = Scene()
+
 
 local world = tiny.world()
 --world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
-world:addSystem(ShapeSystem)
+--world:addSystem(ShapeSystem)
 world:addSystem(TankBehavior)
 world:addSystem(PlayerController)
 
@@ -135,6 +138,8 @@ ForestLevel.load = function()
         roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
         world:addEntity(roadBottomBlock)
 
+        CategoryManager.setBulletproof(roadTopBlock.fixture)
+        CategoryManager.setBulletproof(roadBottomBlock.fixture)
 
         local forest_back2 = { sprite = sprites.forest_back, depth = Depth(1.4, false) }
         forest_back2.body = love.physics.newBody(p_world, -10 + i * sprites.forest_back:size()[1]*1.4, window_h/2 - 86 - 20 - 20),
@@ -172,6 +177,9 @@ ForestLevel.load = function()
     player.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
     player.fixture = love.physics.newFixture(player.body, player.shape)
     world:addEntity(player)
+
+    print(CategoryManager.categories.player)
+    CategoryManager.setObject(player.fixture, CategoryManager.categories.player)
 
     local player2 = {
         msprite = MSprite({

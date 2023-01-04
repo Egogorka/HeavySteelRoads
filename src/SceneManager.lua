@@ -9,7 +9,9 @@ local class = require("libs/30log")
 local Scene = class("Scene", {
     load = function()  end,
     update = function(dt)  end,
-    draw = function(dt)  end
+    draw = function(dt)  end,
+    keypressed = function(key, scancode, is_repeat) end,
+    keyreleased = function(key, scancode) end
 })
 
 return Scene
