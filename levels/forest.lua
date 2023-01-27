@@ -15,8 +15,7 @@ local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
 local CategoryManager = require("src/CategoryManager")
 
 local SpriteSystem = require("src/SpriteSystem")
---local PlayerControlSystem = require("src/PlayerSystem")
-local ShapeSystem = require("src/ShapeDebug")
+local ShapeDebug = require("src/ShapeDebug")
 local TankBehavior = require("src/behavior/TankBehavior")
 local PlayerController = require("src/controllers/PlayerController")
 
@@ -37,7 +36,7 @@ local p_world = love.physics.newWorld(0,0,true)
 
 local sprites = {}
 local animations = {}
-local load_sprites = function()
+local function load_sprites()
 
     sprites.sky = Sprite(love.graphics.newImage("assets/background/Sky.png"), 1, false)
     sprites.sun = Sprite(love.graphics.newImage("assets/background/Sun.png"), 1, false)
@@ -93,7 +92,7 @@ local load_sprites = function()
 
 end
 
-ForestLevel.load = function()
+function ForestLevel.load()
     load_sprites()
 
     -- Back-Background --
@@ -207,7 +206,7 @@ ForestLevel.load = function()
     --SpriteSystem.focus_entity = player
 end
 
-ForestLevel.update = function(dt)
+function ForestLevel.update(dt)
     p_world:update(dt)
 
     camera:update(dt)
@@ -215,13 +214,13 @@ ForestLevel.update = function(dt)
     camera:follow(player.body:getX(), 40)
 end
 
-ForestLevel.draw = function(dt)
+function ForestLevel.draw(dt)
     camera:attach()
     world:update(dt)
     camera:detach()
 end
 
-ForestLevel.mousepressed = function(x, y, button, istouch, presses)
+function ForestLevel.mousepressed(x, y, button, istouch, presses)
     --- Just need to tell my brain that I need to make it at least somehow, not perfect at the start
 
 
