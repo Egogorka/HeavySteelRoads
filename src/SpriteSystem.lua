@@ -21,25 +21,35 @@ function SpriteSystem:preWrap(dt)
     end
 end
 
-function SpriteSystem:processSprite(sprite, position, dt, scale, angle)
+function SpriteSystem:processSprite(sprite, dt, position, depth, scale, angle)
     local animation, image = sprite:current()
-    local _scale = scale * sprite.scale
+    local pos = position + sprite.offset
 
     animation:update(dt)
 
+    if( depth ~= nil ) then
+        local k = self.focus_z / depth.z
+        pos = self.focus_pos - k * ( self.focus_pos - pos)
+        if ( depth.scalable ) then
+            scale = scale * k
+        end
+    end
+    scale = scale * sprite.scale
+
     if(sprite.camera_affected == false) then
         camera:detach()
-        animation:draw(image, position[1], position[2], angle, _scale, _scale)
+        animation:draw(image, pos[1], pos[2], angle, scale, scale)
         camera:attach()
     else
-        animation:draw(image, position[1], position[2], angle, _scale, _scale)
+        animation:draw(image, pos[1], pos[2], angle, scale, scale)
     end
 end
 
-function SpriteSystem:processMSprite(msprite, position, dt, scale, angle)
-    for _, key in ipairs(msprite.sprites_order) do
-        local sprite = msprite.sprites[key]
-        self:processSprite(sprite.sprite, position + sprite.placement.offset, dt, scale * msprite.scale, angle)
+function SpriteSystem:processMSprite(msprite, dt, position, depth, scale, angle)
+    for _, key in ipairs(msprite.sprites_z_order) do
+        local sprite = msprite.sprites[key].sprite
+        local placement = msprite.sprites[key].placement
+        self:processSprite(sprite, dt, position + placement.offset, depth, scale * msprite.scale, angle)
     end
 end
 
@@ -48,20 +58,11 @@ function SpriteSystem:process(entity, dt)
     local angle = entity.body:getAngle()
     local scale = 1
 
-    -- Handle depth if it's not nil
-    if( entity.depth ~= nil ) then
-        local k = self.focus_z / entity.depth.z
-        position = self.focus_pos - k * ( self.focus_pos - position)
-        if ( entity.depth.scalable ) then
-            scale = scale * k
-        end
-    end
-
     -- dispatch to processing different cases
     if(entity.msprite ~= nil) then
-        SpriteSystem:processMSprite(entity.msprite, position, dt, scale, angle)
+        SpriteSystem:processMSprite(entity.msprite, dt, position, entity.depth, scale, angle)
     else
-        SpriteSystem:processSprite(entity.sprite, position, dt, scale, angle)
+        SpriteSystem:processSprite(entity.sprite, dt, position, entity.depth, scale, angle)
     end
 end
 

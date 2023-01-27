@@ -12,14 +12,6 @@ local Vector2, Vector3 = unpack(require("utility/vector"))
 --- Classes
 -----------------------------------------
 
-local Sprite = class("Sprite", {
-    animations = {
-    },
-    current_animation = "default",
-    scale = 1,
-    camera_affected = true,
-})
-
 ---
 --- z - value of depth
 --- scalable - determines if sprite would be scaled with depth
@@ -30,19 +22,25 @@ local Depth = class("Depth", {
 })
 
 local Placement = class("Placement", {
-    offset = Vector2(0),
+    offset = Vector2(0,0),
     z_index = 0, -- higher - 'closer' to the screen in terms of order of sprites
+})
+
+local Sprite = class("Sprite", {
+    animations = {},
+    current_animation = "default",
+    scale = 1,
+
+    offset = Vector2(),
+    camera_affected = true,
 })
 
 -- Short for MultipleSprite
 local MSprite = class("MSprite", {
     sprites = {
-        default = {
-            sprite = Sprite(love.graphics.newImage("assets/placeholder.png")),
-            placement = Placement(),
-        }
+        default = Sprite(love.graphics.newImage("assets/placeholder.png")),
     },
-    sprites_order = {"default"},
+    sprites_z_order = {"default"}, --- sprites Z order
     scale = 1
 })
 
@@ -75,13 +73,17 @@ end
 --- Sprite implementation
 -----------------------------------------
 
-function Sprite:init(o, scale, camera_affected)
-    if(camera_affected ~= nil) then
-        self.camera_affected = camera_affected
+function Sprite:init(o, scale, camera_affected, offset)
+    if(placement ~= nil) then
+        self.offset = offset
     end
     if(scale ~= nil) then
         self.scale = scale
     end
+    if(camera_affected ~= nil) then
+        self.camera_affected = camera_affected
+    end
+
     if not o then
         return
     end
@@ -123,6 +125,7 @@ function Sprite:clone()
     out.scale = self.scale
     out.current_animation = self.current_animation
     out.animations = {}
+    out.offset = self.offset
 
     for k, v in pairs(self.animations) do
         out.animations[k] = {v[1]:clone(), v[2]}
@@ -150,7 +153,7 @@ local function my_sort(t, ord)
 end
 
 function MSprite:sort()
-    self.sprites_order = my_sort(self.sprites, function(a, b) return a.placement.z_index < b.placement.z_index end)
+    self.sprites_z_order = my_sort(self.sprites, function(a, b) return a.placement.z_index < b.placement.z_index end)
 end
 
 function MSprite:init(o, scale)
