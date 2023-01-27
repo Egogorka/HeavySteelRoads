@@ -14,15 +14,13 @@ local PlayerController = tiny.processingSystem()
 PlayerController.filter = tiny.requireAll("tank", "player")
 
 function PlayerController.onAddToWorld(system, world)
-    system.key_pressed = 0
-    system.key_not_processed = 0
     system.keys = {
         up = false,
         down = false,
         left = false,
         right = false,
-        none = true
     }
+    system.keys_changed = false
 end
 
 local key_table = {
@@ -42,11 +40,8 @@ function PlayerController:keypressed(key, scancode, is_repeat)
         return
     end
 
-    self.key_pressed = self.key_pressed + 1
-    self.key_not_processed = self.key_not_processed + 1
-
     self.keys[key] = true
-    self.keys.none = false
+    self.keys_changed = true
 end
 
 
@@ -56,30 +51,29 @@ function PlayerController:keyreleased(key, scancode)
         return
     end
 
-    self.key_pressed = self.key_pressed - 1
-
     self.keys[key] = false
-    if self.key_pressed == 0 then
-        self.keys.none = true
-    end
+    self.keys_changed = true
 end
 
 
 function PlayerController:_process_keyboard(entity, dt)
-    if self.keys.none then
-        entity.tank.messages:push({"stop"})
-        self.keys.none = false
+
+    if not self.keys_changed then
+        return
     end
-    if self.key_not_processed ~= 0 then
-        local velocity = Vector2()
-        for key in pairs(self.keys) do
-            if self.keys[key] and key ~= "any" then
-                velocity = velocity + key_table[key]
-                self.keys[key] = false
-                self.key_not_processed = self.key_not_processed - 1
-            end
+    self.keys_changed = false
+
+    local velocity = Vector2()
+    for key in pairs(self.keys) do
+        if self.keys[key] then
+            velocity = velocity + key_table[key]
         end
-        entity.tank.messages:push({"move", velocity})
+    end
+
+    if velocity == Vector2(0,0) then
+        entity.tank.messages:push({"stop"});
+    else
+        entity.tank.messages:push({"move", velocity});
     end
 end
 

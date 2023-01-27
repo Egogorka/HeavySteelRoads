@@ -42,6 +42,10 @@ function Vector2:y()
     return self[2]
 end
 
+function Vector2.__eq(v1, v2)
+    return v1[1] == v2[1] and v1[2] == v2[2]
+end
+
 function Vector2.__add(v1, v2)
     local out = Vector2()
     out[1] = v1[1] + v2[1]

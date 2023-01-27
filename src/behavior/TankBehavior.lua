@@ -65,7 +65,7 @@ end
 
 ---@param vel - Vector2
 function TankBehavior:move(entity, dt, vel)
-    local velocity = vel / vel:mag() * 100
+    local velocity = vel * 100
 
     --entity.tank.is_moving = true
     entity.msprite.sprites.body.sprite:set("move")
@@ -136,7 +136,7 @@ function TankBehavior:_bullet(entity)
 
     CategoryManager.setBullet(bullet.fixture, CategoryManager.categories.player_bullets)
 
-    print(dump(bullet, 2, 2))
+    --print(dump(bullet, 2, 2))
     world:addEntity(bullet)
     return bullet
 end
@@ -154,7 +154,7 @@ function TankBehavior:shoot(entity, dt)
     end
     local vel = 500 * dx / dx:mag()
 
-    print(dump(vel, 2, 2))
+    --print(dump(vel, 2, 2))
 
     local bullet = self:_bullet(entity)
     bullet.body:setLinearVelocity(vel[1], vel[2])
