@@ -5,22 +5,35 @@
 ---
 
 local Camera = require("libs/Camera")
-local ForestLevel = require("levels/forest")
-local MainMenu = require("levels/main_menu")
+
+LEVELS = {
+    forest = require("levels/forest/forest"),
+    mainMenu = require("levels/main_menu/main_menu")
+}
 
 function CHANGE_LEVEL(level)
     CURRENT_LEVEL = level
+    if level == "exit" then
+        love.event.quit()
+        return
+    end
     CURRENT_LEVEL.load()
 end
 
 function love.load()
+    love.graphics.setDefaultFilter('nearest', 'nearest')
+    love.window.setMode( 800, 600, {
+        resizable = true,
+        minwidth = 800,
+        minheight = 600
+    } )
+
     camera = Camera()
     camera:setDeadzone(camera.w/2 - 80, 0, 80, camera.h)
-    camera.scale = 1.5
 
     love.physics.setMeter(64)
 
-    CURRENT_LEVEL = ForestLevel;
+    CURRENT_LEVEL = LEVELS.mainMenu;
     CURRENT_LEVEL.load()
 end
 
@@ -42,5 +55,31 @@ end
 function love.keyreleased(key, scancode)
     if CURRENT_LEVEL.keyreleased then
         CURRENT_LEVEL.keyreleased(key, scancode)
+    end
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+    if CURRENT_LEVEL.mousemoved then
+        CURRENT_LEVEL.mousemoved(x, y, dx, dy, istouch)
+    end
+end
+
+function love.mousepressed(x, y, button, istouch, presses)
+    if CURRENT_LEVEL.mousepressed then
+        CURRENT_LEVEL.mousepressed(x, y, button, istouch, presses)
+    end
+end
+
+function love.mousereleased(x, y, button, istouch, presses)
+    if CURRENT_LEVEL.mousereleased then
+        CURRENT_LEVEL.mousereleased(x, y, button, istouch, presses)
+    end
+end
+
+function love.resize(w, h)
+    camera.w = w
+    camera.h = h
+    if CURRENT_LEVEL.resize then
+        CURRENT_LEVEL.resize(w, h)
     end
 end

@@ -11,7 +11,11 @@ local Scene = class("Scene", {
     update = function(dt)  end,
     draw = function(dt)  end,
     keypressed = function(key, scancode, is_repeat) end,
-    keyreleased = function(key, scancode) end
+    keyreleased = function(key, scancode) end,
+    mousepressed = function(x, y, button, istouch, presses) end,
+    mousereleased = function(x, y, button, istouch, presses) end,
+    mousemoved = function(x, y, dx, dy, istouch)  end,
+    resize = function(w, h)  end
 })
 
 return Scene

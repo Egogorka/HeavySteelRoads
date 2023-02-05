@@ -4,16 +4,19 @@
 --- DateTime: 16.10.2022 16:43
 ---
 
+local class = require("libs/30log")
+
 local tiny = require("libs/tiny")
 local Vector2 = require("utility/vector")[1]
-local dump = require("utility/dump")
 
-local SpriteSystem = tiny.processingSystem()
-SpriteSystem.filter = tiny.filter('(msprite|sprite)&body')
+local SpriteSystem = tiny.processingSystem(class("SpriteSystem"))
+SpriteSystem.filter = tiny.filter('(msprite|sprite)&(body|position)')
 
-SpriteSystem.focus_z = 1
-SpriteSystem.focus_pos = Vector2(0,0)
-SpriteSystem.focus_entity = nil
+function SpriteSystem:init()
+    self.focus_z = 1
+    self.focus_pos = Vector2(0,0)
+    self.focus_entity = nil
+end
 
 function SpriteSystem:preWrap(dt)
     if (self.focus_entity ~= nil) and (self.focus_entity.body ~= nil) then
@@ -27,6 +30,11 @@ function SpriteSystem:processSprite(sprite, dt, position, depth, scale, angle)
 
     animation:update(dt)
 
+    -- Sprite-scale effects
+    local offset = (1 - sprite.scale) * sprite.origin
+    pos = pos + offset
+
+    -- Depth-scale effects
     if( depth ~= nil ) then
         local k = self.focus_z / depth.z
         pos = self.focus_pos - k * ( self.focus_pos - pos)
@@ -36,12 +44,12 @@ function SpriteSystem:processSprite(sprite, dt, position, depth, scale, angle)
     end
     scale = scale * sprite.scale
 
-    if(sprite.camera_affected == false) then
+    if sprite.camera_affected then
+        animation:draw(image, pos[1], pos[2], angle, scale, scale)
+    else
         camera:detach()
         animation:draw(image, pos[1], pos[2], angle, scale, scale)
         camera:attach()
-    else
-        animation:draw(image, pos[1], pos[2], angle, scale, scale)
     end
 end
 
@@ -54,15 +62,23 @@ function SpriteSystem:processMSprite(msprite, dt, position, depth, scale, angle)
 end
 
 function SpriteSystem:process(entity, dt)
-    local position = Vector2(entity.body:getPosition())
-    local angle = entity.body:getAngle()
+    local position, angle
     local scale = 1
+    if entity.body then
+        position = Vector2(entity.body:getPosition())
+        angle = entity.body:getAngle()
+    else
+        position = entity.position.pos
+        if entity.position.angle then
+            angle = entity.position.angle
+        end
+    end
 
     -- dispatch to processing different cases
     if(entity.msprite ~= nil) then
-        SpriteSystem:processMSprite(entity.msprite, dt, position, entity.depth, scale, angle)
+        self:processMSprite(entity.msprite, dt, position, entity.depth, scale, angle)
     else
-        SpriteSystem:processSprite(entity.sprite, dt, position, entity.depth, scale, angle)
+        self:processSprite(entity.sprite, dt, position, entity.depth, scale, angle)
     end
 end
 

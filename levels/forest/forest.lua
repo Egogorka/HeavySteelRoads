@@ -14,7 +14,7 @@ local window_w, window_h, flags = love.window.getMode()
 local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
 local CategoryManager = require("src/CategoryManager")
 
-local SpriteSystem = require("src/SpriteSystem")
+local SpriteSystem = require("src/SpriteSystem")()
 local ShapeDebug = require("src/ShapeDebug")
 local TankBehavior = require("src/behavior/TankBehavior")
 local PlayerController = require("src/controllers/PlayerController")
@@ -27,7 +27,7 @@ local ForestLevel = Scene()
 local world = tiny.world()
 --world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
---world:addSystem(ShapeSystem)
+world:addSystem(ShapeDebug)
 world:addSystem(TankBehavior)
 world:addSystem(PlayerController)
 
@@ -38,8 +38,8 @@ local sprites = {}
 local animations = {}
 local function load_sprites()
 
-    sprites.sky = Sprite(love.graphics.newImage("assets/background/Sky.png"), 1, false)
-    sprites.sun = Sprite(love.graphics.newImage("assets/background/Sun.png"), 1, false)
+    sprites.sky = Sprite(love.graphics.newImage("assets/background/Sky.png"), false)
+    sprites.sun = Sprite(love.graphics.newImage("assets/background/Sun.png"), false)
     sprites.road = Sprite(love.graphics.newImage("assets/background/Road1.png"))
     sprites.forest_front = Sprite(love.graphics.newImage("assets/background/Forest.png"))
     sprites.forest_back = Sprite(love.graphics.newImage("assets/background/Forest4.png"))

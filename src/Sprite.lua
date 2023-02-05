@@ -29,9 +29,11 @@ local Placement = class("Placement", {
 local Sprite = class("Sprite", {
     animations = {},
     current_animation = "default",
-    scale = 1,
 
+    scale = 1,
     offset = Vector2(),
+    origin = Vector2(),
+
     camera_affected = true,
 })
 
@@ -73,19 +75,22 @@ end
 --- Sprite implementation
 -----------------------------------------
 
-function Sprite:init(o, scale, camera_affected, offset)
-    if(placement ~= nil) then
+function Sprite:init(o, camera_affected, offset, origin, scale)
+    if not o then
+        return
+    end
+
+    if(offset ~= nil) then
         self.offset = offset
+    end
+    if(origin ~= nil) then
+        self.origin = origin
     end
     if(scale ~= nil) then
         self.scale = scale
     end
     if(camera_affected ~= nil) then
         self.camera_affected = camera_affected
-    end
-
-    if not o then
-        return
     end
 
     if( o["type"] ~= nil and o:type() == "Image") then
