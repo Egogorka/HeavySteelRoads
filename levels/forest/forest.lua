@@ -6,7 +6,7 @@
 
 local anim8 = require("libs/anim8")
 local tiny = require("libs/tiny")
-
+local dump = require("utility/dump")
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
 local window_w, window_h, flags = love.window.getMode()
@@ -15,10 +15,11 @@ local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
 local CategoryManager = require("src/CategoryManager")
 
 local SpriteSystem = require("src/SpriteSystem")()
-local ShapeDebug = require("src/ShapeDebug")
+--local ShapeDebug = require("src/ShapeDebug")
 local TankBehavior = require("src/behavior/TankBehavior")
+local BulletBehavior = require("src/behavior/BulletBehavior")
 local PlayerController = require("src/controllers/PlayerController")
-
+local HealthSystem = require("src/HealthSystem")
 
 local Scene = require("src/SceneManager")
 local ForestLevel = Scene()
@@ -27,9 +28,11 @@ local ForestLevel = Scene()
 local world = tiny.world()
 --world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
-world:addSystem(ShapeDebug)
+--world:addSystem(ShapeDebug)
 world:addSystem(TankBehavior)
 world:addSystem(PlayerController)
+world:addSystem(BulletBehavior)
+world:addSystem(HealthSystem)
 
 local player
 local p_world = love.physics.newWorld(0,0,true)
@@ -120,25 +123,33 @@ function ForestLevel.load()
     -- Background --
     for i=0,10 do
 
+        -- Road Entities
+
         local road = { sprite = sprites.road }
         road.body = love.physics.newBody(p_world, i * road.sprite:size()[1], window_h/2)
-
         world:addEntity(road)
+
         local roadTopBlock = {
             body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 - 10/2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
+        roadTopBlock.body:setUserData(roadTopBlock)
         roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
         world:addEntity(roadTopBlock)
+
         local roadBottomBlock = {
             body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 + road.sprite:size()[2] + 10/2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
+        roadBottomBlock.body:setUserData(roadBottomBlock)
         roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
         world:addEntity(roadBottomBlock)
 
+
         CategoryManager.setBulletproof(roadTopBlock.fixture)
         CategoryManager.setBulletproof(roadBottomBlock.fixture)
+
+        -- Trees
 
         local forest_back2 = { sprite = sprites.forest_back, depth = Depth(1.4, false) }
         forest_back2.body = love.physics.newBody(p_world, -10 + i * sprites.forest_back:size()[1]*1.4, window_h/2 - 86 - 20 - 20),
@@ -173,11 +184,11 @@ function ForestLevel.load()
 
     player.body = love.physics.newBody(p_world, 300, window_h/2 + sprites.road:size()[2]/2, "dynamic")
     player.body:setFixedRotation(true)
+    player.body:setUserData(player)
     player.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
     player.fixture = love.physics.newFixture(player.body, player.shape)
     world:addEntity(player)
 
-    print(CategoryManager.categories.player)
     CategoryManager.setObject(player.fixture, CategoryManager.categories.player)
 
     local player2 = {
@@ -191,19 +202,46 @@ function ForestLevel.load()
                 placement = Placement(Vector2(-5,-15), 2)
             },
         }),
+        behavior = "tank",
         tank = {
             aim = nil
+        },
+        health = {
+            count = 100,
+            change = 0
         },
         depth = Depth(1)
     }
 
     player2.body = love.physics.newBody(p_world, 400, window_h/2 + sprites.road:size()[2]/2, "dynamic")
     player2.body:setFixedRotation(true)
+    player2.body:setUserData(player2)
     player2.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
-    player2.fixture = love.physics.newFixture(player.body, player.shape)
+    player2.fixture = love.physics.newFixture(player2.body, player2.shape)
     world:addEntity(player2)
 
-    --SpriteSystem.focus_entity = player
+    CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
+
+    local function beginContact(a, b, coll)
+        local a_entity = a:getBody():getUserData()
+        local b_entity = b:getBody():getUserData()
+        --print("BeginContact", dump(a_entity, 1, 0), "with", dump(b_entity, 1, 0))
+        if a_entity.behavior then
+            a_entity[a_entity.behavior].messages:push({"contact", b_entity})
+        end
+        if b_entity.behavior then
+            b_entity[b_entity.behavior].messages:push({"contact", a_entity})
+        end
+    end
+
+    local function endContact(a, b, coll)
+
+    end
+
+    SpriteSystem.focus_entity = player
+    p_world:setCallbacks(beginContact, endContact)
+
+
 end
 
 function ForestLevel.update(dt)

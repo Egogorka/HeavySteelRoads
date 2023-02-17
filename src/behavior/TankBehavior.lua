@@ -36,7 +36,7 @@ function TankBehavior:process(entity, dt)
         local message = entity.tank.messages:pop()
         local command = message[1]
 
-        if command then
+        if self[command] then
             self[command](self, entity, dt, message[2])
         end
     end
@@ -128,11 +128,15 @@ function TankBehavior:_bullet(entity)
 
     local bullet = {
         sprite = Sprite(love.graphics.newImage("assets/player/Bullet1.png")),
-        shape = love.physics.newRectangleShape(10, 10)
+        shape = love.physics.newRectangleShape(10, 10),
+        bullet = {},
+        behavior = "bullet"
     }
     bullet.body = love.physics.newBody(p_world, x+15, y, "kinematic")
     bullet.body:setFixedRotation(true)
+    bullet.body:setUserData(bullet)
     bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
+    bullet.fixture:setSensor(true)
 
     CategoryManager.setBullet(bullet.fixture, CategoryManager.categories.player_bullets)
 
@@ -159,6 +163,12 @@ function TankBehavior:shoot(entity, dt)
     local bullet = self:_bullet(entity)
     bullet.body:setLinearVelocity(vel[1], vel[2])
     bullet.body:setAngle(dx:angle())
+end
+
+function TankBehavior:die(entity, dt)
+    local world = self.world
+    tiny.removeEntity(world, entity)
+    entity.body:destroy()
 end
 
 return TankBehavior
