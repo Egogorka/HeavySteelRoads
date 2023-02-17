@@ -109,8 +109,23 @@ function MainMenu.load()
     MainMenu.resize(window_w, window_h)
 end
 
+local effect = love.graphics.newShader([[
+    extern number time;
+    extern vec4 max;
+    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords){
+        vec4 tex_color = Texel(texture, texture_coords);
+        return ( tex_color + (max - tex_color)*sin(time)/4.0 ) * color;
+    }
+]])
+
+local t = 0
 function MainMenu.draw(dt)
+    t = t + dt
+    effect:send("time", t)
+    effect:send("max", {1,0,0,1})
+    love.graphics.setShader(effect)
     world:update(dt)
+    love.graphics.setShader()
     loveframes.draw()
 end
 
