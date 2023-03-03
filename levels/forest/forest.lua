@@ -7,6 +7,7 @@
 local anim8 = require("libs/anim8")
 local tiny = require("libs/tiny")
 local dump = require("utility/dump")
+local flux = require("libs/flux")
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
 local window_w, window_h, flags = love.window.getMode()
@@ -253,6 +254,8 @@ function ForestLevel.update(dt)
 end
 
 function ForestLevel.draw(dt)
+    flux.update(dt)
+
     camera:attach()
     world:update(dt)
     camera:detach()

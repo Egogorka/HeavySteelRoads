@@ -5,6 +5,7 @@
 ---
 
 local class = require("libs/30log")
+local flux = require("libs/flux")
 
 local tiny = require("libs/tiny")
 local Vector2 = require("utility/vector")[1]
@@ -44,12 +45,37 @@ function SpriteSystem:processSprite(sprite, dt, position, depth, scale, angle)
     end
     scale = scale * sprite.scale
 
+    local color = {love.graphics.getColor()}
+    if sprite.hurt_effect then
+        sprite.hurt_effect = false
+
+        sprite.hurt_effect_flag = true
+        sprite.hurt_color = 1
+
+        local temp = flux
+            .to(sprite, 0.1, { hurt_color = 0.2} )
+            :ease("elasticout")
+            :after(sprite, 0.1, { hurt_color = 1} )
+            :oncomplete(
+        function()
+            sprite.hurt_effect_flag = false
+        end)
+    end
+
+    if sprite.hurt_effect_flag then
+        love.graphics.setColor(1, sprite.hurt_color, sprite.hurt_color, 1)
+    end
+
     if sprite.camera_affected then
         animation:draw(image, pos[1], pos[2], angle, scale, scale)
     else
         camera:detach()
         animation:draw(image, pos[1], pos[2], angle, scale, scale)
         camera:attach()
+    end
+
+    if sprite.hurt_effect_flag then
+        love.graphics.setColor(color)
     end
 end
 

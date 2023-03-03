@@ -35,6 +35,7 @@ local Sprite = class("Sprite", {
     origin = Vector2(),
 
     camera_affected = true,
+    effects = {}, -- Effects
 })
 
 -- Short for MultipleSprite

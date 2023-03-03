@@ -18,9 +18,10 @@ function HealthSystem:process(entity, dt)
         return
     end
 
-    if health.change then
+    if health.change and health.change ~= 0 then
         entity[behavior].messages:push({"hurt", health.change})
         health.count = health.count + health.change
+        health.change = 0
     end
     if health.count < 0 then
         entity[behavior].messages:push({"die"})

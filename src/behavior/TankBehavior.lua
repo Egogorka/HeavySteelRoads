@@ -173,6 +173,11 @@ function TankBehavior:shoot(entity, dt)
     bullet.body:setAngle(dx:angle())
 end
 
+function TankBehavior:hurt(entity, dt)
+    entity.msprite.sprites.body.sprite.hurt_effect = true
+    entity.msprite.sprites.tower.sprite.hurt_effect = true
+end
+
 function TankBehavior:die(entity, dt)
     local world = self.world
     tiny.removeEntity(world, entity)
