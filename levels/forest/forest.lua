@@ -11,10 +11,10 @@ local dump = require("utility/dump")
 local Vector2, Vector3 = unpack(require('utility/vector'))
 local window_w, window_h, flags = love.window.getMode()
 
-local Sprite, MSprite, Depth, Placement = unpack(require('src/Sprite'))
+local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 local CategoryManager = require("src/CategoryManager")
 
-local SpriteSystem = require("src/SpriteSystem")()
+local SpriteSystem = require("src/graphics/SpriteSystem")()
 --local ShapeDebug = require("src/ShapeDebug")
 local TankBehavior = require("src/behavior/TankBehavior")
 local BulletBehavior = require("src/behavior/BulletBehavior")

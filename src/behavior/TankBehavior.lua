@@ -13,7 +13,7 @@ local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
 local dump = require("utility/dump")
 
-local Sprite = require("src/Sprite")[1]
+local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/CategoryManager")
 
 local tiny = require("libs/tiny")
