@@ -27,6 +27,8 @@ function TankBehavior:onAdd(entity)
         return
     end
     entity.tank.messages = Stack()
+
+    entity.tank.reload = 0
 end
 
 function TankBehavior:process(entity, dt)
@@ -146,6 +148,12 @@ function TankBehavior:_bullet(entity)
 end
 
 function TankBehavior:shoot(entity, dt)
+
+    if entity.tank.reload > 0 then
+        entity.tank.reload = entity.tank.reload - dt
+        return
+    end
+    entity.tank.reload = 0.1
 
     if entity.tank.aim == nil then
         return
