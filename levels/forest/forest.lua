@@ -242,15 +242,21 @@ function ForestLevel.load()
     SpriteSystem.focus_entity = player
     p_world:setCallbacks(beginContact, endContact)
 
-
+    camera.viscosity = 1
 end
+
+local targeting = false
 
 function ForestLevel.update(dt)
     p_world:update(dt)
 
     camera:update(dt)
     SpriteSystem.focus_pos = Vector2(camera.x,camera.y)
-    camera:follow(player.body:getX(), 40)
+    if targeting then
+        camera:follow({player.body:getX(), player.body:getY()})
+    else
+        camera:follow(nil)
+    end
 end
 
 function ForestLevel.draw(dt)
@@ -258,7 +264,10 @@ function ForestLevel.draw(dt)
 
     camera:attach()
     world:update(dt)
+    camera:draw_camera_box()
     camera:detach()
+
+    camera:draw()
 end
 
 function ForestLevel.mousepressed(x, y, button, istouch, presses)
@@ -272,6 +281,28 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
     end
     if key == "c" then
         camera.from.scale = camera.from.scale / 1.1
+    end
+    if key == "g" then
+        print(dump(camera, 3, 2))
+    end
+    if key == "t" then
+        targeting = not targeting
+    end
+    if not targeting then
+        local dir = Vector2()
+        if key == "w" then
+            dir = dir + {0, -10}
+        end
+        if key == "s" then
+            dir = dir + {0, 10}
+        end
+        if key == "a" then
+            dir = dir + {-10, 0}
+        end
+        if key == "d" then
+            dir = dir + {10, 0}
+        end
+        camera.from.pos = camera.from.pos + dir
     end
 end
 

@@ -117,17 +117,17 @@ end
 function Camera:attach()
     love.graphics.push()
     love.graphics.translate(
-        -self.from.pos[1] - self.from.origin[1], -self.from.pos[2] - self.from.origin[2]
+            self.to.pos[1] + self.to.origin[1], self.to.pos[2] + self.to.origin[2]
     )
-    love.graphics.scale(1/self.from.scale)
-    love.graphics.rotate(-self.from.angle)
-    love.graphics.translate(self.from.origin[1], self.from.origin[2])
-
-    love.graphics.translate(-self.to.origin[1],-self.to.origin[2])
-    love.graphics.scale(self.to.scale)
     love.graphics.rotate(self.to.angle)
+    love.graphics.scale(self.to.scale)
+    love.graphics.translate(-self.to.origin[1],-self.to.origin[2])
+    love.graphics.translate(self.from.origin[1], self.from.origin[2])
+    love.graphics.rotate(-self.from.angle)
+    love.graphics.scale(1/self.from.scale)
+
     love.graphics.translate(
-        self.to.pos[1] + self.to.origin[1], self.to.pos[2] + self.to.origin[2]
+         -self.from.pos[1] - self.from.origin[1], -self.from.pos[2] - self.from.origin[2]
     )
 end
 
@@ -214,9 +214,45 @@ function Camera:update(dt)
 
 end
 
+function Camera:draw_camera_box() -- While camera is attached
+    local color = {love.graphics.getColor()}
+
+    local p1 = self.from.pos
+    local p2 = self.from.pos + self.from.size
+    local size = p2 - p1
+
+    love.graphics.setColor(255,0,0)
+    love.graphics.rectangle('line', p1[1], p1[2], size[1], size[2])
+
+    love.graphics.setColor(color)
+end
+
 function Camera:draw()
+    local color = {love.graphics.getColor()}
 
+    do
+        local p1 = self:toScreenCoords(self.from.pos)
+        local p2 = self:toScreenCoords(self.from.pos + self.from.size)
+        local size = p2 - p1
 
+        love.graphics.setColor(255,0,0)
+        love.graphics.rectangle('line', p1[1], p1[2], size[1], size[2])
+    end
+
+    do
+        local p = self:toScreenCoords(self:wc2w(self.from.origin))
+        love.graphics.circle('line', p[1], p[2], 5)
+    end
+
+    do
+        local p1 = self:toScreenCoords(self:wc2w(self.deadzone.center - self.deadzone.size/2))
+        local size = self.deadzone.size / self.from.scale
+
+        love.graphics.setColor(255,255,255)
+        love.graphics.rectangle('line', p1[1], p1[2], size[1], size[2])
+    end
+
+    love.graphics.setColor(color)
 end
 
 ---@param
