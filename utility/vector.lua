@@ -13,7 +13,16 @@ function Vector2:init(a, b)
         -- Create from table --
         if (a["x"] ~= nil) and (a["y"] ~= nil) then
             -- This is something like Vector2 - duck typing
-            self[1] = a.x; self[2] = a.y
+            if type(a["x"]) == "function" then
+                self[1] = a:x();
+            else
+                self[1] = a.x;
+            end
+            if type(a["y"]) == "function" then
+                self[2] = a:y();
+            else
+                self[2] = a.y;
+            end
         else
             -- Then just by numbers
             self[1] = a[1]; self[2] = a[2]

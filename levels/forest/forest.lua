@@ -16,7 +16,7 @@ local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 local CategoryManager = require("src/CategoryManager")
 
 local SpriteSystem = require("src/graphics/SpriteSystem")()
---local ShapeDebug = require("src/ShapeDebug")
+local ShapeDebug = require("src/ShapeDebug")
 local TankBehavior = require("src/behavior/TankBehavior")
 local BulletBehavior = require("src/behavior/BulletBehavior")
 local PlayerController = require("src/controllers/PlayerController")
@@ -29,7 +29,7 @@ local ForestLevel = Scene()
 local world = tiny.world()
 --world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
---world:addSystem(ShapeDebug)
+world:addSystem(ShapeDebug)
 world:addSystem(TankBehavior)
 world:addSystem(PlayerController)
 world:addSystem(BulletBehavior)
@@ -263,12 +263,16 @@ end
 
 function ForestLevel.mousepressed(x, y, button, istouch, presses)
     --- Just need to tell my brain that I need to make it at least somehow, not perfect at the start
-
-
 end
 
 function ForestLevel.keypressed(key, scancode, is_repeat)
     PlayerController:keypressed(key, scancode, is_repeat)
+    if key == "z" then
+        camera.from.scale = camera.from.scale * 1.1
+    end
+    if key == "c" then
+        camera.from.scale = camera.from.scale / 1.1
+    end
 end
 
 function ForestLevel.keyreleased(key, scancode)

@@ -4,12 +4,27 @@
 --- DateTime: 16.10.2022 12:20
 ---
 
-local Camera = require("libs/Camera")
+Vector2, Vector3 = unpack(require("utility/vector"))
+Stack = require("utility/stack")
+dump = require("utility/dump")
+
+tiny = require("libs/tiny")
+
+local Camera = require("libs/MyCamera")
+local window_w, window_h, flags = love.window.getMode()
 
 LEVELS = {
     forest = require("levels/forest/forest"),
     mainMenu = require("levels/main_menu/main_menu")
 }
+
+GAME_CANVAS = love.graphics.newCanvas(400, 300)
+
+function DRAW_GAME_CANVAS()
+    love.graphics.setCanvas()
+    love.graphics.draw(GAME_CANVAS, 0, 0, 0, 1.5)
+    love.graphics.setCanvas(GAME_CANVAS)
+end
 
 function CHANGE_LEVEL(level)
     CURRENT_LEVEL = level
@@ -22,14 +37,17 @@ end
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
+
+    love.window.setTitle("HeavySteelRoads")
     love.window.setMode( 800, 600, {
         resizable = true,
         minwidth = 800,
         minheight = 600
     } )
 
-    camera = Camera()
-    camera:setDeadzone(camera.w/2 - 80, 0, 80, camera.h)
+    camera = Camera();
+    camera:setFromSizes({0,0}, {window_w, window_h}, {0,0}, {window_w, window_h} )
+    camera:setDeadzone({camera.from.size[1]/2 - 40, camera.from.size[2]/2}, {80, camera.from.size[2]})
 
     love.physics.setMeter(64)
 
@@ -77,8 +95,8 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.resize(w, h)
-    camera.w = w
-    camera.h = h
+    --camera.w = w
+    --camera.h = h
     if CURRENT_LEVEL.resize then
         CURRENT_LEVEL.resize(w, h)
     end
