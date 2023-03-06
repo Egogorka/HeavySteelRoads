@@ -100,7 +100,7 @@ function Camera:setFromSizes(out_pos, out_size, in_pos, in_size)
         self.to.origin = Vector2(out_size)/2
     end
 
-    local scales = Vector2(in_size)/Vector2(out_size)
+    local scales = self.to.size/self.from.size
     print("Scales", dump(scales, 2, 2))
     self.to.scale = math.min(scales[1], scales[2])
 end
@@ -121,8 +121,8 @@ function Camera:attach()
     )
     love.graphics.rotate(self.to.angle)
     love.graphics.scale(self.to.scale)
-    love.graphics.translate(-self.to.origin[1],-self.to.origin[2])
-    love.graphics.translate(self.from.origin[1], self.from.origin[2])
+    --love.graphics.translate(-self.to.origin[1],-self.to.origin[2])
+    --love.graphics.translate(self.from.origin[1], self.from.origin[2])
     love.graphics.rotate(-self.from.angle)
     love.graphics.scale(1/self.from.scale)
 
@@ -141,9 +141,9 @@ function Camera:toScreenCoords(vec) -- w2s / world to screen
         _vec - self.from.pos - self.from.origin,
         1/self.from.scale,
         -self.from.angle
-    ) + self.from.origin
+    )
     local out = transform(
-        temp - self.to.origin,
+        temp,
             self.to.scale,
             self.to.angle
     ) + self.to.origin + self.to.pos
@@ -156,9 +156,9 @@ function Camera:toWorldCoords(vec) -- s2w / screen to world
             _vec - self.to.pos - self.to.origin,
             1/self.to.scale,
             -self.to.angle
-    ) + self.to.origin
+    )
     local out = transform(
-            temp - self.from.origin,
+            temp,
             self.from.scale,
             self.from.angle
     ) + self.from.origin + self.from.pos
@@ -221,7 +221,7 @@ function Camera:draw_camera_box() -- While camera is attached
     local p2 = self.from.pos + self.from.size
     local size = p2 - p1
 
-    love.graphics.setColor(255,0,0)
+    love.graphics.setColor(255,0,255)
     love.graphics.rectangle('line', p1[1], p1[2], size[1], size[2])
 
     love.graphics.setColor(color)
