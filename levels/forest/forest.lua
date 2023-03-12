@@ -242,7 +242,7 @@ function ForestLevel.load()
     SpriteSystem.focus_entity = player
     p_world:setCallbacks(beginContact, endContact)
 
-    camera.viscosity = 1
+    camera.viscosity = 0.1
 end
 
 local targeting = false

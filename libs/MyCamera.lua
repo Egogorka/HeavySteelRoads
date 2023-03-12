@@ -55,7 +55,8 @@ local Camera = class("Camera", {
     },
 
     target = nil,
-    viscosity = nil
+    viscosity = nil,
+    lead = 0
 })
 
 local function theta(x)
@@ -201,11 +202,13 @@ function Camera:update(dt)
         -- If there is no target there's nothing to do
         return
     end
-    local delta = self:_deadzone_process(self:w2wc(self.target))
+    local target = self.target
+
+    local delta = self:_deadzone_process(self:w2wc(target))
 
     local temp = 1
     if self.viscosity then
-        temp = self.viscosity * dt
+        temp = dt / self.viscosity
     end
 
     self.from.pos = self.from.pos + cap(temp) * transform(
@@ -246,7 +249,7 @@ function Camera:draw()
 
     do
         local p1 = self:toScreenCoords(self:wc2w(self.deadzone.center - self.deadzone.size/2))
-        local size = self.deadzone.size / self.from.scale
+        local size = self.deadzone.size * self.to.scale
 
         love.graphics.setColor(255,255,255)
         love.graphics.rectangle('line', p1[1], p1[2], size[1], size[2])
@@ -259,6 +262,9 @@ end
 function Camera:follow(vec)
     if vec then
         self.target = Vector2(vec)
+        if not self.target_previous then
+            self.target_previous = self.target
+        end
         return
     end
     self.target = nil
