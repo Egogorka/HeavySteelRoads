@@ -134,16 +134,20 @@ function ForestLevel.load()
             body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 - 10/2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
-        roadTopBlock.body:setUserData(roadTopBlock)
         roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
+        roadTopBlock.fixture:setUserData({
+            entity = roadTopBlock
+        })
         world:addEntity(roadTopBlock)
 
         local roadBottomBlock = {
             body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 + road.sprite:size()[2] + 10/2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
-        roadBottomBlock.body:setUserData(roadBottomBlock)
         roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
+        roadBottomBlock.fixture:setUserData({
+            entity = roadBottomBlock
+        })
         world:addEntity(roadBottomBlock)
 
 
@@ -185,9 +189,11 @@ function ForestLevel.load()
 
     player.body = love.physics.newBody(p_world, 300, window_h/2 + sprites.road:size()[2]/2, "dynamic")
     player.body:setFixedRotation(true)
-    player.body:setUserData(player)
     player.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
     player.fixture = love.physics.newFixture(player.body, player.shape)
+    player.fixture:setUserData({
+        entity = player
+    })
     world:addEntity(player)
 
     CategoryManager.setObject(player.fixture, CategoryManager.categories.player)
@@ -216,16 +222,19 @@ function ForestLevel.load()
 
     player2.body = love.physics.newBody(p_world, 400, window_h/2 + sprites.road:size()[2]/2, "dynamic")
     player2.body:setFixedRotation(true)
-    player2.body:setUserData(player2)
     player2.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
     player2.fixture = love.physics.newFixture(player2.body, player2.shape)
+    player2.fixture:setUserData({
+        entity = player2
+    })
+
     world:addEntity(player2)
 
     CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
 
     local function beginContact(a, b, coll)
-        local a_entity = a:getBody():getUserData()
-        local b_entity = b:getBody():getUserData()
+        local a_entity = a:getUserData().entity
+        local b_entity = b:getUserData().entity
         --print("BeginContact", dump(a_entity, 1, 0), "with", dump(b_entity, 1, 0))
         if a_entity.behavior then
             a_entity[a_entity.behavior].messages:push({"contact", b_entity})
@@ -264,7 +273,6 @@ function ForestLevel.draw(dt)
 
     camera:attach()
     world:update(dt)
-    camera:draw_camera_box()
     camera:detach()
 
     camera:draw()

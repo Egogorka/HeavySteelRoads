@@ -97,6 +97,7 @@ end
 function love.resize(w, h)
     --camera.w = w
     --camera.h = h
+    camera:setFromSizes({0,0}, {w,h})
     if CURRENT_LEVEL.resize then
         CURRENT_LEVEL.resize(w, h)
     end

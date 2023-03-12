@@ -136,9 +136,11 @@ function TankBehavior:_bullet(entity)
     }
     bullet.body = love.physics.newBody(p_world, x+15, y, "kinematic")
     bullet.body:setFixedRotation(true)
-    bullet.body:setUserData(bullet)
     bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
     bullet.fixture:setSensor(true)
+    bullet.fixture:setUserData({
+        entity = bullet
+    })
 
     CategoryManager.setBullet(bullet.fixture, CategoryManager.categories.player_bullets)
 
