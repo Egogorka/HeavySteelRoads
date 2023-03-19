@@ -12,12 +12,19 @@ local ShapeSystem = tiny.processingSystem()
 ShapeSystem.filter = tiny.requireAll("shape", "body")
 
 function ShapeSystem:process(entity, dt)
-    local x1, y1, x2, y2, x3, y3, x4, y4 = entity.shape:getPoints()
-    local pos  = Vector2(entity.body:getPosition())
+    local fixtures = entity.body:getFixtures()
 
     local r, g, b, a = love.graphics.getColor()
     love.graphics.setColor({1,0,0})
-    love.graphics.rectangle("line", pos[1] + x2, pos[2] + y2, x4 - x2, y4 - y2)
+
+    for i=1, #fixtures do
+        local fixture = fixtures[i]
+        local x1, y1, x2, y2, x3, y3, x4, y4 = fixture:getShape():getPoints()
+        local pos  = Vector2(entity.body:getPosition())
+
+        love.graphics.rectangle("line", pos[1] + x2, pos[2] + y2, x4 - x2, y4 - y2)
+    end
+
     love.graphics.setColor(r, g, b, a)
 end
 
