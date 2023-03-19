@@ -12,6 +12,7 @@
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
 local dump = require("utility/dump")
+local Torus = require("utility/torus")
 
 local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/CategoryManager")
@@ -23,66 +24,21 @@ local TankBehavior = tiny.processingSystem()
 TankBehavior.filter = tiny.requireAll("tank", "body", "msprite")
 
 function TankBehavior:onAdd(entity)
-    if entity.tank.messages then
-        return
-    end
-    entity.tank.messages = Stack()
+    fill_table(entity.tank, {
+        messages = Stack(),
 
-    entity.tank.reload = 0
+        reloaded = true,
+        shoot_timer = 0,
+        shoot_timer_max = 1,
+
+        aimed = false,
+        rotation_speed = 1,
+        rotation_angle = 0, -- In units of Pi : Right is 0, Down is 1/2
+        target_angle = 0
+    })
 end
-
-function TankBehavior:process(entity, dt)
-    -- Command logic
-    while entity.tank.messages:size() ~= 0 do
-        --print("Command: \n", dump(entity.tank.messages:lookup(), 2, 2))
-        local message = entity.tank.messages:pop()
-        local command = message[1]
-
-        if self[command] then
-            self[command](self, entity, dt, message[2])
-        end
-    end
-end
-
-
---- Possible actions
----
---- shoot
---- -> args = none
----
---- aim
---- -> args =
----     Vector2 --- to where
----
---- move
---- -> args =
----     Vector2 --- direction
---- stop
---- -> args = none
----
----
-
-
---- Move block
-
----@param vel - Vector2
-function TankBehavior:move(entity, dt, vel)
-    local velocity = vel * 100
-
-    --entity.tank.is_moving = true
-    entity.msprite.sprites.body.sprite:set("move")
-    entity.body:setLinearVelocity(velocity:x(), velocity:y())
-end
-
-function TankBehavior:stop(entity, dt)
-    --entity.tank.is_moving = false
-    entity.msprite.sprites.body.sprite:set("idle")
-    entity.body:setLinearVelocity(0, 0)
-end
-
 
 --- Aim block
-
 local function tower_state(phi)
     if( phi > 7/8 ) then
         return "left"
@@ -111,13 +67,70 @@ local function tower_state(phi)
     return "left"
 end
 
+function TankBehavior:process(entity, dt)
+    local tank = entity.tank
+
+    if not tank.reloaded then
+        tank.shoot_timer = tank.shoot_timer + dt
+        if tank.shoot_timer > tank.shoot_timer_max then
+            tank.shoot_timer = 0
+            tank.reloaded = true
+        end
+    end
+
+    if not tank.aimed then
+        local t_current = Torus(tank.rotation_angle/2 + 1/2)
+        local t_target = Torus(tank.target_angle/2 + 1/2)
+
+        local dist = Torus.dist(t_current - t_target)
+        local dir = Torus.dir(t_current, t_target) and 1 or -1
+
+        if 2*dist < tank.rotation_speed * dt then
+            tank.rotation_angle = tank.target_angle
+            tank.aimed = true
+        else
+            tank.rotation_angle = tank.rotation_angle + dir * tank.rotation_speed * dt
+        end
+
+        tank.rotation_angle = Torus(tank.rotation_angle/2 + 1/2).a * 2 - 1
+
+        entity.msprite.sprites.tower.sprite:set(tower_state(tank.rotation_angle))
+    end
+
+    -- Command logic
+    while tank.messages:size() ~= 0 do
+        --print("Command: \n", dump(entity.tank.messages:lookup(), 2, 2))
+        local message = tank.messages:pop()
+        local command = message[1]
+
+        if self[command] then
+            self[command](self, entity, dt, message[2])
+        end
+    end
+end
+
+--- Move block
+---@param vel - Vector2
+function TankBehavior:move(entity, dt, vel)
+    local velocity = vel * 100
+
+    --entity.tank.is_moving = true
+    entity.msprite.sprites.body.sprite:set("move")
+    entity.body:setLinearVelocity(velocity:x(), velocity:y())
+end
+
+function TankBehavior:stop(entity, dt)
+    --entity.tank.is_moving = false
+    entity.msprite.sprites.body.sprite:set("idle")
+    entity.body:setLinearVelocity(0, 0)
+end
+
+
 ---@param vel - Vector2
 function TankBehavior:aim(entity, dt, aim)
     local position = Vector2(entity.body:getPosition())
-    entity.tank.aim = aim;
-
-    local angle = (aim - position):angle()/math.pi
-    entity.msprite.sprites.tower.sprite:set(tower_state(angle))
+    entity.tank.target_angle = (aim - position):angle()/math.pi
+    entity.tank.aimed = false
 end
 
 
@@ -151,28 +164,15 @@ end
 
 function TankBehavior:shoot(entity, dt)
 
-    if entity.tank.reload > 0 then
-        entity.tank.reload = entity.tank.reload - dt
+    if not entity.tank.reloaded then
         return
     end
-    entity.tank.reload = 0.1
+    entity.tank.reloaded = false
 
-    if entity.tank.aim == nil then
-        return
-    end -- If we aim at nothing there is nothing to shoot
-    local position = Vector2(entity.body:getPosition())
-
-    local dx = entity.tank.aim - position
-    if dx:mag() == 0 then
-        return
-    end
-    local vel = 500 * dx / dx:mag()
-
-    --print(dump(vel, 2, 2))
-
+    local vel = 500 * Vector2.fromPolar(1, entity.tank.rotation_angle * math.pi)
     local bullet = self:_bullet(entity)
     bullet.body:setLinearVelocity(vel[1], vel[2])
-    bullet.body:setAngle(dx:angle())
+    bullet.body:setAngle(entity.tank.rotation_angle * math.pi)
 end
 
 function TankBehavior:hurt(entity, dt)
