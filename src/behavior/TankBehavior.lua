@@ -183,6 +183,9 @@ end
 function TankBehavior:die(entity, dt)
     local world = self.world
     tiny.removeEntity(world, entity)
+end
+
+function TankBehavior:onRemove(entity)
     entity.body:destroy()
 end
 

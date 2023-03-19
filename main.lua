@@ -7,8 +7,14 @@
 Vector2, Vector3 = unpack(require("utility/vector"))
 Stack = require("utility/stack")
 dump = require("utility/dump")
+fill_table = require("utility/settingslike")
+
+function pdump(o, n, i)
+    print(dump(o, n or 3, i or 2))
+end
 
 tiny = require("libs/tiny")
+require("libs/strong")
 
 local Camera = require("libs/MyCamera")
 local window_w, window_h, flags = love.window.getMode()

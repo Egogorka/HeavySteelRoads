@@ -17,10 +17,13 @@ local CategoryManager = require("src/CategoryManager")
 
 local SpriteSystem = require("src/graphics/SpriteSystem")()
 local ShapeDebug = require("src/ShapeDebug")
+local HealthSystem = require("src/HealthSystem")
+
 local TankBehavior = require("src/behavior/TankBehavior")
 local BulletBehavior = require("src/behavior/BulletBehavior")
+
 local PlayerController = require("src/controllers/PlayerController")
-local HealthSystem = require("src/HealthSystem")
+local AITank = require("src/controllers/AITankController")()
 
 local Scene = require("src/SceneManager")
 local ForestLevel = Scene()
@@ -30,10 +33,13 @@ local world = tiny.world()
 --world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
 world:addSystem(ShapeDebug)
-world:addSystem(TankBehavior)
-world:addSystem(PlayerController)
-world:addSystem(BulletBehavior)
 world:addSystem(HealthSystem)
+
+world:addSystem(TankBehavior)
+world:addSystem(BulletBehavior)
+
+world:addSystem(PlayerController)
+world:addSystem(AITank)
 
 local player
 local p_world = love.physics.newWorld(0,0,true)
@@ -217,7 +223,9 @@ function ForestLevel.load()
             count = 100,
             change = 0
         },
-        depth = Depth(1)
+        depth = Depth(1),
+
+        ai = {}
     }
 
     player2.body = love.physics.newBody(p_world, 400, window_h/2 + sprites.road:size()[2]/2, "dynamic")
@@ -228,35 +236,75 @@ function ForestLevel.load()
         entity = player2
     })
 
-    world:addEntity(player2)
+    do
+        local shoot_box = {}
 
-    CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
+        shoot_box.shape = love.physics.newRectangleShape(50/2, 20/2, 100, 100)
+        shoot_box.fixture = love.physics.newFixture(player2.body, shoot_box.shape)
+        shoot_box.fixture:setSensor(true)
+        shoot_box.fixture:setUserData({
+            entity = player2,
+            caller = "ai",
+            name = "shoot_box"
+        })
 
-    local function beginContact(a, b, coll)
-        local a_entity = a:getUserData().entity
-        local b_entity = b:getUserData().entity
-        --print("BeginContact", dump(a_entity, 1, 0), "with", dump(b_entity, 1, 0))
-        if a_entity.behavior then
-            a_entity[a_entity.behavior].messages:push({"contact", b_entity})
-        end
-        if b_entity.behavior then
-            b_entity[b_entity.behavior].messages:push({"contact", a_entity})
-        end
-    end
-
-    local function endContact(a, b, coll)
-
+        player2.ai.shoot_box = shoot_box
     end
 
     SpriteSystem.focus_entity = player
+    AITank.target = player
+
+    world:addEntity(player2)
+    world:refresh()
+
+    CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
+
+    local function contact(a, b, coll, text)
+        --if a.action then
+        --    a.action(a, b, coll)
+        --end
+
+        if a.caller then
+            if a.entity[a.caller].messages then
+                a.entity[a.caller].messages:push({text,
+                    { entity = b.entity, fixture = a.name }
+                })
+            end
+            --if a.method then
+            --    a.caller.method(a, b, coll)
+            --end
+        else
+            if a.entity.behavior then
+                a.entity[a.entity.behavior].messages:push({text, b.entity})
+            end
+        end
+    end
+
+    local function beginContact(_a, _b, _coll)
+        local a_data = _a:getUserData()
+        local b_data = _b:getUserData()
+
+        contact(a_data, b_data, _coll, "contact")
+        contact(b_data, a_data, _coll, "contact")
+    end
+
+    local function endContact(_a, _b, _coll)
+        local a_data = _a:getUserData()
+        local b_data = _b:getUserData()
+
+        contact(a_data, b_data, _coll, "endContact")
+        contact(b_data, a_data, _coll, "endContact")
+    end
+
     p_world:setCallbacks(beginContact, endContact)
 
     camera.viscosity = 0.1
 end
 
-local targeting = false
+local targeting = true
 
 function ForestLevel.update(dt)
+    world:refresh()
     p_world:update(dt)
 
     camera:update(dt)
@@ -311,6 +359,13 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
             dir = dir + {10, 0}
         end
         camera.from.pos = camera.from.pos + dir
+    else
+        if key == "l" then
+            camera.lead = camera.lead + 1
+        end
+        if key == "k" then
+            camera.lead = camera.lead - 1
+        end
     end
 end
 
