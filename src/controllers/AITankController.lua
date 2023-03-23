@@ -17,8 +17,9 @@ function AITank:onAdd(entity)
     fill_table(entity.ai, {
         messages = Stack(),
         stack = Stack(),
-        target = self.target,
 
+        target = self.target,
+        target_pos = nil,
         in_shoot_range = false,
 
         stare_timer_max = 1,
@@ -64,13 +65,13 @@ function AITank:process(entity, dt)
 end
 
 function AITank:contact(entity, dt, data)
-
     if data.fixture ~= "shoot_box" then
         return
     end
 
     if data.entity == entity.ai.target then
         entity.ai.in_shoot_range = true
+        entity.ai.target_pos = Vector2(entity.ai.target.body:getPosition())
     end
 end
 
@@ -78,8 +79,7 @@ function AITank:endContact(entity, dt, data)
     if data.fixture ~= "shoot_box" then
         return
     end
-
-    if data.entity == entity.target then
+    if data.entity == entity.ai.target then
         entity.ai.in_shoot_range = false
     end
 end
@@ -111,7 +111,7 @@ end
 function AITank:aiming(entity, dt)
     local ai = entity.ai
     entity.tank.messages:push({"stop"})
-    entity.tank.messages:push({"aim", Vector2(ai.target.body:getPosition())})
+    entity.tank.messages:push({"aim", entity.ai.target_pos})
 
     if ai.stare_timer < ai.stare_timer_max then
         ai.stare_timer = ai.stare_timer + dt

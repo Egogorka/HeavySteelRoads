@@ -41,6 +41,9 @@ function BulletBehavior:contact(entity, dt, other)
 
     local world = self.world
     tiny.removeEntity(world, entity)
+end
+
+function BulletBehavior:onRemove(entity)
     entity.body:destroy()
 end
 

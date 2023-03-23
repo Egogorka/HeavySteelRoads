@@ -34,7 +34,9 @@ function TankBehavior:onAdd(entity)
         aimed = false,
         rotation_speed = 1,
         rotation_angle = 0, -- In units of Pi : Right is 0, Down is 1/2
-        target_angle = 0
+        target_angle = 0,
+
+        team = CategoryManager.categories.enemy
     })
 end
 
@@ -99,7 +101,6 @@ function TankBehavior:process(entity, dt)
 
     -- Command logic
     while tank.messages:size() ~= 0 do
-        --print("Command: \n", dump(entity.tank.messages:lookup(), 2, 2))
         local message = tank.messages:pop()
         local command = message[1]
 
@@ -126,11 +127,15 @@ function TankBehavior:stop(entity, dt)
 end
 
 
----@param vel - Vector2
+---@param aim - Vector2
 function TankBehavior:aim(entity, dt, aim)
-    local position = Vector2(entity.body:getPosition())
-    entity.tank.target_angle = (aim - position):angle()/math.pi
-    entity.tank.aimed = false
+    if aim then
+        local position = Vector2(entity.body:getPosition())
+        entity.tank.target_angle = (aim - position):angle()/math.pi
+        entity.tank.aimed = false
+    else
+        entity.tank.aimed = true
+    end
 end
 
 
@@ -151,13 +156,11 @@ function TankBehavior:_bullet(entity)
     bullet.body:setFixedRotation(true)
     bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
     bullet.fixture:setSensor(true)
-    bullet.fixture:setUserData({
-        entity = bullet
-    })
+    bullet.fixture:setUserData({ entity = bullet })
 
-    CategoryManager.setBullet(bullet.fixture, CategoryManager.categories.player_bullets)
+    -- TODO: This is a bad thing. Need to add category.Team2Bullet, but this looks cleaner now
+    CategoryManager.setBullet(bullet.fixture, entity.tank.team + 1)
 
-    --print(dump(bullet, 2, 2))
     world:addEntity(bullet)
     return bullet
 end

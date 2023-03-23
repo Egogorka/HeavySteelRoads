@@ -186,8 +186,14 @@ function ForestLevel.load()
                 placement = Placement(Vector2(-5,-15), 2)
             },
         }),
+        behavior = "tank",
         tank = {
-            aim = nil
+            aim = nil,
+            team = CategoryManager.categories.player
+        },
+        health = {
+            count = 20,
+            change = 0
         },
         player = 1,
         depth = Depth(1)
@@ -236,6 +242,7 @@ function ForestLevel.load()
         entity = player2
     })
 
+    CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
     do
         local shoot_box = {}
 
@@ -248,6 +255,7 @@ function ForestLevel.load()
             name = "shoot_box"
         })
 
+        CategoryManager.setObject(shoot_box.fixture, CategoryManager.categories.enemy)
         player2.ai.shoot_box = shoot_box
     end
 
