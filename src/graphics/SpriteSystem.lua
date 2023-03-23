@@ -20,7 +20,7 @@ function SpriteSystem:init()
 end
 
 function SpriteSystem:preWrap(dt)
-    if (self.focus_entity ~= nil) and (self.focus_entity.body ~= nil) then
+    if (self.focus_entity ~= nil) and (not self.focus_entity.body:isDestroyed()) then
         self.focus_pos = Vector2(self.focus_entity.body:getPosition())
     end
 end

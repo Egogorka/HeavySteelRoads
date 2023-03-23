@@ -251,7 +251,6 @@ function ForestLevel.load()
         player2.ai.shoot_box = shoot_box
     end
 
-    SpriteSystem.focus_entity = player
     AITank.target = player
 
     world:addEntity(player2)
@@ -308,8 +307,8 @@ function ForestLevel.update(dt)
     p_world:update(dt)
 
     camera:update(dt)
-    SpriteSystem.focus_pos = Vector2(camera.x,camera.y)
-    if targeting then
+    SpriteSystem.focus_pos = camera.from.pos + camera.from.origin
+    if targeting and not player.body:isDestroyed() then
         camera:follow({player.body:getX(), player.body:getY()})
     else
         camera:follow(nil)
