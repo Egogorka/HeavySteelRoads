@@ -6,9 +6,16 @@
 
 local function fill_table(table, defaults)
     for k, v in pairs(defaults) do
-        if (not table[k]) then
-            table[k] = v
+        if type(table[k]) == "table" and type(v) == "table" then
+            fill_table(table[k], v)
         end
+
+        if table[k] ~= nil then
+            goto continue
+        end
+
+        table[k] = v
+        ::continue::
     end
 end
 
