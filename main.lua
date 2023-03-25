@@ -19,6 +19,8 @@ require("libs/strong")
 local Camera = require("libs/MyCamera")
 local window_w, window_h, flags = love.window.getMode()
 
+GraphicsLoader = require("loaders/GraphicsLoader")()
+
 LEVELS = {
     forest = require("levels/forest/forest"),
     mainMenu = require("levels/main_menu/main_menu")

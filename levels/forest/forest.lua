@@ -9,7 +9,6 @@ local tiny = require("libs/tiny")
 local dump = require("utility/dump")
 local flux = require("libs/flux")
 
-local GraphicsLoader = require("loaders/GraphicsLoader")()
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
 local window_w, window_h, flags = love.window.getMode()
@@ -46,15 +45,17 @@ world:addSystem(AITank)
 local player
 local p_world = love.physics.newWorld(0,0,true)
 
-local sprites = {}
-local animations = {}
 local function load_sprites()
-    sprites = GraphicsLoader:loadSprites("assets/background/")
-    animations = GraphicsLoader:loadAnimations("assets/player/")
+    GraphicsLoader:loadSprites("assets/background/", true)
+    GraphicsLoader:loadAnimations("assets/player/", true)
+    GraphicsLoader:loadAnimations("assets/effects/", true)
 end
 
 function ForestLevel.load()
     load_sprites()
+
+    local sprites = GraphicsLoader.sprites
+    local animations = GraphicsLoader.animations
 
     -- Back-Background --
     local sky1 = {
@@ -217,45 +218,49 @@ function ForestLevel.load()
 
     CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
 
-    local function contact(a, b, coll, text)
+    ---
+    --- ATM I dont know where to put this code, so i write there
+    --- There are two acceptors of contact information - AI and Behaviors.
+    --- Thus the standard for fixture userData is:
+    --- {
+    ---     entity : Entity - contains the link to the parent entity of fixture
+    ---     name : nil|string - stands for name of holder of fixture
+    ---         (example, name = "shoot_box" , then fixture is in entity.shoot_box.fixture)
+    ---     caller : nil|string - contains the name of AI or nil. The contact message is put
+    ---     in AI messages stack. And if it's nil, then in Behavior's.
+    --- }
+    ---
+    local function contact(a_fixture, b_fixture, coll, text)
         --if a.action then
         --    a.action(a, b, coll)
         --end
+        local a = a_fixture:getUserData()
+        local b = b_fixture:getUserData()
 
         if a.caller then
             if a.entity[a.caller].messages then
-                a.entity[a.caller].messages:push({text,
-                    { entity = b.entity, fixture = a.name }
-                })
+                a.entity[a.caller].messages:push({text, {a, b} })
             end
-            --if a.method then
-            --    a.caller.method(a, b, coll)
-            --end
         else
             if a.entity.behavior then
-                a.entity[a.entity.behavior].messages:push({text, b.entity})
+                a.entity[a.entity.behavior].messages:push({text, {a, b} })
             end
         end
     end
 
-    local function beginContact(_a, _b, _coll)
-        local a_data = _a:getUserData()
-        local b_data = _b:getUserData()
-
-        contact(a_data, b_data, _coll, "contact")
-        contact(b_data, a_data, _coll, "contact")
+    local function beginContact(a, b, coll)
+        contact(a, b, coll, "contact")
+        contact(b, a, coll, "contact")
     end
 
-    local function endContact(_a, _b, _coll)
-        local a_data = _a:getUserData()
-        local b_data = _b:getUserData()
-
-        contact(a_data, b_data, _coll, "endContact")
-        contact(b_data, a_data, _coll, "endContact")
+    local function endContact(a, b, coll)
+        contact(a, b, coll, "endContact")
+        contact(b, a, coll, "endContact")
     end
 
     p_world:setCallbacks(beginContact, endContact)
 
+    camera.from.scale = 0.5
     camera.viscosity = 0.1
 end
 

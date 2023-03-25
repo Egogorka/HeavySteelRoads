@@ -65,21 +65,27 @@ function AITank:process(entity, dt)
 end
 
 function AITank:contact(entity, dt, data)
-    if data.fixture ~= "shoot_box" then
+    local other = data[2]
+    local this = data[1]
+
+    if this.name ~= "shoot_box" then
         return
     end
 
-    if data.entity == entity.ai.target then
+    if other.entity == entity.ai.target then
         entity.ai.in_shoot_range = true
         entity.ai.target_pos = Vector2(entity.ai.target.body:getPosition())
     end
 end
 
 function AITank:endContact(entity, dt, data)
-    if data.fixture ~= "shoot_box" then
+    local other = data[2]
+    local this = data[1]
+
+    if this.name ~= "shoot_box" then
         return
     end
-    if data.entity == entity.ai.target then
+    if other.entity == entity.ai.target then
         entity.ai.in_shoot_range = false
     end
 end

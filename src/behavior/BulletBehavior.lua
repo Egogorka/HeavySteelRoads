@@ -34,12 +34,35 @@ function BulletBehavior:process(entity, dt)
     end
 end
 
-function BulletBehavior:contact(entity, dt, other)
-    if other.health then
-        other.health.change = -10
+function BulletBehavior:_explosion(entity)
+    local p_world = entity.body:getWorld()
+    local world = self.world
+    local x, y = entity.body:getPosition()
+
+    local animation = GraphicsLoader.animations.explosion:clone()
+    local explosion = {
+        sprite = animation
+    }
+    explosion.body = love.physics.newBody(p_world, x, y, "static")
+    animation.animations.default[1].onLoop = function(anim, loops)
+        explosion.body:destroy()
+        tiny.removeEntity(world, explosion)
+    end
+
+    world:addEntity(explosion)
+    return explosion
+end
+
+function BulletBehavior:contact(entity, dt, data)
+    local other = data[2]
+    if other.caller ~= nil then return end
+
+    if other.entity.health then
+        other.entity.health.change = -10
     end
 
     local world = self.world
+    self:_explosion(entity)
     tiny.removeEntity(world, entity)
 end
 
