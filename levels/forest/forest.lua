@@ -9,6 +9,8 @@ local tiny = require("libs/tiny")
 local dump = require("utility/dump")
 local flux = require("libs/flux")
 
+local GraphicsLoader = require("loaders/GraphicsLoader")()
+
 local Vector2, Vector3 = unpack(require('utility/vector'))
 local window_w, window_h, flags = love.window.getMode()
 
@@ -47,59 +49,8 @@ local p_world = love.physics.newWorld(0,0,true)
 local sprites = {}
 local animations = {}
 local function load_sprites()
-
-    sprites.sky = Sprite(love.graphics.newImage("assets/background/Sky.png"), false)
-    sprites.sun = Sprite(love.graphics.newImage("assets/background/Sun.png"), false)
-    sprites.road = Sprite(love.graphics.newImage("assets/background/Road1.png"))
-    sprites.forest_front = Sprite(love.graphics.newImage("assets/background/Forest.png"))
-    sprites.forest_back = Sprite(love.graphics.newImage("assets/background/Forest4.png"))
-
-    local body_image = love.graphics.newImage("assets/player/TankBody.png")
-    local body_grid = anim8.newGrid(47, 20, body_image:getWidth(), body_image:getHeight(), -4, -4, 4)
-    animations.body = Sprite({
-        animations = {
-            idle = {
-                anim8.newAnimation(body_grid(1, 1), 1), body_image
-            },
-            move = {
-                anim8.newAnimation(body_grid(1, '1-4'), 0.2), body_image
-            }
-        },
-        current_animation = "idle"
-    })
-
-    local tower_image = love.graphics.newImage("assets/player/TankTower.png")
-    local tower_grid  = anim8.newGrid(51, 29, tower_image:getWidth(), tower_image:getHeight())
-    animations.tower = Sprite({
-        animations = {
-            right = {
-                anim8.newAnimation(tower_grid(1,1), 1), tower_image
-            },
-            right_up = {
-                anim8.newAnimation(tower_grid(1,2), 1), tower_image
-            },
-            up = {
-                anim8.newAnimation(tower_grid(1,3), 1), tower_image
-            },
-            left_up = {
-                anim8.newAnimation(tower_grid(1,4), 1), tower_image
-            },
-            left = {
-                anim8.newAnimation(tower_grid(1,5), 1), tower_image
-            },
-            left_down = {
-                anim8.newAnimation(tower_grid(1,6), 1), tower_image
-            },
-            down = {
-                anim8.newAnimation(tower_grid(1,7), 1), tower_image
-            },
-            right_down = {
-                anim8.newAnimation(tower_grid(1,8), 1), tower_image
-            }
-        },
-        current_animation = "right"
-    })
-
+    sprites = GraphicsLoader:loadSprites("assets/background/")
+    animations = GraphicsLoader:loadAnimations("assets/player/")
 end
 
 function ForestLevel.load()

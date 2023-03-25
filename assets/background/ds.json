@@ -1,0 +1,24 @@
+[
+  {
+    "filename" : "Sky.png",
+    "name" : "sky",
+    "camera_affected" : false
+  },
+  {
+    "filename" : "Sun.png",
+    "name" : "sun",
+    "camera_affected" : false
+  },
+  {
+    "filename" : "Road1.png",
+    "name" : "road"
+  },
+  {
+    "filename" : "Forest.png",
+    "name" : "forest_front"
+  },
+  {
+    "filename" : "Forest4.png",
+    "name" : "forest_back"
+  }
+]

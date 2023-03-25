@@ -1,0 +1,55 @@
+[
+  {
+    "filename" : "TankBody.png",
+    "name" : "body",
+    "grid" : {
+      "size" : [47, 20],
+      "offset" : [-4, -4],
+      "border" : 4
+    },
+    "animations": {
+      "idle" :  {
+        "frames": [1, 1]
+      },
+      "move" : {
+        "frames": [1, "1-4"],
+        "durations": 0.2
+      }
+    },
+    "current_animation": "idle"
+  },
+  {
+    "filename" : "TankTower.png",
+    "name" : "tower",
+    "grid" : {
+      "size" : [51, 29]
+    },
+    "animations": {
+      "right" :  {
+        "frames": [1, 1]
+      },
+      "right_up" : {
+        "frames": [1, 2]
+      },
+      "up": {
+        "frames": [1, 3]
+      },
+      "left_up": {
+        "frames": [1, 4]
+      },
+      "left": {
+        "frames": [1, 5]
+      },
+      "left_down": {
+        "frames": [1, 6]
+      },
+      "down": {
+        "frames": [1, 7]
+      },
+      "right_down": {
+        "frames": [1, 8]
+      }
+    },
+    "current_animation": "right"
+  }
+]
