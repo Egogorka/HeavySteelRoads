@@ -40,7 +40,7 @@ function GraphicsLoader:loadAnimations(path, name)
 
     local destination = {}
     if name then
-        if type(name) == "bool" then
+        if type(name) == "boolean" then
             destination = self.animations
         else
             self.animations.name = {}
@@ -50,6 +50,12 @@ function GraphicsLoader:loadAnimations(path, name)
 
     for k, v in pairs(raw) do
         local image = love.graphics.newImage(path..v.filename)
+
+        local camera_affected, offset, origin, scale
+        if v.camera_affected ~= nil then camera_affected = v.camera_affected end
+        if v.offset ~= nil then offset = v.offset end
+        if v.origin ~= nil then origin = v.origin end
+        if v.scale ~= nil then scale = v.scale end
 
         local grid = nil
         if v.grid then
@@ -81,7 +87,7 @@ function GraphicsLoader:loadAnimations(path, name)
         destination[v.name] = Sprite({
             animations = animations,
             current_animation = v.current_animation
-        })
+        }, camera_affected, offset, origin, scale)
     end
     return destination
 end
@@ -109,7 +115,7 @@ function GraphicsLoader:loadSprites(path, name)
 
     local destination = {}
     if name then
-        if type(name) == "bool" then
+        if type(name) == "boolean" then
             destination = self.sprites
         else
             self.sprites.name = {}
