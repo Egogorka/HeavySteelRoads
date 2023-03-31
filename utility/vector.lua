@@ -67,7 +67,10 @@ function Vector2.__unm(v)
 end
 
 function Vector2.__sub(v1, v2)
-    return v1 + (-v2)
+    local out = Vector2()
+    out[1] = v1[1] - v2[1]
+    out[2] = v1[2] - v2[2]
+    return out
 end
 
 function Vector2.__mul(a, b)
