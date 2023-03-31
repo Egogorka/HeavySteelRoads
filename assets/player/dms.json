@@ -1,0 +1,12 @@
+{
+  "player_tank" : {
+    "body" : {
+      "sprite" : "animations.body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tower",
+      "placement": [-5, -15, 2]
+    }
+  }
+}

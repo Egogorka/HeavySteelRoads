@@ -65,7 +65,7 @@ end
 
 function Placement:init(offset, z_index)
     if(offset ~= nil) then
-        self.offset = offset
+        self.offset = Vector2(offset)
     end
     if(z_index ~= nil) then
         self.z_index = z_index
@@ -102,7 +102,11 @@ function Sprite:init(o, camera_affected, offset, origin, scale)
         self.current_animation = "default"
     else
         self.current_animation = o.current_animation
-        self.animations = o.animations
+
+        self.animations = {}
+        for k, v in pairs(o.animations) do
+            self.animations[k] = {v[1]:clone(), v[2]}
+        end
     end
 end
 
@@ -126,18 +130,7 @@ function Sprite:size()
 end
 
 function Sprite:clone()
-    local out = Sprite()
-    out.camera_affected = self.camera_affected
-    out.scale = self.scale
-    out.current_animation = self.current_animation
-    out.animations = {}
-    out.offset = self.offset
-
-    for k, v in pairs(self.animations) do
-        out.animations[k] = {v[1]:clone(), v[2]}
-    end
-
-    return out
+    return Sprite(self, self.camera_affected, self.offset, self.origin, self.scale)
 end
 
 -----------------------------------------
@@ -167,10 +160,16 @@ function MSprite:init(o, scale)
         self.sprites.default.sprite = Sprite(o)
         self.sprites.default.placement = Placement()
     elseif(o ~= nil) then
+        local source = o
         if(o.sprites ~= nil) then
-            self.sprites = o.sprites
-        else
-            self.sprites = o
+            source = o.sprites
+        end
+        self.sprites = {}
+        for k, v in pairs(source) do
+            self.sprites[k] = {
+                sprite = v.sprite:clone(),
+                placement = v.placement
+            }
         end
     end
 
@@ -180,6 +179,10 @@ function MSprite:init(o, scale)
 
     -- Presort sprites according to their placement z_index
     self:sort()
+end
+
+function MSprite:clone()
+    return MSprite(self, self.scale)
 end
 
 return {Sprite, MSprite, Depth, Placement}

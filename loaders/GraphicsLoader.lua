@@ -7,6 +7,7 @@
 local class = require("libs/30log")
 local json = require("libs/json/json")
 
+local rcall = require("utility/rcall")
 local anim8 = require("libs/anim8")
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
@@ -15,6 +16,7 @@ local GraphicsLoader = class("GraphicsLoader")
 function GraphicsLoader:init()
     self.animations = {}
     self.sprites = {}
+    self.msprites = {}
 end
 
 
@@ -139,5 +141,40 @@ function GraphicsLoader:loadSprites(path, name)
     return destination
 end
 
+
+function GraphicsLoader:loadMSprites(path, name)
+
+    local f = assert(io.open(path.."dms.json", "rb"))
+    local content = f:read("*all")
+    f:close()
+
+    local raw = json.decode(content)
+
+    local destination = {}
+    if name then
+        if type(name) == "boolean" then
+            destination = self.msprites
+        else
+            self.msprites.name = {}
+            destination = self.msprites.name
+        end
+    end
+
+    for k, v in pairs(raw) do
+        destination[k] = {}
+        local temp = {}
+        for key, data in pairs(v) do
+            local sprite = rcall(self, data.sprite)
+            local placement = Placement({data.placement[1], data.placement[2]}, data.placement[3])
+
+            temp[key] = {
+                sprite = sprite,
+                placement = placement
+            }
+        end
+        destination[k] = MSprite(temp)
+    end
+    return destination
+end
 
 return GraphicsLoader
