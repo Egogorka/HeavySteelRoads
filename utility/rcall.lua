@@ -8,7 +8,7 @@ require("libs/strong")
 
 --- @param obj table
 --- @param path string
-local function recursive_call(obj, path)
+function rcall(obj, path)
     local split = path / "."
     local output = obj
     for i, v in ipairs(split) do
@@ -18,4 +18,27 @@ local function recursive_call(obj, path)
 end
 
 
-return recursive_call
+function rcreate(obj, path)
+    local split = path / "."
+    operate = obj
+    for i, v in ipairs(split) do
+        operate[v] = {}
+        operate = operate[v]
+    end
+    return operate
+end
+
+
+function rcopy(table, s)
+    if type(table) ~= 'table' then return table end
+
+    local seen = s or {}
+    if seen[table] then return seen[table] end
+
+    local res = {}
+    seen[table] = res
+    for k, v in pairs(table) do
+        res[k] = rcopy(v, seen) -- there was copy(k, s) for key
+    end
+    return res
+end
