@@ -5,6 +5,7 @@
 ---
 
 local class = require("libs/30log")
+local CategoryManager = require("src/CategoryManager")
 
 local AITank = tiny.processingSystem(class("AITank"))
 AITank.filter = tiny.requireAll("tank", "ai")
@@ -14,9 +15,24 @@ function AITank:init()
 end
 
 function AITank:onAdd(entity)
+    local shoot_box = {}
+
+    shoot_box.shape = love.physics.newRectangleShape(50/2, 20/2, 400, 400)
+    shoot_box.fixture = love.physics.newFixture(entity.body, shoot_box.shape)
+    shoot_box.fixture:setSensor(true)
+    shoot_box.fixture:setUserData({
+        entity = entity,
+        caller = "ai",
+        name = "shoot_box"
+    })
+
+    CategoryManager.setObject(shoot_box.fixture, entity.tank.team)
+
     fill_table(entity.ai, {
         messages = Stack(),
         stack = Stack(),
+
+        shoot_box = shoot_box,
 
         target = self.target,
         target_pos = nil,
@@ -74,7 +90,6 @@ function AITank:contact(entity, dt, data)
 
     if other.entity == entity.ai.target then
         entity.ai.in_shoot_range = true
-        entity.ai.target_pos = Vector2(entity.ai.target.body:getPosition())
     end
 end
 
@@ -99,9 +114,13 @@ function AITank:idle(entity, dt)
     --end
 
     if ai.in_shoot_range then
+        entity.ai.target_pos = Vector2(entity.ai.target.body:getPosition())
         ai.stack:push("aiming")
         return
     end
+
+    entity.tank.messages:push({"move", Vector2({-0.3, 0})})
+    entity.tank.messages:push({"aim", Vector2(entity.body:getPosition()) + {-10, 0}})
 end
 
 --function AITank:ramAwait(entity, dt)
@@ -121,6 +140,9 @@ function AITank:aiming(entity, dt)
 
     if ai.stare_timer < ai.stare_timer_max then
         ai.stare_timer = ai.stare_timer + dt
+        if not entity.ai.target.body:isDestroyed() then
+            entity.ai.target_pos = Vector2(entity.ai.target.body:getPosition())
+        end
         ai.stack:push("aiming")
         return
     end

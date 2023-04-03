@@ -31,7 +31,6 @@ local ForestLevel = Scene()
 
 
 local world = tiny.world()
---world:addSystem(PlayerControlSystem)
 world:addSystem(SpriteSystem)
 world:addSystem(ShapeDebug)
 world:addSystem(HealthSystem)
@@ -49,13 +48,19 @@ local function load_sprites()
     GraphicsLoader:loadSprites("assets/background/", true)
     GraphicsLoader:loadAnimations("assets/player/", true)
     GraphicsLoader:loadAnimations("assets/effects/", true)
+    GraphicsLoader:loadMSprites("assets/player/", true)
 end
 
 function ForestLevel.load()
     load_sprites()
 
+    PrefabsLoader:loadPrefabs("prefabs/tanks.json", "tanks")
+
+    PrefabsLoader:setPhysicsWorld(p_world)
+
     local sprites = GraphicsLoader.sprites
     local animations = GraphicsLoader.animations
+    local msprites = GraphicsLoader.msprites
 
     -- Back-Background --
     local sky1 = {
@@ -127,96 +132,28 @@ function ForestLevel.load()
         world:addEntity(forest_front)
     end
 
-    player = {
-        msprite = MSprite({
-            body = {
-                sprite = animations.body,
-                placement = Placement(Vector2(), 1)
-            },
-            tower = {
-                sprite = animations.tower,
-                placement = Placement(Vector2(-5,-15), 2)
-            },
-        }),
-        behavior = "tank",
-        tank = {
-            aim = nil,
-            team = CategoryManager.categories.player
-        },
-        health = {
-            count = 20,
-            change = 0
-        },
-        player = 1,
-        depth = Depth(1)
-    }
-
-    player.body = love.physics.newBody(p_world, 300, window_h/2 + sprites.road:size()[2]/2, "dynamic")
-    player.body:setFixedRotation(true)
-    player.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
-    player.fixture = love.physics.newFixture(player.body, player.shape)
-    player.fixture:setUserData({
-        entity = player
-    })
+    player = PrefabsLoader:fabricate("tanks.player_tank")
+    player.body:setPosition(300, window_h/2 + sprites.road:size()[2]/2)
+    player.player = 1
+    player.tank.team = CategoryManager.categories.player
     world:addEntity(player)
 
     CategoryManager.setObject(player.fixture, CategoryManager.categories.player)
 
-    local player2 = {
-        msprite = MSprite({
-            body = {
-                sprite = animations.body:clone(),
-                placement = Placement(Vector2(), 1)
-            },
-            tower = {
-                sprite = animations.tower:clone(),
-                placement = Placement(Vector2(-5,-15), 2)
-            },
-        }),
-        behavior = "tank",
-        tank = {
-            aim = nil
-        },
-        health = {
-            count = 100,
-            change = 0
-        },
-        depth = Depth(1),
-
-        ai = {}
-    }
-
-    player2.body = love.physics.newBody(p_world, 400, window_h/2 + sprites.road:size()[2]/2, "dynamic")
-    player2.body:setFixedRotation(true)
-    player2.shape = love.physics.newRectangleShape(50/2,20/2, 50,20)
-    player2.fixture = love.physics.newFixture(player2.body, player2.shape)
-    player2.fixture:setUserData({
-        entity = player2
-    })
-
-    CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
-    do
-        local shoot_box = {}
-
-        shoot_box.shape = love.physics.newRectangleShape(50/2, 20/2, 100, 100)
-        shoot_box.fixture = love.physics.newFixture(player2.body, shoot_box.shape)
-        shoot_box.fixture:setSensor(true)
-        shoot_box.fixture:setUserData({
-            entity = player2,
-            caller = "ai",
-            name = "shoot_box"
-        })
-
-        CategoryManager.setObject(shoot_box.fixture, CategoryManager.categories.enemy)
-        player2.ai.shoot_box = shoot_box
-    end
-
     AITank.target = player
 
-    world:addEntity(player2)
-    world:refresh()
+    player2 = PrefabsLoader:fabricate("tanks.player_tank")
+    player2.body:setPosition(400, window_h/2 + sprites.road:size()[2]/2)
+    player2.ai = {}
 
-    CategoryManager.setObject(player2.fixture, CategoryManager.categories.enemy)
+    player3 = PrefabsLoader:fabricate("tanks.player_tank")
+    player3.body:setPosition(450, window_h/2 + sprites.road:size()[2]/4)
+    player3.ai = {}
+    CategoryManager.setObject(player3.fixture, CategoryManager.categories.enemy)
+
+    world:addEntity(player2)
+    world:addEntity(player3)
+    world:refresh()
 
     ---
     --- ATM I dont know where to put this code, so i write there
@@ -261,7 +198,8 @@ function ForestLevel.load()
     p_world:setCallbacks(beginContact, endContact)
 
     camera.from.scale = 0.5
-    camera.viscosity = 0.1
+    camera.viscosity = 1
+    camera.inertia = 0.5
 end
 
 local targeting = true

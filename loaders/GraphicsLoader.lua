@@ -7,7 +7,7 @@
 local class = require("libs/30log")
 local json = require("libs/json/json")
 
-local rcall = require("utility/rcall")
+require("utility/rcall")
 local anim8 = require("libs/anim8")
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 

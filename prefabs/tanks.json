@@ -1,0 +1,18 @@
+{
+  "player_tank": {
+    "msprite": "player_tank",
+    "depth": 1,
+
+    "behavior" : "tank",
+    "tank" : {
+      "aim" : null
+    },
+    "health" : {
+      "count" : 100
+    },
+
+    "body": "dynamic",
+    "shape" : [25, 10, 50, 20],
+    "fixture" : 1
+  }
+}
