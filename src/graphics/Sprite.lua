@@ -35,7 +35,7 @@ local Sprite = class("Sprite", {
     origin = Vector2(),
 
     camera_affected = true,
-    effects = {}, -- Effects
+    effect = nil
 })
 
 -- Short for MultipleSprite
@@ -44,7 +44,9 @@ local MSprite = class("MSprite", {
         default = Sprite(love.graphics.newImage("assets/placeholder.png")),
     },
     sprites_z_order = {"default"}, --- sprites Z order
-    scale = 1
+    scale = 1,
+
+    effect = nil
 })
 
 -----------------------------------------

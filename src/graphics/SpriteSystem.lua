@@ -45,25 +45,8 @@ function SpriteSystem:processSprite(sprite, dt, position, depth, scale, angle)
     end
     scale = scale * sprite.scale
 
-    local color = {love.graphics.getColor()}
-    if sprite.hurt_effect then
-        sprite.hurt_effect = false
-
-        sprite.hurt_effect_flag = true
-        sprite.hurt_color = 1
-
-        local temp = flux
-            .to(sprite, 0.1, { hurt_color = 0.2} )
-            :ease("elasticout")
-            :after(sprite, 0.1, { hurt_color = 1} )
-            :oncomplete(
-        function()
-            sprite.hurt_effect_flag = false
-        end)
-    end
-
-    if sprite.hurt_effect_flag then
-        love.graphics.setColor(1, sprite.hurt_color, sprite.hurt_color, 1)
+    if sprite.effect then
+        sprite.effect:beforeDraw(sprite)
     end
 
     if sprite.camera_affected then
@@ -74,16 +57,30 @@ function SpriteSystem:processSprite(sprite, dt, position, depth, scale, angle)
         camera:attach()
     end
 
-    if sprite.hurt_effect_flag then
-        love.graphics.setColor(color)
+    if sprite.effect then
+        sprite.effect:afterDraw(sprite)
+        if sprite.effect.is_done then
+            sprite.effect = nil
+        end
     end
 end
 
 function SpriteSystem:processMSprite(msprite, dt, position, depth, scale, angle)
+    local flag = false
     for _, key in ipairs(msprite.sprites_z_order) do
         local sprite = msprite.sprites[key].sprite
         local placement = msprite.sprites[key].placement
+
+        if sprite.effect == nil and msprite.effect ~= nil then
+            sprite.effect = msprite.effect
+            flag = true
+        end
+
         self:processSprite(sprite, dt, position + placement.offset, depth, scale * msprite.scale, angle)
+    end
+
+    if flag then
+        msprite.effect = nil
     end
 end
 

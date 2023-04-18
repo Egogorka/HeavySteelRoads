@@ -16,6 +16,7 @@ local Torus = require("utility/torus")
 
 local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/CategoryManager")
+local Effects = require("src/graphics/Effects")
 
 local tiny = require("libs/tiny")
 
@@ -179,8 +180,7 @@ function TankBehavior:shoot(entity, dt)
 end
 
 function TankBehavior:hurt(entity, dt)
-    entity.msprite.sprites.body.sprite.hurt_effect = true
-    entity.msprite.sprites.tower.sprite.hurt_effect = true
+    entity.msprite.effect = Effects.hurt()
 end
 
 function TankBehavior:die(entity, dt)
