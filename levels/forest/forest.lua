@@ -138,8 +138,6 @@ function ForestLevel.load()
     player.tank.team = CategoryManager.categories.player
     world:addEntity(player)
 
-    CategoryManager.setObject(player.fixture, CategoryManager.categories.player)
-
     AITank.target = player
 
     player2 = PrefabsLoader:fabricate("tanks.player_tank")
@@ -149,7 +147,6 @@ function ForestLevel.load()
     player3 = PrefabsLoader:fabricate("tanks.player_tank")
     player3.body:setPosition(450, window_h/2 + sprites.road:size()[2]/4)
     player3.ai = {}
-    CategoryManager.setObject(player3.fixture, CategoryManager.categories.enemy)
 
     world:addEntity(player2)
     world:addEntity(player3)

@@ -38,6 +38,7 @@ function TankBehavior:onAdd(entity)
 
         team = CategoryManager.categories.enemy
     })
+    CategoryManager.setObject(entity.fixture, entity.tank.team)
 end
 
 --- Aim block
@@ -166,7 +167,7 @@ function TankBehavior:shoot(entity, dt)
     end
     entity.tank.reload_timer:start()
 
-    local vel = 500 * Vector2.fromPolar(1, entity.tank.rotation_angle * math.pi)
+    local vel = 300 * Vector2.fromPolar(1, entity.tank.rotation_angle * math.pi)
     local bullet = self:_bullet(entity)
     bullet.body:setLinearVelocity(vel[1], vel[2])
     bullet.body:setAngle(entity.tank.rotation_angle * math.pi)
