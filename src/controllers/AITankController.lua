@@ -147,7 +147,7 @@ function AITank:aiming(entity, dt)
         return
     end
 
-    if entity.tank.reloaded then
+    if not entity.tank.reload_timer.is_on then
         ai.stare_timer = 0
         entity.tank.messages:push({"shoot"})
     end

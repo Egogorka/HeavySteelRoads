@@ -13,6 +13,7 @@ local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
 local dump = require("utility/dump")
 local Torus = require("utility/torus")
+local Timer = require("utility/timer")
 
 local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/CategoryManager")
@@ -28,9 +29,7 @@ function TankBehavior:onAdd(entity)
     fill_table(entity.tank, {
         messages = Stack(),
 
-        reloaded = true,
-        shoot_timer = 0,
-        shoot_timer_max = 1,
+        reload_timer = Timer(1),
 
         aimed = false,
         rotation_speed = 1,
@@ -73,13 +72,7 @@ end
 function TankBehavior:process(entity, dt)
     local tank = entity.tank
 
-    if not tank.reloaded then
-        tank.shoot_timer = tank.shoot_timer + dt
-        if tank.shoot_timer > tank.shoot_timer_max then
-            tank.shoot_timer = 0
-            tank.reloaded = true
-        end
-    end
+    tank.reload_timer:update(dt)
 
     if not tank.aimed then
         local t_current = Torus(tank.rotation_angle/2 + 1/2)
@@ -168,10 +161,10 @@ end
 
 function TankBehavior:shoot(entity, dt)
 
-    if not entity.tank.reloaded then
+    if entity.tank.reload_timer.is_on then
         return
     end
-    entity.tank.reloaded = false
+    entity.tank.reload_timer:start()
 
     local vel = 500 * Vector2.fromPolar(1, entity.tank.rotation_angle * math.pi)
     local bullet = self:_bullet(entity)
