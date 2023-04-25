@@ -25,6 +25,7 @@ function HealthSystem:process(entity, dt)
     end
     if health.count < 0 then
         entity[behavior].messages:push({"die"})
+        health.count = 0
     end
 end
 

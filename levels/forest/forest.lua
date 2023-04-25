@@ -29,6 +29,7 @@ local AITank = require("src/controllers/AITankController")()
 local Scene = require("src/SceneManager")
 local ForestLevel = Scene()
 
+local HPBar = require("src/gui/HP_Bar")
 
 local world = tiny.world()
 world:addSystem(SpriteSystem)
@@ -44,19 +45,21 @@ world:addSystem(AITank)
 local player
 local p_world = love.physics.newWorld(0,0,true)
 
+local gui = {}
+
 local function load_sprites()
     GraphicsLoader:loadSprites("assets/background/", true)
     GraphicsLoader:loadAnimations("assets/player/", true)
     GraphicsLoader:loadAnimations("assets/effects/", true)
     GraphicsLoader:loadMSprites("assets/player/", true)
+
+    gui.stats_tab = love.graphics.newImage("assets/gui/PanelInterfaceNew2.png")
+
+    HPBar.load()
+    gui.hp_bar = HPBar(40, 100)
 end
 
-function ForestLevel.load()
-    load_sprites()
-
-    PrefabsLoader:loadPrefabs("prefabs/tanks.json", "tanks")
-
-    PrefabsLoader:setPhysicsWorld(p_world)
+local function load_level()
 
     local sprites = GraphicsLoader.sprites
     local animations = GraphicsLoader.animations
@@ -150,6 +153,15 @@ function ForestLevel.load()
 
     world:addEntity(player2)
     world:addEntity(player3)
+end
+
+function ForestLevel.load()
+    load_sprites()
+
+    PrefabsLoader:loadPrefabs("prefabs/tanks.json", "tanks")
+    PrefabsLoader:setPhysicsWorld(p_world)
+
+    load_level()
     world:refresh()
 
     ---
@@ -194,7 +206,7 @@ function ForestLevel.load()
 
     p_world:setCallbacks(beginContact, endContact)
 
-    camera.from.scale = 0.5
+    camera.from.scale = 1
     camera.viscosity = 1
     camera.inertia = 0.5
 end
@@ -214,6 +226,15 @@ function ForestLevel.update(dt)
     end
 end
 
+local function Gui_draw()
+
+    love.graphics.draw(gui.stats_tab, 0, 0, 0, 2, 2)
+    --love.graphics.draw(gui.hp_texture, gui.hp, 10, 10, 0, 2, 2)
+    gui.hp_bar:setHP(player.health.count)
+    gui.hp_bar:draw(10, 10)
+
+end
+
 function ForestLevel.draw(dt)
     flux.update(dt)
 
@@ -222,6 +243,7 @@ function ForestLevel.draw(dt)
     camera:detach()
 
     camera:draw()
+    Gui_draw()
 end
 
 function ForestLevel.mousepressed(x, y, button, istouch, presses)
