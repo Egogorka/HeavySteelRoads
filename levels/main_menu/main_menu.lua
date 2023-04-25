@@ -27,19 +27,19 @@ local animations = {}
 
 local function load_sprites()
     do
-        local temp = love.graphics.newImage("assets/menu/AncharMenu1.png")
+        local temp = love.graphics.newImage("assets/gui/AncharMenu1.png")
         sprites.background = Sprite(
             temp, true, Vector2(-temp:getWidth()/2, 0), Vector2(temp:getWidth()/2, 0)
         )
     end
     do
-        local temp = love.graphics.newImage("assets/menu/Logo3.png")
+        local temp = love.graphics.newImage("assets/gui/Logo3.png")
         sprites.logo = Sprite(
             temp, true, Vector2(-temp:getWidth()/2, -temp:getHeight()/2), Vector2(temp:getWidth()/2, temp:getHeight()/2)
         )
     end
 
-    local button_image = love.graphics.newImage("assets/menu/MenuButtons2.png")
+    local button_image = love.graphics.newImage("assets/gui/MenuButtons2.png")
     local button_grid = anim8.newGrid(
             102, 18,
             button_image:getWidth(), button_image:getHeight(),
@@ -106,6 +106,7 @@ function MainMenu.load()
         CHANGE_LEVEL("exit")
     end
 
+    window_w, window_h, flags = love.window.getMode()
     MainMenu.resize(window_w, window_h)
 end
 
