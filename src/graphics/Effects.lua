@@ -45,6 +45,27 @@ end
 --- Ram Effect
 -----------------------------------------------------------
 
+function RamEffect:init(sprite)
+    self.hurt_color = 1
+    flux.to(self, 0.1, { hurt_color = 0.2 })
+        :ease("elasticout")
+        :after(self, 0.1, { hurt_color = 1 })
+        :oncomplete(function()
+        self.is_done = true
+    end)
+end
+
+function RamEffect:beforeDraw(sprite)
+    self.color = {love.graphics.getColor()}
+    love.graphics.setColor(self.hurt_color, self.hurt_color, 1, 1)
+end
+
+function RamEffect:afterDraw(sprite)
+    love.graphics.setColor(self.color)
+end
+
+-----------------------------------------------------------
+
 local EffectArray = {
     hurt = HurtEffect,
     ram = RamEffect

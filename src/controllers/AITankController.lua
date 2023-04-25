@@ -28,26 +28,32 @@ function AITank:onAdd(entity)
 
     CategoryManager.setObject(shoot_box.fixture, entity.tank.team)
 
+    local ram_box = {}
+
+    ram_box.shape = love.physics.newRectangleShape(50/2, 20/2, 100, 100)
+    ram_box.fixture = love.physics.newFixture(entity.body, ram_box.shape)
+    ram_box.fixture:setSensor(true)
+    ram_box.fixture:setUserData({
+        entity = entity,
+        caller = "ai",
+        name = "ram_box"
+    })
+
     fill_table(entity.ai, {
         messages = Stack(),
         stack = Stack(),
 
         shoot_box = shoot_box,
+        ram_box = ram_box,
 
         target = self.target,
         target_pos = nil,
-        in_shoot_range = false,
 
+        in_shoot_range = false,
         stare_timer_max = 1,
         stare_timer = 0,
 
-        --ram_timer = 0,
-        --ram_timer_max = 20,
-        --ram_reloaded = true,
-        --in_ram_range = false,
-        --
-        --ram_anticipation_timer = 0,
-        --ram_anticipation_max = 5
+        in_ram_range = false,
     })
 end
 
@@ -84,12 +90,16 @@ function AITank:contact(entity, dt, data)
     local other = data[2]
     local this = data[1]
 
-    if this.name ~= "shoot_box" then
-        return
+    if this.name == "shoot_box" then
+        if other.entity == entity.ai.target then
+            entity.ai.in_shoot_range = true
+        end
     end
 
-    if other.entity == entity.ai.target then
-        entity.ai.in_shoot_range = true
+    if this.name == "ram_box" then
+        if other.entity == entity.ai.target then
+            entity.ai.in_ram_range = true
+        end
     end
 end
 
@@ -97,11 +107,16 @@ function AITank:endContact(entity, dt, data)
     local other = data[2]
     local this = data[1]
 
-    if this.name ~= "shoot_box" then
-        return
+    if this.name == "shoot_box" then
+        if other.entity == entity.ai.target then
+            entity.ai.in_shoot_range = false
+        end
     end
-    if other.entity == entity.ai.target then
-        entity.ai.in_shoot_range = false
+
+    if this.name == "ram_box" then
+        if other.entity == entity.ai.target then
+            entity.ai.in_ram_range = false
+        end
     end
 end
 
@@ -113,7 +128,14 @@ function AITank:idle(entity, dt)
     --    return
     --end
 
+    if ai.in_ram_range then
+        entity.ai.ram_pos = Vector2(entity.ai.target.body:getPosition())
+        ai.stack:push("ram")
+        return
+    end
+
     if ai.in_shoot_range then
+
         entity.ai.target_pos = Vector2(entity.ai.target.body:getPosition())
         ai.stack:push("aiming")
         return
@@ -123,15 +145,17 @@ function AITank:idle(entity, dt)
     entity.tank.messages:push({"aim", Vector2(entity.body:getPosition()) + {-10, 0}})
 end
 
---function AITank:ramAwait(entity, dt)
---    local ai = entity.ai
---    entity.tank.messages:push("stop")
---
---end
---
---function AITank:ram(entity, dt)
---
---end
+function AITank:ramAwait(entity, dt)
+    local ai = entity.ai
+    entity.tank.messages:push({"stop"})
+end
+
+function AITank:ram(entity, dt)
+    if entity.tank.ram_reload_timer.is_on then
+        return
+    end
+    entity.tank.messages:push({"ram", entity.ai.ram_pos})
+end
 
 function AITank:aiming(entity, dt)
     local ai = entity.ai
@@ -147,7 +171,7 @@ function AITank:aiming(entity, dt)
         return
     end
 
-    if not entity.tank.reload_timer.is_on then
+    if not entity.tank.shoot_reload_timer.is_on then
         ai.stare_timer = 0
         entity.tank.messages:push({"shoot"})
     end

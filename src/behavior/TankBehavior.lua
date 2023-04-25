@@ -25,19 +25,33 @@ local tiny = require("libs/tiny")
 local TankBehavior = tiny.processingSystem()
 TankBehavior.filter = tiny.requireAll("tank", "body", "msprite")
 
+TankBehavior.states = {
+    ramming = {
+        shoot = true, move = true
+    }
+}
+
 function TankBehavior:onAdd(entity)
     fill_table(entity.tank, {
         messages = Stack(),
+        stack = Stack(),
 
-        reload_timer = Timer(1),
+        shoot_reload_timer = Timer(1),
 
         aimed = false,
         rotation_speed = 1,
         rotation_angle = 0, -- In units of Pi : Right is 0, Down is 1/2
         target_angle = 0,
 
+        ram_reload_timer = Timer(2),
+        ram_pre_timer = Timer(1),
+        ram_pos = nil,
+
+        -- Default team setting - enemy
         team = CategoryManager.categories.enemy
     })
+    entity.tank.ram_pre_timer.on_end = function(timer) self:_ram(entity) end
+
     CategoryManager.setObject(entity.fixture, entity.tank.team)
 end
 
@@ -73,7 +87,9 @@ end
 function TankBehavior:process(entity, dt)
     local tank = entity.tank
 
-    tank.reload_timer:update(dt)
+    tank.shoot_reload_timer:update(dt)
+    tank.ram_reload_timer:update(dt)
+    tank.ram_pre_timer:update(dt)
 
     if not tank.aimed then
         local t_current = Torus(tank.rotation_angle/2 + 1/2)
@@ -99,16 +115,37 @@ function TankBehavior:process(entity, dt)
         local message = tank.messages:pop()
         local command = message[1]
 
+        if tank.ram_reload_timer.is_on and self.states.ramming[command] then
+            goto continue
+        end
+
         if self[command] then
             self[command](self, entity, dt, message[2])
         end
+        ::continue::
     end
+end
+
+function TankBehavior:ram(entity, dt, pos)
+    entity.tank.ram_reload_timer:start()
+    entity.tank.ram_pre_timer:start()
+    entity.msprite.effect = Effects.ram()
+    entity.tank.ram_pos = Vector2(pos)
+end
+
+function TankBehavior:_ram(entity)
+    local temp = entity.tank.ram_pos - Vector2(entity.body:getPosition())
+    local dir = temp / temp:mag() * 500
+
+    entity.msprite.sprites.body.sprite:set("move")
+    entity.body:setLinearVelocity(dir:x(), dir:y())
 end
 
 --- Move block
 ---@param vel - Vector2
 function TankBehavior:move(entity, dt, vel)
-    local velocity = vel * 100
+    local temp = Vector2(vel)
+    local velocity = temp / temp:mag() * 100
 
     --entity.tank.is_moving = true
     entity.msprite.sprites.body.sprite:set("move")
@@ -162,10 +199,10 @@ end
 
 function TankBehavior:shoot(entity, dt)
 
-    if entity.tank.reload_timer.is_on then
+    if entity.tank.shoot_reload_timer.is_on or not entity.tank.aimed then
         return
     end
-    entity.tank.reload_timer:start()
+    entity.tank.shoot_reload_timer:start()
 
     local vel = 300 * Vector2.fromPolar(1, entity.tank.rotation_angle * math.pi)
     local bullet = self:_bullet(entity)
@@ -174,7 +211,9 @@ function TankBehavior:shoot(entity, dt)
 end
 
 function TankBehavior:hurt(entity, dt)
-    entity.msprite.effect = Effects.hurt()
+    if entity.msprite.effect == nil then
+        entity.msprite.effect = Effects.hurt()
+    end
 end
 
 function TankBehavior:die(entity, dt)
