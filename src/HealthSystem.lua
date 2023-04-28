@@ -7,24 +7,43 @@
 local tiny = require("libs/tiny")
 local dump = require("utility/dump")
 
+local Timer = require("utility/timer")
+
 -- The purpose of HPSystem is to look out for collisions and
 local HealthSystem = tiny.processingSystem()
 HealthSystem.filter = tiny.requireAll("health", "behavior")
 
+function HealthSystem:onAdd(entity)
+    fill_table(entity.health, {
+        count = 0,
+        change = 0,
+        i_time = 1 -- invincibility
+    })
+    entity.health._i_timer = Timer(entity.health.i_time)
+end
+
 function HealthSystem:process(entity, dt)
     local behavior = entity.behavior
     local health = entity.health
-    if not behavior then
-        return
+
+    health._i_timer:update(dt)
+
+    if health._i_timer.is_on then
+        return -- If invincibility frames are on - no handle
     end
 
     if health.change and health.change ~= 0 then
-        entity[behavior].messages:push({"hurt", health.change})
+        health._i_timer:start()
+        if behavior then
+            entity[behavior].messages:push({"hurt", health.change})
+        end
         health.count = health.count + health.change
         health.change = 0
     end
     if health.count < 0 then
-        entity[behavior].messages:push({"die"})
+        if behavior then
+            entity[behavior].messages:push({"die"})
+        end
         health.count = 0
     end
 end
