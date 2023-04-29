@@ -38,6 +38,8 @@ local Camera = class("Camera", {
 
         scale = 1,
         angle = 0,
+
+        pos_previous = Vector2({0,0})
     },
 
     to = {
@@ -102,7 +104,6 @@ function Camera:setFromSizes(out_pos, out_size, in_pos, in_size)
     end
 
     local scales = self.to.size/self.from.size
-    print("Scales", dump(scales, 2, 2))
     self.to.scale = math.min(scales[1], scales[2])
 end
 
@@ -202,9 +203,25 @@ function Camera:update(dt)
         -- If there is no target there's nothing to do
         return
     end
-    local target = self.target
+    local target = self.target + (self.target - self.target_previous) * self.lead
 
     local delta = self:_deadzone_process(self:w2wc(target))
+
+    --local temp1 = 1
+    --local temp2 = 1
+    --if self.viscosity then
+    --    temp1 = dt / self.viscosity
+    --end
+    --
+    --if self.inertia then
+    --    temp2 = dt / self.inertia * dt
+    --end
+    --
+    --local temp = self.from.pos
+    --self.from.pos = self.from.pos +
+    --        cap(temp2) * transform(delta, self.from.scale, self.from.angle) +
+    --        (1 - temp1) * (self.from.pos - self.from.pos_previous)
+    --self.from.pos_previous = temp
 
     local temp = 1
     if self.viscosity then
@@ -261,10 +278,8 @@ end
 ---@param
 function Camera:follow(vec)
     if vec then
+        self.target_previous = self.target or Vector2(vec)
         self.target = Vector2(vec)
-        if not self.target_previous then
-            self.target_previous = self.target
-        end
         return
     end
     self.target = nil
