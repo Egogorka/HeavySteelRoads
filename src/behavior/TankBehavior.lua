@@ -46,6 +46,7 @@ function TankBehavior:onAdd(entity)
         ram_reload_timer = Timer(2),
         ram_pre_timer = Timer(1),
         ram_pos = nil,
+        --ram_distance = 50,
 
         -- Default team setting - enemy
         team = CategoryManager.categories.enemy
@@ -144,8 +145,12 @@ end
 --- Move block
 ---@param vel - Vector2
 function TankBehavior:move(entity, dt, vel)
-    local temp = Vector2(vel)
-    local velocity = temp / temp:mag() * 100
+    local v = Vector2(vel)
+
+    local velocity = v * 100
+    if v:mag() > 1 then
+        velocity = velocity / v:mag()
+    end
 
     --entity.tank.is_moving = true
     entity.msprite.sprites.body.sprite:set("move")
