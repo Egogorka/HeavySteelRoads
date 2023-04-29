@@ -29,6 +29,7 @@ function HealthSystem:process(entity, dt)
     health._i_timer:update(dt)
 
     if health._i_timer.is_on then
+        health.change = 0
         return -- If invincibility frames are on - no handle
     end
 
