@@ -11,6 +11,7 @@ local flux = require("libs/flux")
 
 local Effect = class("Effect", {
     is_done = false,
+    update = function(self, sprite, dt) end,
     beforeDraw = function(self, sprite) end,
     afterDraw = function(self, sprite)  end
 })

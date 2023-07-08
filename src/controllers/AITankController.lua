@@ -111,7 +111,7 @@ end
 
 function AITank:ram(entity, dt)
     -- Needs to be fixed
-    if entity.tank.ram_reload_timer.is_on then
+    if entity.tank.ram_timer.is_on or entity.tank.ram_pre_timer.is_on then
         entity.ai.stack:push("ram")
     end
 end
