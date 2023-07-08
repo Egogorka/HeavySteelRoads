@@ -11,6 +11,8 @@ local flux = require("libs/flux")
 
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
+local Timer = require("utility/timer")
+
 local window_w, window_h, flags = love.window.getMode()
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
@@ -22,11 +24,12 @@ local HealthSystem = require("src/HealthSystem")
 
 local TankBehavior = require("src/behavior/TankBehavior")
 local BulletBehavior = require("src/behavior/BulletBehavior")
+local TruckBehavior = require("src/behavior/TruckBehavior")
 
 local PlayerController = require("src/controllers/PlayerController")
 local AITank = require("src/controllers/AITankController")()
 
-local Scene = require("src/SceneManager")
+local Scene = require("src/scene/Scene")
 local ForestLevel = Scene()
 
 local HPBar = require("src/gui/HP_Bar")
@@ -38,6 +41,7 @@ world:addSystem(HealthSystem)
 
 world:addSystem(TankBehavior)
 world:addSystem(BulletBehavior)
+world:addSystem(TruckBehavior)
 
 world:addSystem(PlayerController)
 world:addSystem(AITank)
@@ -50,6 +54,7 @@ local gui = {}
 local function load_sprites()
     GraphicsLoader:loadSprites("assets/background/", true)
     GraphicsLoader:loadAnimations("assets/player/", true)
+    GraphicsLoader:loadAnimations("assets/entities/enemies/", true)
     GraphicsLoader:loadAnimations("assets/effects/", true)
     GraphicsLoader:loadMSprites("assets/player/", true)
 
@@ -59,11 +64,14 @@ local function load_sprites()
     gui.hp_bar = HPBar(40, 100)
 end
 
-local function load_level()
+local background = {}
+local road_height = 0
 
-    local sprites = GraphicsLoader.sprites
-    local animations = GraphicsLoader.animations
-    local msprites = GraphicsLoader.msprites
+local sprites = GraphicsLoader.sprites
+local animations = GraphicsLoader.animations
+local msprites = GraphicsLoader.msprites
+
+local function load_level()
 
     -- Back-Background --
     local sky1 = {
@@ -88,80 +96,134 @@ local function load_level()
     world:addEntity(sun)
 
     -- Background --
+    -- Trees
     for i=0,10 do
+        local forest_back3 = { sprite = sprites.forest_back2, depth = Depth(1.3, false) }
+        local x = -20 + i * sprites.forest_front:size()[1]*1.3
+        local y = - sprites.forest_front:size()[2] - 80
+        forest_back3.body = love.physics.newBody(p_world, x, y, "kinematic")
+        world:addEntity(forest_back3)
+        table.insert(background, forest_back3)
+    end
 
-        -- Road Entities
+    --for i=0,10 do
+    --    local forest_back2 = { sprite = sprites.forest_front, depth = Depth(1.4, false) }
+    --    local x = -10 + i * sprites.forest_front:size()[1]*1.4
+    --    local y = - sprites.forest_front:size()[2] - 40*2
+    --    forest_back2.body = love.physics.newBody(p_world, x, y, "kinematic")
+    --    world:addEntity(forest_back2)
+    --    table.insert(background, forest_back2)
+    --end
+    --
+    for i=0, 10 do
+        local forest_back1 = { sprite = sprites.forest_front, depth = Depth(1.2, false) }
+        local x = 0 + i * sprites.forest_front:size()[1]*1.2
+        local y = - sprites.forest_front:size()[2] - 40
+        forest_back1.body = love.physics.newBody(p_world, x, y, "kinematic")
+        world:addEntity(forest_back1)
+        table.insert(background, forest_back1)
+    end
 
+    for i=0, 10 do
+        local forest_front = { sprite = sprites.forest_back }
+        local x = 0 + i * sprites.forest_back:size()[1]
+        local y = - sprites.forest_back:size()[2]
+        forest_front.body = love.physics.newBody(p_world, x, y, "kinematic")
+        world:addEntity(forest_front)
+        table.insert(background, forest_front)
+    end
+
+    -- Road Entities
+    for i=0, 10 do
         local road = { sprite = sprites.road }
-        road.body = love.physics.newBody(p_world, i * road.sprite:size()[1], window_h/2)
+        road.body = love.physics.newBody(p_world, i * road.sprite:size()[1], 0, "kinematic")
         world:addEntity(road)
+        table.insert(background, road)
 
         local roadTopBlock = {
-            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 - 10/2),
+            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], - 10/2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
         roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
         roadTopBlock.fixture:setUserData({
             entity = roadTopBlock
         })
-        world:addEntity(roadTopBlock)
 
         local roadBottomBlock = {
-            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], window_h/2 + road.sprite:size()[2] + 10/2),
+            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], road.sprite:size()[2] + 10/2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
         roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
         roadBottomBlock.fixture:setUserData({
             entity = roadBottomBlock
         })
-        world:addEntity(roadBottomBlock)
-
-
-        CategoryManager.setBulletproof(roadTopBlock.fixture)
-        CategoryManager.setBulletproof(roadBottomBlock.fixture)
-
-        -- Trees
-
-        local forest_back2 = { sprite = sprites.forest_back, depth = Depth(1.4, false) }
-        forest_back2.body = love.physics.newBody(p_world, -10 + i * sprites.forest_back:size()[1]*1.4, window_h/2 - 86 - 20 - 20),
-        world:addEntity(forest_back2)
-
-        local forest_back1 = { sprite = sprites.forest_back, depth = Depth(1.2, false) }
-        forest_back1.body = love.physics.newBody(p_world, 0 + i * sprites.forest_back:size()[1]*1.2, window_h/2 - 86 - 20)
-        world:addEntity(forest_back1)
-
-        local forest_front = { sprite = sprites.forest_front, }
-        forest_front.body = love.physics.newBody(p_world, 0 + i * sprites.forest_front:size()[1], window_h/2 - 166)
-        world:addEntity(forest_front)
+        --CategoryManager.setBulletproof(roadTopBlock.fixture)
+        --CategoryManager.setBulletproof(roadBottomBlock.fixture)
     end
 
     player = PrefabsLoader:fabricate("tanks.player_tank")
-    player.body:setPosition(300, window_h/2 + sprites.road:size()[2]/2)
+    player.body:setPosition(100, sprites.road:size()[2]/2)
     player.player = 1
     player.tank.team = CategoryManager.categories.player
     world:addEntity(player)
 
     AITank.target = player
-
-    player2 = PrefabsLoader:fabricate("tanks.player_tank")
-    player2.body:setPosition(400, window_h/2 + sprites.road:size()[2]/2)
-    player2.ai = {}
-
-    player3 = PrefabsLoader:fabricate("tanks.player_tank")
-    player3.body:setPosition(450, window_h/2 + sprites.road:size()[2]/4)
-    player3.ai = {}
-
-    world:addEntity(player2)
-    world:addEntity(player3)
 end
+
+local enemies = {}
+
+local function enemy_tank_spawn()
+    local type = math.random(0,1)
+    local enemy;
+    if type == 0 then
+        enemy = PrefabsLoader:fabricate("tanks.player_tank")
+    else
+        enemy = PrefabsLoader:fabricate("tanks.truck")
+    end
+
+
+    local posY = math.random(0, road_height)
+    enemy.body:setPosition(window_w, posY)
+    enemy.ai = {}
+    table.insert(enemies, enemy)
+    world:addEntity(enemy)
+    return enemy
+end
+
+local enemy_timer = Timer(10, function(timer)
+
+    for k, enemy in pairs(enemies) do
+        if enemy.body:isDestroyed() then
+            goto continue
+        end
+        do
+            local x, y = enemy.body:getPosition()
+            if x < -50 then
+                tiny.removeEntity(world, enemy)
+            end
+        end
+        ::continue::
+        enemy = nil
+    end
+
+    enemy_tank_spawn()
+
+    local probability = math.random(1,100)
+    if probability > 10 then
+        enemy_tank_spawn()
+    end
+
+end, true)
 
 function ForestLevel.load()
     load_sprites()
+    road_height = sprites.road:size()[2]
 
     PrefabsLoader:loadPrefabs("prefabs/tanks.json", "tanks")
     PrefabsLoader:setPhysicsWorld(p_world)
 
     load_level()
+    enemy_timer:start()
     world:refresh()
 
     ---
@@ -189,6 +251,7 @@ function ForestLevel.load()
             end
         else
             if a.entity.behavior then
+                pdump(a.entity)
                 a.entity[a.entity.behavior].messages:push({text, {a, b} })
             end
         end
@@ -207,14 +270,21 @@ function ForestLevel.load()
     p_world:setCallbacks(beginContact, endContact)
 
     camera.from.scale = 1
-    camera.viscosity = 1
+    camera.from.pos = Vector2(0, -camera.from.size[2]/2 - 100)
+    --camera.viscosity = 1
     camera.inertia = 0.5
 end
 
-local targeting = true
+local targeting = false
 
 function ForestLevel.update(dt)
+    enemy_timer:update(dt)
     world:refresh()
+
+    for k, v in pairs(background) do
+        v.body:setLinearVelocity(-50, 0)
+    end
+
     p_world:update(dt)
 
     camera:update(dt)

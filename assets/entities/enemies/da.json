@@ -1,0 +1,18 @@
+[
+  {
+    "filename" : "Truck1.png",
+    "name" : "truck",
+    "grid" : {
+      "size" : [50, 26]
+    },
+    "animations": {
+      "idle" : {
+        "frames": [1, 1]
+      },
+      "move" : {
+        "frames": [1, "1-2"]
+      }
+    },
+    "current_animation": "idle"
+  }
+]

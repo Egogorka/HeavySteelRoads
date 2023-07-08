@@ -27,13 +27,13 @@ LEVELS = {
     mainMenu = require("levels/main_menu/main_menu")
 }
 
-GAME_CANVAS = love.graphics.newCanvas(400, 300)
-
-function DRAW_GAME_CANVAS()
-    love.graphics.setCanvas()
-    love.graphics.draw(GAME_CANVAS, 0, 0, 0, 1.5)
-    love.graphics.setCanvas(GAME_CANVAS)
-end
+--GAME_CANVAS = love.graphics.newCanvas(400, 300)
+--
+--function DRAW_GAME_CANVAS()
+--    love.graphics.setCanvas()
+--    love.graphics.draw(GAME_CANVAS, 0, 0, 0, 1.5)
+--    love.graphics.setCanvas(GAME_CANVAS)
+--end
 
 function CHANGE_LEVEL(level)
     CURRENT_LEVEL = level
@@ -48,17 +48,17 @@ function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     love.window.setTitle("HeavySteelRoads")
-    love.window.setMode( 1200, 1000, {
+    love.window.setMode( 800, 600, {
         resizable = true,
-        minwidth = 800,
-        minheight = 600
+        minwidth = 600,
+        minheight = 400
     } )
 
     window_w, window_h, flags = love.window.getMode()
 
     camera = Camera();
-    camera:setFromSizes({0,0}, {window_w, window_h}, {0,0}, {800, 600} )
-    camera:setDeadzone({camera.from.size[1]/2 - 40, camera.from.size[2]/2}, {80, camera.from.size[2]})
+    camera:setFromSizes({0,0}, {window_w, window_h}, {0,0}, {600, 400} )
+    camera:setDeadzone({camera.from.size[1]/2, camera.from.size[2]/2}, {0, 0})
     camera.from.scale = 1.5
 
     love.physics.setMeter(64)
