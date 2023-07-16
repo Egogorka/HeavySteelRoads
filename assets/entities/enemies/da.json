@@ -11,6 +11,12 @@
       },
       "move" : {
         "frames": [1, "1-2"]
+      },
+      "idle_empty": {
+        "frames": [2, 1]
+      },
+      "move_empty": {
+        "frames": [2, "1-2"]
       }
     },
     "current_animation": "idle"

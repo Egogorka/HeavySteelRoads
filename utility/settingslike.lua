@@ -7,7 +7,9 @@
 local function fill_table(table, defaults)
     for k, v in pairs(defaults) do
         if type(table[k]) == "table" and type(v) == "table" then
-            fill_table(table[k], v)
+            if #v ~= 0 then
+                fill_table(table[k], v)
+            end
         end
 
         if table[k] ~= nil then

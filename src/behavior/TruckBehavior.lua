@@ -6,7 +6,6 @@
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
 local dump = require("utility/dump")
-local Torus = require("utility/torus")
 local Timer = require("utility/timer")
 
 local Sprite = require("src/graphics/Sprite")[1]
@@ -17,16 +16,41 @@ local tiny = require("libs/tiny")
 
 
 local TruckBehavior = tiny.processingSystem()
-TruckBehavior.filter = tiny.requireAll("truck", "body", "sprite")
+TruckBehavior.filter = tiny.requireAll("truck", "health", "body", "fixture", "sprite")
 
 function TruckBehavior:onAdd(entity)
     fill_table(entity.truck, {
         messages = Stack(),
-        stack = Stack(),
+
+        contents = {},
+        max_velocity = 100,
 
         -- Default team setting - enemy
         team = CategoryManager.categories.enemy
     })
+
+    if #entity.truck.contents > 0 then
+        for k, v in pairs(entity.truck.contents) do
+
+            if v.body == nil then
+                print("One of the contents of truck have no body - making default one")
+                local p_world = entity.body:getWorld()
+                local body = love.physics.newBody(p_world, 0, 0, "static")
+                body:setActive(false)
+                body:setFixedRotation(true)
+                v.body = body
+            else
+                v.body:setActive(false)
+            end
+
+            if v.fixture == nil then
+                print("One of the contents of truck have no fixture - making default one")
+                local shape = love.physics.newRectangleShape(10,10)
+                local fixture = love.physics.newFixture(v.body, shape)
+                v.fixture = fixture
+            end
+        end
+    end
 
     CategoryManager.setObject(entity.fixture, entity.truck.team)
 end
@@ -42,7 +66,6 @@ function TruckBehavior:process(entity, dt)
         if self[command] then
             self[command](self, entity, dt, message[2])
         end
-        ::continue::
     end
 end
 
@@ -57,19 +80,45 @@ function TruckBehavior:move(entity, dt, vel)
     end
 
     --entity.truck.is_moving = true
-    entity.sprite:set("move")
+    if #entity.truck.contents == 0 then
+        entity.sprite:set("move_empty")
+    else
+        entity.sprite:set("move")
+    end
     entity.body:setLinearVelocity(velocity:x(), velocity:y())
 end
 
 function TruckBehavior:stop(entity, dt)
     --entity.truck.is_moving = false
-    entity.sprite:set("idle")
+    if #entity.truck.contents == 0 then
+        entity.sprite:set("idle_empty")
+    else
+        entity.sprite:set("idle")
+    end
     entity.body:setLinearVelocity(0, 0)
 end
 
+function TruckBehavior:_spawn_content(entity, content)
+    local x, y = entity.body:getPosition()
+    local tlX, tlY, brX, brY = entity.shape:computeAABB(0, 0, 0) -- TopLeft and BottomRight
+    local w = brX - tlX; local h = brY - tlY
+
+    content.body:setActive(true)
+    content.body:setPosition(x + math.random(-10, w+10), y + math.random(-10, h+10))
+end
+
 function TruckBehavior:hurt(entity, dt)
-    if entity.sprite == nil then
-        entity.sprite = Effects.hurt()
+    if entity.health.count <= 20 then
+        for k, v in pairs(entity.truck.contents) do
+            self:_spawn_content(entity, v)
+            self.world:addEntity(v)
+            pdump(v)
+        end
+        entity.truck.contents = {}
+    end
+
+    if entity.sprite.effect == nil then
+        entity.sprite.effect = Effects.hurt()
     end
 end
 

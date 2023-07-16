@@ -20,7 +20,9 @@
     "depth": 1,
 
     "behavior": "truck",
-    "truck": {},
+    "truck": {
+      "contents": {}
+    },
 
     "health": {
       "count" : 100

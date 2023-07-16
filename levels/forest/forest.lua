@@ -25,9 +25,11 @@ local HealthSystem = require("src/HealthSystem")
 local TankBehavior = require("src/behavior/TankBehavior")
 local BulletBehavior = require("src/behavior/BulletBehavior")
 local TruckBehavior = require("src/behavior/TruckBehavior")
+local PickupBehavior = require("src/behavior/PickupBehavior")
 
 local PlayerController = require("src/controllers/PlayerController")
 local AITank = require("src/controllers/AITankController")()
+local AITruck = require("src/controllers/AITruckController")()
 
 local Scene = require("src/scene/Scene")
 local ForestLevel = Scene()
@@ -42,9 +44,11 @@ world:addSystem(HealthSystem)
 world:addSystem(TankBehavior)
 world:addSystem(BulletBehavior)
 world:addSystem(TruckBehavior)
+world:addSystem(PickupBehavior)
 
 world:addSystem(PlayerController)
 world:addSystem(AITank)
+world:addSystem(AITruck)
 
 local player
 local p_world = love.physics.newWorld(0,0,true)
@@ -53,10 +57,13 @@ local gui = {}
 
 local function load_sprites()
     GraphicsLoader:loadSprites("assets/background/", true)
+    GraphicsLoader:loadSprites("assets/objects/", true)
+
     GraphicsLoader:loadAnimations("assets/player/", true)
+    GraphicsLoader:loadMSprites("assets/player/", true)
+
     GraphicsLoader:loadAnimations("assets/entities/enemies/", true)
     GraphicsLoader:loadAnimations("assets/effects/", true)
-    GraphicsLoader:loadMSprites("assets/player/", true)
 
     gui.stats_tab = love.graphics.newImage("assets/gui/PanelInterfaceNew2.png")
 
@@ -168,17 +175,22 @@ local function load_level()
     world:addEntity(player)
 
     AITank.target = player
+    AITruck.target = player
 end
 
 local enemies = {}
 
-local function enemy_tank_spawn()
+local function enemy_spawn()
     local type = math.random(0,1)
     local enemy;
     if type == 0 then
         enemy = PrefabsLoader:fabricate("tanks.player_tank")
     else
         enemy = PrefabsLoader:fabricate("tanks.truck")
+        local contents_amount = math.random(1,2)
+        for i=1,contents_amount do
+            table.insert(enemy.truck.contents, PrefabsLoader:fabricate("pickups.hp_up"))
+        end
     end
 
 
@@ -194,23 +206,26 @@ local enemy_timer = Timer(10, function(timer)
 
     for k, enemy in pairs(enemies) do
         if enemy.body:isDestroyed() then
+            enemies[k] = nil
             goto continue
         end
         do
             local x, y = enemy.body:getPosition()
             if x < -50 then
                 tiny.removeEntity(world, enemy)
+                enemies[k] = nil
             end
         end
         ::continue::
-        enemy = nil
     end
 
-    enemy_tank_spawn()
+    if #enemies < 5 then
+        enemy_spawn()
 
-    local probability = math.random(1,100)
-    if probability > 10 then
-        enemy_tank_spawn()
+        local probability = math.random(1,100)
+        if probability > 10 then
+            enemy_spawn()
+        end
     end
 
 end, true)
@@ -220,6 +235,8 @@ function ForestLevel.load()
     road_height = sprites.road:size()[2]
 
     PrefabsLoader:loadPrefabs("prefabs/tanks.json", "tanks")
+    PrefabsLoader:loadPrefabs("prefabs/pickups.json", "pickups")
+
     PrefabsLoader:setPhysicsWorld(p_world)
 
     load_level()
@@ -251,7 +268,6 @@ function ForestLevel.load()
             end
         else
             if a.entity.behavior then
-                pdump(a.entity)
                 a.entity[a.entity.behavior].messages:push({text, {a, b} })
             end
         end

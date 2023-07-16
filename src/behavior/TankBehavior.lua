@@ -36,7 +36,7 @@ function TankBehavior:onAdd(entity)
         messages = Stack(),
         stack = Stack(),
 
-        shoot_reload_timer = Timer(1),
+        shoot_reload_timer = Timer(0.8),
 
         aimed = false,
         rotation_speed = 1,
@@ -245,6 +245,7 @@ function TankBehavior:die(entity, dt)
 end
 
 function TankBehavior:onRemove(entity)
+    print("TankRemoved")
     entity.body:destroy()
 end
 
