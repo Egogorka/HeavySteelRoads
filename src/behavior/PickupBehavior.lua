@@ -16,13 +16,14 @@ local Effects = require("src/graphics/Effects")
 
 local tiny = require("libs/tiny")
 
-local PickupBehavior = tiny.processingSystem()
+local Behavior = require("Behavior")
+local PickupBehavior = tiny.processingSystem(Behavior:extend("PickupBehavior"))
 PickupBehavior.filter = tiny.requireAll("pickup", "body", "fixture", "sprite")
 
 function PickupBehavior:onAdd(entity)
-    fill_table(entity.pickup, {
-        messages = Stack(),
+    PickupBehavior.super.onAdd(self, entity)
 
+    fill_table(entity.pickup, {
         on_pickup = function(pickup, picker)
             picker.health.change = 20
         end,
@@ -38,15 +39,7 @@ function PickupBehavior:process(entity, dt)
         pickup.expiration_timer.update(dt)
     end
 
-    -- Command logic
-    while pickup.messages:size() ~= 0 do
-        local message = pickup.messages:pop()
-        local command = message[1]
-
-        if self[command] then
-            self[command](self, entity, dt, message[2])
-        end
-    end
+    PickupBehavior.super.process(self, entity, dt)
 end
 
 function PickupBehavior:contact(entity, dt, data)

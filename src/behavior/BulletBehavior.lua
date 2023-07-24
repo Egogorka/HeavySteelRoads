@@ -12,27 +12,10 @@ local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/CategoryManager")
 
 local tiny = require("libs/tiny")
+local Behavior = require("Behavior")
 
-local BulletBehavior = tiny.processingSystem()
+local BulletBehavior = tiny.processingSystem(Behavior:extend("BulletBehavior"))
 BulletBehavior.filter = tiny.requireAll("bullet", "body")
-
-function BulletBehavior:onAdd(entity)
-    if entity.bullet.messages then
-        return
-    end
-    entity.bullet.messages = Stack()
-end
-
-function BulletBehavior:process(entity, dt)
-    while entity.bullet.messages:size() ~= 0 do
-        local message = entity.bullet.messages:pop()
-        local command = message[1]
-
-        if self[command] then
-            self[command](self, entity, dt, message[2])
-        end
-    end
-end
 
 function BulletBehavior:_explosion(entity)
     local p_world = entity.body:getWorld()

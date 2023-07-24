@@ -14,11 +14,12 @@ local Effects = require("src/graphics/Effects")
 
 local tiny = require("libs/tiny")
 
-
-local TruckBehavior = tiny.processingSystem()
+local Behavior = require("Behavior")
+local TruckBehavior = tiny.processingSystem(Behavior:extend("Behavior"))
 TruckBehavior.filter = tiny.requireAll("truck", "health", "body", "fixture", "sprite")
 
 function TruckBehavior:onAdd(entity)
+    TruckBehavior.super.onAdd(self, entity)
     fill_table(entity.truck, {
         messages = Stack(),
 
@@ -53,20 +54,6 @@ function TruckBehavior:onAdd(entity)
     end
 
     CategoryManager.setObject(entity.fixture, entity.truck.team)
-end
-
-function TruckBehavior:process(entity, dt)
-    local truck = entity.truck
-
-    -- Command logic
-    while truck.messages:size() ~= 0 do
-        local message = truck.messages:pop()
-        local command = message[1]
-
-        if self[command] then
-            self[command](self, entity, dt, message[2])
-        end
-    end
 end
 
 --- Move block
