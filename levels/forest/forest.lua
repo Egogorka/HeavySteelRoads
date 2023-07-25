@@ -164,8 +164,8 @@ local function load_level()
         roadBottomBlock.fixture:setUserData({
             entity = roadBottomBlock
         })
-        --CategoryManager.setBulletproof(roadTopBlock.fixture)
-        --CategoryManager.setBulletproof(roadBottomBlock.fixture)
+        CategoryManager.setBulletproof(roadTopBlock.fixture)
+        CategoryManager.setBulletproof(roadBottomBlock.fixture)
     end
 
     player = PrefabsLoader:fabricate("tanks.player_tank")
@@ -292,8 +292,13 @@ function ForestLevel.load()
 end
 
 local targeting = false
+local pause = false
 
 function ForestLevel.update(dt)
+    if pause then
+        return
+    end
+
     enemy_timer:update(dt)
     world:refresh()
 
@@ -350,6 +355,10 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
     if key == "t" then
         targeting = not targeting
     end
+    if key == "p" then
+        pause = not pause
+    end
+
     if not targeting then
         local dir = Vector2()
         if key == "w" then
