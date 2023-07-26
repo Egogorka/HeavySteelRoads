@@ -161,7 +161,7 @@ function TankBehavior:_ram(entity)
 end
 
 --- Move block
----@param vel - Vector2
+---@param vel table
 function TankBehavior:move(entity, dt, vel)
     local v = Vector2(vel)
 
@@ -182,7 +182,7 @@ function TankBehavior:stop(entity, dt)
 end
 
 
----@param aim - Vector2
+---@param aim table
 function TankBehavior:aim(entity, dt, aim)
     if aim then
         local position = Vector2(entity.body:getPosition())
