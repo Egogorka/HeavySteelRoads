@@ -12,7 +12,7 @@ local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/CategoryManager")
 
 local tiny = require("libs/tiny")
-local Behavior = require("Behavior")
+local Behavior = require("src/behavior/Behavior")
 
 local BulletBehavior = tiny.processingSystem(Behavior:extend("BulletBehavior"))
 BulletBehavior.filter = tiny.requireAll("bullet", "body")

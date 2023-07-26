@@ -14,15 +14,13 @@ local Effects = require("src/graphics/Effects")
 
 local tiny = require("libs/tiny")
 
-local Behavior = require("Behavior")
+local Behavior = require("src/behavior/Behavior")
 local TruckBehavior = tiny.processingSystem(Behavior:extend("Behavior"))
 TruckBehavior.filter = tiny.requireAll("truck", "health", "body", "fixture", "sprite")
 
 function TruckBehavior:onAdd(entity)
     TruckBehavior.super.onAdd(self, entity)
     fill_table(entity.truck, {
-        messages = Stack(),
-
         contents = {},
         max_velocity = 100,
 

@@ -16,7 +16,7 @@ local Effects = require("src/graphics/Effects")
 
 local tiny = require("libs/tiny")
 
-local Behavior = require("Behavior")
+local Behavior = require("src/behavior/Behavior")
 local PickupBehavior = tiny.processingSystem(Behavior:extend("PickupBehavior"))
 PickupBehavior.filter = tiny.requireAll("pickup", "body", "fixture", "sprite")
 
