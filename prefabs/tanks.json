@@ -14,5 +14,22 @@
     "body": "dynamic",
     "shape" : [25, 10, 50, 20],
     "fixture" : 1
+  },
+  "truck": {
+    "sprite": "truck",
+    "depth": 1,
+
+    "behavior": "truck",
+    "truck": {
+      "contents": {}
+    },
+
+    "health": {
+      "count" : 100
+    },
+
+    "body": "dynamic",
+    "shape": [25, 10, 50, 20],
+    "fixture" : true
   }
 }

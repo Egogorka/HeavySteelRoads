@@ -36,23 +36,36 @@ function TankBehavior:onAdd(entity)
         messages = Stack(),
         stack = Stack(),
 
-        shoot_reload_timer = Timer(1),
+        shoot_reload_timer = Timer(0.8),
 
         aimed = false,
         rotation_speed = 1,
         rotation_angle = 0, -- In units of Pi : Right is 0, Down is 1/2
         target_angle = 0,
 
-        ram_reload_timer = Timer(2),
-        ram_pre_timer = Timer(1),
-        ram_pos = nil,
-
         -- Default team setting - enemy
         team = CategoryManager.categories.enemy
     })
-    entity.tank.ram_pre_timer.on_end = function(timer) self:_ram(entity) end
+
+    self:init_ram(entity)
 
     CategoryManager.setObject(entity.fixture, entity.tank.team)
+end
+
+function TankBehavior:init_ram(entity)
+    local settings = {
+        ram_reload_timer = Timer(2),
+        ram_pre_timer = Timer(0.5),
+        ram_pos = nil,
+        ram_distance = 100,
+        ram_velocity = 500,
+        ram_timer = nil,
+    }
+    settings.ram_timer = Timer(settings.ram_distance/settings.ram_velocity)
+
+    fill_table(entity.tank, settings)
+    entity.tank.ram_pre_timer.on_end = function(timer) self:_ram(entity) end
+    entity.tank.ram_timer.on_end = function(timer) entity.tank.messages:push({"stop"}) end
 end
 
 --- Aim block
@@ -90,6 +103,7 @@ function TankBehavior:process(entity, dt)
     tank.shoot_reload_timer:update(dt)
     tank.ram_reload_timer:update(dt)
     tank.ram_pre_timer:update(dt)
+    tank.ram_timer:update(dt)
 
     if not tank.aimed then
         local t_current = Torus(tank.rotation_angle/2 + 1/2)
@@ -135,17 +149,26 @@ end
 
 function TankBehavior:_ram(entity)
     local temp = entity.tank.ram_pos - Vector2(entity.body:getPosition())
-    local dir = temp / temp:mag() * 500
 
+    local vel = 500
+    if ( temp[1] < 0 ) then
+        vel = -500
+    end
+
+    entity.tank.ram_timer:start()
     entity.msprite.sprites.body.sprite:set("move")
-    entity.body:setLinearVelocity(dir:x(), dir:y())
+    entity.body:setLinearVelocity(vel, 0)
 end
 
 --- Move block
----@param vel - Vector2
+---@param vel table
 function TankBehavior:move(entity, dt, vel)
-    local temp = Vector2(vel)
-    local velocity = temp / temp:mag() * 100
+    local v = Vector2(vel)
+
+    local velocity = v * 100
+    if v:mag() > 1 then
+        velocity = velocity / v:mag()
+    end
 
     --entity.tank.is_moving = true
     entity.msprite.sprites.body.sprite:set("move")
@@ -159,7 +182,7 @@ function TankBehavior:stop(entity, dt)
 end
 
 
----@param aim - Vector2
+---@param aim table
 function TankBehavior:aim(entity, dt, aim)
     if aim then
         local position = Vector2(entity.body:getPosition())
@@ -222,6 +245,7 @@ function TankBehavior:die(entity, dt)
 end
 
 function TankBehavior:onRemove(entity)
+    print("TankRemoved")
     entity.body:destroy()
 end
 

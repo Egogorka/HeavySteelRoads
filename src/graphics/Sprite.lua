@@ -35,7 +35,10 @@ local Sprite = class("Sprite", {
     origin = Vector2(),
 
     camera_affected = true,
-    effect = nil
+    effect = nil,
+
+    is_flippedH = false,
+    is_flippedV = false,
 })
 
 -- Short for MultipleSprite
@@ -46,7 +49,10 @@ local MSprite = class("MSprite", {
     sprites_z_order = {"default"}, --- sprites Z order
     scale = 1,
 
-    effect = nil
+    effect = nil,
+
+    is_flippedH = false,
+    is_flippedV = false,
 })
 
 -----------------------------------------
@@ -131,6 +137,20 @@ function Sprite:size()
     return Vector2(w, h)
 end
 
+function Sprite:flipH()
+    for _, animation in pairs(self.animations) do
+        animation[1]:flipH()
+    end
+    self.is_flippedH = not self.is_flippedH
+end
+
+function Sprite:flipV()
+    for _, animation in pairs(self.animations) do
+        animation[1]:flipV()
+    end
+    self.is_flippedV = not self.is_flippedV
+end
+
 function Sprite:clone()
     return Sprite(self, self.camera_affected, self.offset, self.origin, self.scale)
 end
@@ -181,6 +201,20 @@ function MSprite:init(o, scale)
 
     -- Presort sprites according to their placement z_index
     self:sort()
+end
+
+function MSprite:flipH()
+    for _, sprite in pairs(self.sprites) do
+        sprite:flipH()
+    end
+    self.is_flippedH = not self.is_flippedH
+end
+
+function MSprite:flipV()
+    for _, sprite in pairs(self.sprites) do
+        sprite:flipV()
+    end
+    self.is_flippedV = not self.is_flippedV
 end
 
 function MSprite:clone()

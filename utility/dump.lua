@@ -18,9 +18,9 @@ function table.contains(table, element)
     return false
 end
 
----@param o - Object to dump
----@param n - nesting parameter
----@param i - how many tabs
+---@param o table  - Object to dump
+---@param n number - nesting parameter
+---@param i number - how many tabs
 local function dump(o, n, i)
     i = i or 0
     local offset = string.rep("  ", i+1)

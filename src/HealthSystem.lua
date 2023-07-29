@@ -17,23 +17,24 @@ function HealthSystem:onAdd(entity)
     fill_table(entity.health, {
         count = 0,
         change = 0,
-        i_time = 1 -- invincibility
+        i_time = 0.5 -- invincibility
     })
-    entity.health._i_timer = Timer(entity.health.i_time)
+    entity.health.i_timer = Timer(entity.health.i_time)
 end
 
 function HealthSystem:process(entity, dt)
     local behavior = entity.behavior
     local health = entity.health
 
-    health._i_timer:update(dt)
+    health.i_timer:update(dt)
 
-    if health._i_timer.is_on then
+    if health.i_timer.is_on then
+        health.change = 0
         return -- If invincibility frames are on - no handle
     end
 
     if health.change and health.change ~= 0 then
-        health._i_timer:start()
+        health.i_timer:start()
         if behavior then
             entity[behavior].messages:push({"hurt", health.change})
         end

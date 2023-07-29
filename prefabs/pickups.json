@@ -1,0 +1,13 @@
+{
+  "hp_up": {
+    "sprite": "hp_up",
+    "depth": 1,
+
+    "pickup": {},
+    "behavior": "pickup",
+
+    "body": "kinematic",
+    "shape": [9, 9, 18, 18],
+    "fixture": true
+  }
+}

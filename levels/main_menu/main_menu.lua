@@ -16,7 +16,7 @@ local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
 local SpriteSystem = require("src/graphics/SpriteSystem")()
 
-local Scene = require("src/SceneManager")
+local Scene = require("src/scene/Scene")
 local MainMenu = Scene()
 
 local world = tiny.world()

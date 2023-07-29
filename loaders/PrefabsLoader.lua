@@ -47,7 +47,17 @@ function PrefabsLoader:fabricate(name)
 
     local p = rcopy(rcall(self.prefabs, name))
     if p.sprite then
-        p.sprite = self.graphics_loader.sprites[p.sprite]:clone()
+        if self.graphics_loader.sprites[p.sprite] then
+            p.sprite = self.graphics_loader.sprites[p.sprite]:clone()
+        else
+            if self.graphics_loader.animations[p.sprite] then
+                p.sprite = self.graphics_loader.animations[p.sprite]:clone()
+            else
+                print("Error: Trying to fabricate "..name.." without sprite "..p.sprite)
+                pdump(self.graphics_loader.animations)
+                pdump(self.graphics_loader.sprites)
+            end
+        end
     end
     if p.msprite then
         p.msprite = self.graphics_loader.msprites[p.msprite]:clone()
