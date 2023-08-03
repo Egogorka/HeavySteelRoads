@@ -8,6 +8,7 @@ local anim8 = require("libs/anim8")
 local tiny = require("libs/tiny")
 local dump = require("utility/dump")
 local flux = require("libs/flux")
+local UserData = require("src/physics/UserData")
 
 
 local Vector2, Vector3 = unpack(require('utility/vector'))
@@ -17,6 +18,7 @@ local window_w, window_h, flags = love.window.getMode()
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 local CategoryManager = require("src/physics/CategoryManager")
+local PhysicsManager = require("src/physics/PhysicsManager")
 
 local SpriteSystem = require("src/graphics/SpriteSystem")()
 local ShapeDebug = require("src/ShapeDebug")
@@ -235,6 +237,7 @@ function ForestLevel.load()
     PrefabsLoader:loadPrefabs("prefabs/pickups.json", "pickups")
 
     PrefabsLoader:setPhysicsWorld(p_world)
+    PhysicsManager.setCallbacks(p_world)
 
     load_level()
     enemy_timer:start()
