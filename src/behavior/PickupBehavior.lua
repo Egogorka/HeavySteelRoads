@@ -29,7 +29,7 @@ function PickupBehavior:onAdd(entity)
         end,
         expiration_timer = nil -- Otherwise Timer
     })
-
+    CategoryManager.setObject(entity.fixture, "neutral")
     entity.fixture:setSensor(true)
 end
 

@@ -7,6 +7,7 @@
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
 local class = require("libs/30log")
+local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
 
@@ -80,11 +81,7 @@ function AITruck:init_avoid_box(entity)
     avoid_box.shape = love.physics.newRectangleShape(50/2, 20/2, 400, 400)
     avoid_box.fixture = love.physics.newFixture(entity.body, avoid_box.shape)
     avoid_box.fixture:setSensor(true)
-    avoid_box.fixture:setUserData({
-        entity = entity,
-        caller = "ai",
-        name = "avoid_box"
-    })
+    avoid_box.fixture:setUserData(UserData(entity, "avoid_box", "ai"))
     CategoryManager.setObject(avoid_box.fixture, entity.truck.team)
 
     fill_table(entity.ai, {

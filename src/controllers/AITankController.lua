@@ -7,6 +7,7 @@
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
 local class = require("libs/30log")
+local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
 
@@ -96,11 +97,7 @@ function AITank:init_ram(entity)
     ram_box.shape = love.physics.newRectangleShape(50/2, 20/2, 100, 20)
     ram_box.fixture = love.physics.newFixture(entity.body, ram_box.shape)
     ram_box.fixture:setSensor(true)
-    ram_box.fixture:setUserData({
-        entity = entity,
-        caller = "ai",
-        name = "ram_box"
-    })
+    ram_box.fixture:setUserData(UserData(entity, "ram_box", "ai"))
     CategoryManager.setObject(ram_box.fixture, entity.tank.team)
 
     fill_table(entity.ai, {
@@ -126,11 +123,7 @@ function AITank:init_shoot(entity)
     shoot_box.shape = love.physics.newRectangleShape(50/2, 20/2, 400, 400)
     shoot_box.fixture = love.physics.newFixture(entity.body, shoot_box.shape)
     shoot_box.fixture:setSensor(true)
-    shoot_box.fixture:setUserData({
-        entity = entity,
-        caller = "ai",
-        name = "shoot_box"
-    })
+    shoot_box.fixture:setUserData(UserData(entity, "shoot_box", "ai"))
     CategoryManager.setObject(shoot_box.fixture, entity.tank.team)
 
     local stare_timer = Timer(1)

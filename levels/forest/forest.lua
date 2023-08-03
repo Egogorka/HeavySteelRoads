@@ -146,32 +146,29 @@ local function load_level()
         road.body = love.physics.newBody(p_world, i * road.sprite:size()[1], 0, "kinematic")
         world:addEntity(road)
         table.insert(background, road)
+    end
 
         local roadTopBlock = {
-            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], - 10/2),
+        body = love.physics.newBody(p_world, window_w / 2, -10 / 2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
         roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
-        roadTopBlock.fixture:setUserData({
-            entity = roadTopBlock
-        })
-
+    roadTopBlock.fixture:setUserData(UserData(roadTopBlock))
+    CategoryManager.setWall(roadTopBlock.fixture, "neutral")
+    world:addEntity(roadTopBlock)
         local roadBottomBlock = {
-            body = love.physics.newBody(p_world, window_w/2 + i * road.sprite:size()[1], road.sprite:size()[2] + 10/2),
+        body = love.physics.newBody(p_world, window_w / 2, sprites.road:size()[2] + 10 / 2),
             shape = love.physics.newRectangleShape(window_w, 10)
         }
         roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
-        roadBottomBlock.fixture:setUserData({
-            entity = roadBottomBlock
-        })
-        CategoryManager.setBulletproof(roadTopBlock.fixture)
-        CategoryManager.setBulletproof(roadBottomBlock.fixture)
-    end
+    roadBottomBlock.fixture:setUserData(UserData(roadBottomBlock))
+    CategoryManager.setWall(roadBottomBlock.fixture, "neutral")
+    world:addEntity(roadBottomBlock)
 
     player = PrefabsLoader:fabricate("tanks.player_tank")
     player.body:setPosition(100, sprites.road:size()[2]/2)
     player.player = 1
-    player.tank.team = CategoryManager.categories.player
+    player.tank.team = "player"
     world:addEntity(player)
 
     AITank.target = player
@@ -242,48 +239,6 @@ function ForestLevel.load()
     load_level()
     enemy_timer:start()
     world:refresh()
-
-    ---
-    --- ATM I dont know where to put this code, so i write there
-    --- There are two acceptors of contact information - AI and Behaviors.
-    --- Thus the standard for fixture userData is:
-    --- {
-    ---     entity : Entity - contains the link to the parent entity of fixture
-    ---     name : nil|string - stands for name of holder of fixture
-    ---         (example, name = "shoot_box" , then fixture is in entity.shoot_box.fixture)
-    ---     caller : nil|string - contains the name of AI or nil. The contact message is put
-    ---     in AI messages stack. And if it's nil, then in Behavior's.
-    --- }
-    ---
-    local function contact(a_fixture, b_fixture, coll, text)
-        --if a.action then
-        --    a.action(a, b, coll)
-        --end
-        local a = a_fixture:getUserData()
-        local b = b_fixture:getUserData()
-
-        if a.caller then
-            if a.entity[a.caller].messages then
-                a.entity[a.caller].messages:push({text, {a, b} })
-            end
-        else
-            if a.entity.behavior then
-                a.entity[a.entity.behavior].messages:push({text, {a, b} })
-            end
-        end
-    end
-
-    local function beginContact(a, b, coll)
-        contact(a, b, coll, "contact")
-        contact(b, a, coll, "contact")
-    end
-
-    local function endContact(a, b, coll)
-        contact(a, b, coll, "endContact")
-        contact(b, a, coll, "endContact")
-    end
-
-    p_world:setCallbacks(beginContact, endContact)
 
     camera.from.scale = 1
     camera.from.pos = Vector2(0, -camera.from.size[2]/2 - 100)

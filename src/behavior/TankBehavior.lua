@@ -14,6 +14,7 @@ local Stack = require("utility/stack")
 local dump = require("utility/dump")
 local Torus = require("utility/torus")
 local Timer = require("utility/timer")
+local UserData = require("src/physics/UserData")
 
 local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/physics/CategoryManager")
@@ -44,7 +45,7 @@ function TankBehavior:onAdd(entity)
         target_angle = 0,
 
         -- Default team setting - enemy
-        team = CategoryManager.categories.enemy
+        team = "enemy"
     })
 
     self:init_ram(entity)
@@ -211,10 +212,9 @@ function TankBehavior:_bullet(entity)
     bullet.body:setFixedRotation(true)
     bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
     bullet.fixture:setSensor(true)
-    bullet.fixture:setUserData({ entity = bullet })
+    bullet.fixture:setUserData(UserData(bullet))
 
-    -- TODO: This is a bad thing. Need to add category.Team2Bullet, but this looks cleaner now
-    CategoryManager.setBullet(bullet.fixture, entity.tank.team + 1)
+    CategoryManager.setBullet(bullet.fixture, entity.tank.team)
 
     world:addEntity(bullet)
     return bullet
