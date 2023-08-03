@@ -150,19 +150,19 @@ local function load_level()
         table.insert(background, road)
     end
 
-        local roadTopBlock = {
+    local roadTopBlock = {
         body = love.physics.newBody(p_world, window_w / 2, -10 / 2),
-            shape = love.physics.newRectangleShape(window_w, 10)
-        }
-        roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
+        shape = love.physics.newRectangleShape(window_w, 10)
+    }
+    roadTopBlock.fixture = love.physics.newFixture(roadTopBlock.body, roadTopBlock.shape)
     roadTopBlock.fixture:setUserData(UserData(roadTopBlock))
     CategoryManager.setWall(roadTopBlock.fixture, "neutral")
     world:addEntity(roadTopBlock)
-        local roadBottomBlock = {
+    local roadBottomBlock = {
         body = love.physics.newBody(p_world, window_w / 2, sprites.road:size()[2] + 10 / 2),
-            shape = love.physics.newRectangleShape(window_w, 10)
-        }
-        roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
+        shape = love.physics.newRectangleShape(window_w, 10)
+    }
+    roadBottomBlock.fixture = love.physics.newFixture(roadBottomBlock.body, roadBottomBlock.shape)
     roadBottomBlock.fixture:setUserData(UserData(roadBottomBlock))
     CategoryManager.setWall(roadBottomBlock.fixture, "neutral")
     world:addEntity(roadBottomBlock)
@@ -186,6 +186,8 @@ local function enemy_spawn()
         enemy = PrefabsLoader:fabricate("tanks.player_tank")
     else
         enemy = PrefabsLoader:fabricate("tanks.truck")
+        pdump(enemy.sprite, 5)
+        enemy.sprite:flipH()
         local contents_amount = math.random(1,2)
         for i=1,contents_amount do
             table.insert(enemy.truck.contents, PrefabsLoader:fabricate("pickups.hp_up"))
