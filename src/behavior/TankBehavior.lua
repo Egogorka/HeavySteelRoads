@@ -249,4 +249,17 @@ function TankBehavior:onRemove(entity)
     entity.body:destroy()
 end
 
+function TankBehavior:contact(entity, dt, data)
+    local other = data[2]
+    if other.caller ~= nil then return end
+
+    if other.entity.health then
+        if entity.tank.ram_timer.is_on then
+            other.entity.health.change = -20
+        else
+            other.entity.health.change = -5
+        end
+    end
+end
+
 return TankBehavior

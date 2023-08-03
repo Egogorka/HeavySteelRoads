@@ -116,4 +116,13 @@ function TruckBehavior:onRemove(entity)
     entity.body:destroy()
 end
 
+function TruckBehavior:contact(entity, dt, data)
+    local other = data[2]
+    if other.caller ~= nil then return end
+
+    if other.entity.health then
+        other.entity.health.change = -5
+    end
+end
+
 return TruckBehavior
