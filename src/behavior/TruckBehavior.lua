@@ -22,10 +22,12 @@ function TruckBehavior:onAdd(entity)
     TruckBehavior.super.onAdd(self, entity)
     fill_table(entity.truck, {
         contents = {},
-        max_velocity = 100,
+        max_speed_empty = 120,
+        max_speed_full = 100,
+        max_speed = 100,
 
         -- Default team setting - enemy
-        team = CategoryManager.categories.enemy
+        team = "enemy"
     })
 
     if #entity.truck.contents > 0 then
@@ -59,7 +61,7 @@ end
 function TruckBehavior:move(entity, dt, vel)
     local v = Vector2(vel)
 
-    local velocity = v * 100
+    local velocity = v * entity.truck.max_speed
     if v:mag() > 1 then
         velocity = velocity / v:mag()
     end
@@ -100,6 +102,7 @@ function TruckBehavior:hurt(entity, dt)
             pdump(v)
         end
         entity.truck.contents = {}
+        entity.truck.max_speed = entity.truck.max_speed_empty
     end
 
     if entity.sprite.effect == nil then

@@ -58,7 +58,7 @@ function AITruck:idle(entity, dt)
 
     -- Handle state
 
-    entity.truck.messages:push({"move", Vector2({-0.15, 0})})
+    entity.truck.messages:push({ "move", Vector2({ -0.4, 0 }) })
 
     -- State out branches
 
@@ -98,14 +98,14 @@ function AITruck:action(entity, dt)
     local ai = entity.ai
     local truck = entity.truck
 
-    local d = ai.target_pos - {entity.body:getPosition()}
+    local d = ai.target_pos - { entity.body:getPosition() }
 
     if math.abs(d:y()) < 40 then
-        local dir = 0.3
+        local dir = 0.6
         if d:y() < 0 then dir = -dir end
-        truck.messages:push({"move", {0, -dir}})
+        truck.messages:push({ "move", { 0, -dir } })
     else
-        truck.messages:push({"move", {-0.3, 0}})
+        truck.messages:push({ "move", { -0.6, 0 } })
     end
 
     if ai.in_avoid_box then
