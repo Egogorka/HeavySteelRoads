@@ -9,7 +9,7 @@ local dump = require("utility/dump")
 local Timer = require("utility/timer")
 
 local Sprite = require("src/graphics/Sprite")[1]
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 local Effects = require("src/graphics/Effects")
 
 local tiny = require("libs/tiny")

@@ -16,7 +16,7 @@ local Timer = require("utility/timer")
 local window_w, window_h, flags = love.window.getMode()
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 
 local SpriteSystem = require("src/graphics/SpriteSystem")()
 local ShapeDebug = require("src/ShapeDebug")

@@ -9,7 +9,7 @@ local Stack = require("utility/stack")
 local dump = require("utility/dump")
 
 local Sprite = require("src/graphics/Sprite")[1]
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 
 local tiny = require("libs/tiny")
 local Behavior = require("src/behavior/Behavior")

@@ -8,7 +8,7 @@ local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
 local class = require("libs/30log")
 
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 
 local AITank = tiny.processingSystem(class("AITank"))
 AITank.filter = tiny.requireAll("tank", "ai")
