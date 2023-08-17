@@ -64,9 +64,6 @@ local function preSolve(a_fixture, b_fixture, coll)
     local a_category = getArrayAsBits({ a_fixture:getCategory() })
     local b_category = getArrayAsBits({ b_fixture:getCategory() })
 
-    pdump(a)
-    pdump(b)
-
     local b_sensor = 0x0000
     local a_sensor = 0x0000
 
@@ -77,10 +74,10 @@ local function preSolve(a_fixture, b_fixture, coll)
         a_sensor = a.sensor_mask.n
     end
 
-    print("And results: ", bit.band(a_category, b_sensor), bit.band(b_category, a_sensor))
+    -- print("And results: ", bit.band(a_category, b_sensor), bit.band(b_category, a_sensor))
     if bit.band(a_category, b_sensor) ~= 0 and bit.band(b_category, a_sensor) ~= 0 then
         coll:setEnabled(false)
-        print("Collision!")
+        -- print("Collision!")
     end
 end
 
