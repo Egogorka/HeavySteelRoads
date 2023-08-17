@@ -17,6 +17,12 @@ local Behavior = require("src/behavior/Behavior")
 local BulletBehavior = tiny.processingSystem(Behavior:extend("BulletBehavior"))
 BulletBehavior.filter = tiny.requireAll("bullet", "body")
 
+function BulletBehavior:onAdd(entity)
+    fill_table(entity.bullet, {
+        damage = 10
+    })
+end
+
 function BulletBehavior:_explosion(entity)
     local p_world = entity.body:getWorld()
     local world = self.world
@@ -41,7 +47,7 @@ function BulletBehavior:contact(entity, dt, data)
     if other.caller ~= nil then return end
 
     if other.entity.health then
-        other.entity.health.change = -10
+        other.entity.health.change = entity.bullet.damage
     end
 
     local world = self.world
