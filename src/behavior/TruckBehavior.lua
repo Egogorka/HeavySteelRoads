@@ -57,7 +57,7 @@ function TruckBehavior:onAdd(entity)
 end
 
 --- Move block
----@param vel - Vector2
+---@param vel table - Vector2
 function TruckBehavior:move(entity, dt, vel)
     local v = Vector2(vel)
 

@@ -11,7 +11,6 @@
 
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
-local dump = require("utility/dump")
 local Torus = require("utility/torus")
 local Timer = require("utility/timer")
 local UserData = require("src/physics/UserData")
