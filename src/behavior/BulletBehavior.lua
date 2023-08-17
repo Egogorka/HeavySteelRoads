@@ -48,7 +48,7 @@ function BulletBehavior:contact(entity, dt, data)
     if other.caller ~= nil then return end
 
     if other.entity.health then
-        other.entity.health.change = entity.bullet.damage
+        other.entity.health.change = -entity.bullet.damage
     end
 
     local world = self.world
