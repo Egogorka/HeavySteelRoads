@@ -18,6 +18,7 @@ local BulletBehavior = tiny.processingSystem(Behavior:extend("BulletBehavior"))
 BulletBehavior.filter = tiny.requireAll("bullet", "body")
 
 function BulletBehavior:onAdd(entity)
+    BulletBehavior.super.onAdd(self, entity)
     fill_table(entity.bullet, {
         damage = 10
     })
