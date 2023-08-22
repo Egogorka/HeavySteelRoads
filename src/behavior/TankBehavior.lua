@@ -36,6 +36,8 @@ function TankBehavior:onAdd(entity)
         messages = Stack(),
         stack = Stack(),
 
+        max_speed = 100,
+
         shoot_reload_timer = Timer(0.8),
 
         aimed = false,
@@ -165,7 +167,7 @@ end
 function TankBehavior:move(entity, dt, vel)
     local v = Vector2(vel)
 
-    local velocity = v * 100
+    local velocity = v * entity.tank.max_speed
     if v:mag() > 1 then
         velocity = velocity / v:mag()
     end

@@ -11,6 +11,7 @@ local tiny = require("libs/tiny")
 local Vector2 = require("utility/vector")[1]
 
 local SpriteSystem = tiny.processingSystem(class("SpriteSystem"))
+-- local SpriteSystem = tiny.sortedProcessingSystem(class("SpriteSystem"))
 SpriteSystem.filter = tiny.filter('(msprite|sprite)&(body|position)')
 
 function SpriteSystem:init()
@@ -18,6 +19,31 @@ function SpriteSystem:init()
     self.focus_pos = Vector2(0,0)
     self.focus_entity = nil
 end
+
+-- local function compare(z1, y1, z2, y2)
+--     if z1 ~= z2 then
+--         return z1 < z2
+--     end
+--     return y1 > y2
+-- end
+
+-- function SpriteSystem:compare(e1, e2)
+--     local z1 = 1 --TODO: inject depth dependancy
+--     local z2 = 1
+
+--     if e1.depth then z1 = e1.depth.z end
+--     if e2.depth then z2 = e2.depth.z end
+
+--     local y1, y2
+
+--     if e1.body then _, y1 = e1.body:getPosition() end
+--     if e2.body then _, y2 = e2.body:getPosition() end
+
+--     if e1.position then y1 = e1.position.pos[2] end
+--     if e2.position then y2 = e2.position.pos[2] end
+
+--     return compare(z1, y1, z2, y2)
+-- end
 
 function SpriteSystem:preWrap(dt)
     if (self.focus_entity ~= nil) and (not self.focus_entity.body:isDestroyed()) then

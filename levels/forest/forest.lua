@@ -53,7 +53,7 @@ world:addSystem(AITank)
 world:addSystem(AITruck)
 
 local player
-local p_world = love.physics.newWorld(0,0,true)
+local p_world = love.physics.newWorld(0, 0, true)
 
 local gui = {}
 
@@ -80,8 +80,10 @@ local sprites = GraphicsLoader.sprites
 local animations = GraphicsLoader.animations
 local msprites = GraphicsLoader.msprites
 
-local function load_level()
+local cameraTarget
+local roadHeight
 
+local function load_level()
     -- Back-Background --
     local sky1 = {
         sprite = sprites.sky,
@@ -106,10 +108,10 @@ local function load_level()
 
     -- Background --
     -- Trees
-    for i=0,10 do
+    for i = 0, 10 do
         local forest_back3 = { sprite = sprites.forest_back2, depth = Depth(1.3, false) }
-        local x = -20 + i * sprites.forest_front:size()[1]*1.3
-        local y = - sprites.forest_front:size()[2] - 80
+        local x = -20 + i * sprites.forest_front:size()[1] * 1.3
+        local y = -sprites.forest_front:size()[2] - 80
         forest_back3.body = love.physics.newBody(p_world, x, y, "kinematic")
         world:addEntity(forest_back3)
         table.insert(background, forest_back3)
@@ -124,26 +126,26 @@ local function load_level()
     --    table.insert(background, forest_back2)
     --end
     --
-    for i=0, 10 do
+    for i = 0, 10 do
         local forest_back1 = { sprite = sprites.forest_front, depth = Depth(1.2, false) }
-        local x = 0 + i * sprites.forest_front:size()[1]*1.2
-        local y = - sprites.forest_front:size()[2] - 40
+        local x = 0 + i * sprites.forest_front:size()[1] * 1.2
+        local y = -sprites.forest_front:size()[2] - 40
         forest_back1.body = love.physics.newBody(p_world, x, y, "kinematic")
         world:addEntity(forest_back1)
         table.insert(background, forest_back1)
     end
 
-    for i=0, 10 do
+    for i = 0, 10 do
         local forest_front = { sprite = sprites.forest_back }
         local x = 0 + i * sprites.forest_back:size()[1]
-        local y = - sprites.forest_back:size()[2]
+        local y = -sprites.forest_back:size()[2]
         forest_front.body = love.physics.newBody(p_world, x, y, "kinematic")
         world:addEntity(forest_front)
         table.insert(background, forest_front)
     end
 
     -- Road Entities
-    for i=0, 10 do
+    for i = 0, 10 do
         local road = { sprite = sprites.road }
         road.body = love.physics.newBody(p_world, i * road.sprite:size()[1], 0, "kinematic")
         world:addEntity(road)
@@ -168,10 +170,18 @@ local function load_level()
     world:addEntity(roadBottomBlock)
 
     player = PrefabsLoader:fabricate("tanks.player_tank")
-    player.body:setPosition(100, sprites.road:size()[2]/2)
+    player.body:setPosition(100, sprites.road:size()[2] / 2)
     player.player = 1
     player.tank.team = "player"
     world:addEntity(player)
+
+    cameraTarget = {
+        body = love.physics.newBody(p_world, window_w / 2, 0, "kinematic")
+    }
+    cameraLeftBlock = {
+        body = love.physics.newBody(p_world, 0, window_h / 2, "kinematic"),
+        shape = love.physics.newRectangleShape()
+    }
 
     AITank.target = player
     AITruck.target = player
@@ -180,16 +190,15 @@ end
 local enemies = {}
 
 local function enemy_spawn()
-    local type = math.random(0,1)
+    local type = math.random(0, 1)
     local enemy;
     if type == 0 then
         enemy = PrefabsLoader:fabricate("tanks.player_tank")
     else
         enemy = PrefabsLoader:fabricate("tanks.truck")
-        pdump(enemy.sprite, 5)
         enemy.sprite:flipH()
-        local contents_amount = math.random(1,2)
-        for i=1,contents_amount do
+        local contents_amount = math.random(1, 2)
+        for i = 1, contents_amount do
             table.insert(enemy.truck.contents, PrefabsLoader:fabricate("pickups.hp_up"))
         end
     end
@@ -204,7 +213,6 @@ local function enemy_spawn()
 end
 
 local enemy_timer = Timer(10, function(timer)
-
     for k, enemy in pairs(enemies) do
         if enemy.body:isDestroyed() then
             enemies[k] = nil
@@ -223,12 +231,11 @@ local enemy_timer = Timer(10, function(timer)
     if #enemies < 5 then
         enemy_spawn()
 
-        local probability = math.random(1,100)
+        local probability = math.random(1, 100)
         if probability > 10 then
             enemy_spawn()
         end
     end
-
 end, true)
 
 function ForestLevel.load()
@@ -243,15 +250,18 @@ function ForestLevel.load()
 
     load_level()
     enemy_timer:start()
+
     world:refresh()
+    PlayerController:keypressed("right") -- Simulate keypress to wake up tank
+    PlayerController:keyreleased("right")
 
     camera.from.scale = 1
-    camera.from.pos = Vector2(0, -camera.from.size[2]/2 - 100)
-    --camera.viscosity = 1
+    camera.from.pos = Vector2(0, -camera.from.size[2] / 2 - 100)
+    -- camera.viscosity = 1
     camera.inertia = 0.5
 end
 
-local targeting = false
+local targeting = true
 local pause = false
 
 function ForestLevel.update(dt)
@@ -259,31 +269,31 @@ function ForestLevel.update(dt)
         return
     end
 
-    enemy_timer:update(dt)
+    -- enemy_timer:update(dt)
     world:refresh()
 
-    for k, v in pairs(background) do
-        v.body:setLinearVelocity(-50, 0)
-    end
+    -- for k, v in pairs(background) do
+    --     v.body:setLinearVelocity(-50, 0)
+    -- end
 
+    -- TODO: inject some kind dependancy of 0.5 to PlayerController.lua:66 (17.08.2023) velocity
+    cameraTarget.body:setLinearVelocity(player.tank.max_speed * 0.5, 0)
     p_world:update(dt)
 
     camera:update(dt)
     SpriteSystem.focus_pos = camera.from.pos + camera.from.origin
     if targeting and not player.body:isDestroyed() then
-        camera:follow({player.body:getX(), player.body:getY()})
+        camera:follow({ cameraTarget.body:getX(), cameraTarget.body:getY() })
     else
         camera:follow(nil)
     end
 end
 
 local function Gui_draw()
-
     love.graphics.draw(gui.stats_tab, 0, 0, 0, 2, 2)
     --love.graphics.draw(gui.hp_texture, gui.hp, 10, 10, 0, 2, 2)
     gui.hp_bar:setHP(player.health.count)
     gui.hp_bar:draw(10, 10)
-
 end
 
 function ForestLevel.draw(dt)
@@ -291,9 +301,10 @@ function ForestLevel.draw(dt)
 
     camera:attach()
     world:update(dt)
+    camera:draw()
     camera:detach()
 
-    camera:draw()
+
     Gui_draw()
 end
 
@@ -322,16 +333,16 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
     if not targeting then
         local dir = Vector2()
         if key == "w" then
-            dir = dir + {0, -10}
+            dir = dir + { 0, -10 }
         end
         if key == "s" then
-            dir = dir + {0, 10}
+            dir = dir + { 0, 10 }
         end
         if key == "a" then
-            dir = dir + {-10, 0}
+            dir = dir + { -10, 0 }
         end
         if key == "d" then
-            dir = dir + {10, 0}
+            dir = dir + { 10, 0 }
         end
         camera.from.pos = camera.from.pos + dir
     else

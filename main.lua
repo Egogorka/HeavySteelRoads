@@ -45,6 +45,16 @@ function CHANGE_LEVEL(level)
 end
 
 function love.load()
+    print("Love Lua version: ", _VERSION)
+    local info = "LuaJIT version: "
+
+    if (jit) then
+        info = info .. jit.version
+    else
+        info = info .. "this is not LuaJIT"
+    end
+    print(info)
+
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     love.window.setTitle("HeavySteelRoads")
@@ -59,7 +69,7 @@ function love.load()
     camera = Camera();
     camera:setFromSizes({0,0}, {window_w, window_h}, {0,0}, {600, 400} )
     camera:setDeadzone({camera.from.size[1]/2, camera.from.size[2]/2}, {0, 0})
-    camera.from.scale = 1.5
+    camera.from.scale = 1
 
     love.physics.setMeter(64)
 
@@ -109,7 +119,7 @@ end
 function love.resize(w, h)
     --camera.w = w
     --camera.h = h
-    camera:setFromSizes({0,0}, {w,h})
+    camera:setFromSizes({0, 0}, {w, h}, nil, {600, 400})
     if CURRENT_LEVEL.resize then
         CURRENT_LEVEL.resize(w, h)
     end

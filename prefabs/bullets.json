@@ -1,0 +1,15 @@
+{
+    "default_bullet": {
+        "sprite": "bullet",
+        
+        "behavior": "bullet",
+        "bullet": true,
+
+        "body": "kinematic",
+        "shape": [10, 10, 0, 0],
+        "fixture": {
+            "type": "bullet",
+            "sensor": true
+        }
+    }
+}

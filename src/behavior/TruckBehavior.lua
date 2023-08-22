@@ -15,7 +15,7 @@ local Effects = require("src/graphics/Effects")
 local tiny = require("libs/tiny")
 
 local Behavior = require("src/behavior/Behavior")
-local TruckBehavior = tiny.processingSystem(Behavior:extend("Behavior"))
+local TruckBehavior = tiny.processingSystem(Behavior:extend("TruckBehavior"))
 TruckBehavior.filter = tiny.requireAll("truck", "health", "body", "fixture", "sprite")
 
 function TruckBehavior:onAdd(entity)
