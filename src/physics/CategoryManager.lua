@@ -104,6 +104,7 @@ function CategoryManager.setWall(fixture, team)
     CategoryManager.checkTeam(team, 3)
     fixture:setCategory(CATEGORIES[team]+1)
     fixture:setMask(CATEGORIES[team]+1)
+    SensorMask.fixtureSetMask(fixture, CATEGORIES[team])
 end
 
 -- function CategoryManager.setBullet(fixture, type)

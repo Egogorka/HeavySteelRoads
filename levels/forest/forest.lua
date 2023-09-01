@@ -81,7 +81,11 @@ local animations = GraphicsLoader.animations
 local msprites = GraphicsLoader.msprites
 
 local cameraTarget
-local roadHeight
+local cameraLeftBlock
+local cameraRightBlock
+
+local roadTopBlock
+local roadBottomBlock
 
 local function load_level()
     -- Back-Background --
@@ -117,15 +121,15 @@ local function load_level()
         table.insert(background, forest_back3)
     end
 
-    --for i=0,10 do
+    -- for i=0,10 do
     --    local forest_back2 = { sprite = sprites.forest_front, depth = Depth(1.4, false) }
     --    local x = -10 + i * sprites.forest_front:size()[1]*1.4
     --    local y = - sprites.forest_front:size()[2] - 40*2
     --    forest_back2.body = love.physics.newBody(p_world, x, y, "kinematic")
     --    world:addEntity(forest_back2)
     --    table.insert(background, forest_back2)
-    --end
-    --
+    -- end
+    
     for i = 0, 10 do
         local forest_back1 = { sprite = sprites.forest_front, depth = Depth(1.2, false) }
         local x = 0 + i * sprites.forest_front:size()[1] * 1.2
@@ -152,7 +156,7 @@ local function load_level()
         table.insert(background, road)
     end
 
-    local roadTopBlock = {
+    roadTopBlock = {
         body = love.physics.newBody(p_world, window_w / 2, -10 / 2),
         shape = love.physics.newRectangleShape(window_w, 10)
     }
@@ -160,7 +164,8 @@ local function load_level()
     roadTopBlock.fixture:setUserData(UserData(roadTopBlock))
     CategoryManager.setWall(roadTopBlock.fixture, "neutral")
     world:addEntity(roadTopBlock)
-    local roadBottomBlock = {
+
+    roadBottomBlock = {
         body = love.physics.newBody(p_world, window_w / 2, sprites.road:size()[2] + 10 / 2),
         shape = love.physics.newRectangleShape(window_w, 10)
     }
@@ -178,11 +183,27 @@ local function load_level()
     cameraTarget = {
         body = love.physics.newBody(p_world, window_w / 2, 0, "kinematic")
     }
-    cameraLeftBlock = {
-        body = love.physics.newBody(p_world, 0, window_h / 2, "kinematic"),
-        shape = love.physics.newRectangleShape()
-    }
 
+    cameraLeftBlock = {
+        body = love.physics.newBody(p_world, 0, 0, "kinematic"),
+        shape = love.physics.newRectangleShape(20, window_h)
+    }
+    -- cameraLeftBlock.body:setFixedRotation(true)
+    cameraLeftBlock.fixture = love.physics.newFixture(cameraLeftBlock.body, cameraLeftBlock.shape)
+    cameraLeftBlock.fixture:setUserData(UserData(cameraLeftBlock))
+    CategoryManager.setWall(cameraLeftBlock.fixture, "neutral")
+    world:addEntity(cameraLeftBlock)
+
+    cameraRightBlock = {
+        body = love.physics.newBody(p_world, window_w / 2, 0, "kinematic"),
+        shape = love.physics.newRectangleShape(20, window_h)
+    }
+    -- cameraRightBlock.body:setFixedRotation(true)
+    cameraRightBlock.fixture = love.physics.newFixture(cameraRightBlock.body, cameraRightBlock.shape)
+    cameraRightBlock.fixture:setUserData(UserData(cameraRightBlock))
+    CategoryManager.setWall(cameraRightBlock.fixture, "player")
+    world:addEntity(cameraRightBlock)
+    
     AITank.target = player
     AITruck.target = player
 end
@@ -278,6 +299,17 @@ function ForestLevel.update(dt)
 
     -- TODO: inject some kind dependancy of 0.5 to PlayerController.lua:66 (17.08.2023) velocity
     cameraTarget.body:setLinearVelocity(player.tank.max_speed * 0.5, 0)
+    cameraLeftBlock.body:setLinearVelocity(player.tank.max_speed * 0.5, 0)
+    cameraLeftBlock.body:setPosition(camera.from.pos[1] - 20, camera.from.pos[2])
+
+    cameraRightBlock.body:setLinearVelocity(player.tank.max_speed * 0.5, 0)
+    cameraRightBlock.body:setPosition(camera.from.pos[1] + camera.from.size[1] +20, camera.from.pos[2])
+
+    for i,v in ipairs({roadBottomBlock, roadTopBlock}) do
+        local x, y = v.body:getPosition()
+        v.body:setPosition(camera.from.pos[1] + camera.from.size[1]/2, y)
+    end
+
     p_world:update(dt)
 
     camera:update(dt)
@@ -322,6 +354,11 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
     end
     if key == "g" then
         print(dump(camera, 3, 2))
+    end
+    if key == "h" then
+        local x, y = love.mouse.getPosition()
+        print("Screen coordinates", x, y)
+        print("World coordinates", camera:toWorldCoords({x,y}))
     end
     if key == "t" then
         targeting = not targeting
