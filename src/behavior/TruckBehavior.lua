@@ -22,9 +22,9 @@ function TruckBehavior:onAdd(entity)
     TruckBehavior.super.onAdd(self, entity)
     fill_table(entity.truck, {
         contents = {},
-        max_speed_empty = 120,
-        max_speed_full = 100,
-        max_speed = 100,
+        max_speed_empty = 80,
+        max_speed_full = 60,
+        max_speed = 60, -- current speed
 
         -- Default team setting - enemy
         team = "enemy"

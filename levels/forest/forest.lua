@@ -191,7 +191,7 @@ local function load_level()
     -- cameraLeftBlock.body:setFixedRotation(true)
     cameraLeftBlock.fixture = love.physics.newFixture(cameraLeftBlock.body, cameraLeftBlock.shape)
     cameraLeftBlock.fixture:setUserData(UserData(cameraLeftBlock))
-    CategoryManager.setWall(cameraLeftBlock.fixture, "neutral")
+    CategoryManager.setWall(cameraLeftBlock.fixture, "enemy")
     world:addEntity(cameraLeftBlock)
 
     cameraRightBlock = {
@@ -201,7 +201,7 @@ local function load_level()
     -- cameraRightBlock.body:setFixedRotation(true)
     cameraRightBlock.fixture = love.physics.newFixture(cameraRightBlock.body, cameraRightBlock.shape)
     cameraRightBlock.fixture:setUserData(UserData(cameraRightBlock))
-    CategoryManager.setWall(cameraRightBlock.fixture, "player")
+    CategoryManager.setWall(cameraRightBlock.fixture, "enemy")
     world:addEntity(cameraRightBlock)
     
     AITank.target = player
@@ -224,9 +224,15 @@ local function enemy_spawn()
         end
     end
 
+    local x, y = enemy.body:getPosition()
+    local top_left_x, top_left_y, bottom_right_x, bottom_right_y = enemy.shape:computeAABB(0, 0, 0)
 
-    local posY = math.random(0, road_height)
-    enemy.body:setPosition(window_w, posY)
+    local top_dist = top_left_y - y
+    local bottom_dist = bottom_right_y - y
+
+    local posY = (0 - top_dist) + (road_height - bottom_dist - 0 + top_dist) * math.random()
+
+    enemy.body:setPosition(camera.from.pos[1] + camera.from.size[1], posY)
     enemy.ai = {}
     table.insert(enemies, enemy)
     world:addEntity(enemy)
@@ -290,7 +296,7 @@ function ForestLevel.update(dt)
         return
     end
 
-    -- enemy_timer:update(dt)
+    enemy_timer:update(dt)
     world:refresh()
 
     -- for k, v in pairs(background) do

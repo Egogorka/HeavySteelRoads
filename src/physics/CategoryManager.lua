@@ -73,7 +73,7 @@ function CategoryManager.setObject(fixture, team)
     CategoryManager.checkTeam(team, 3)
     fixture:setCategory(CATEGORIES[team])
     fixture:setMask(CATEGORIES[team])
-    SensorMask.fixtureSetMask(fixture, CATEGORIES["player"], CATEGORIES["enemy"], CATEGORIES["neutral"])
+    SensorMask.fixtureSetMask(fixture, CATEGORIES[team] + 1, CATEGORIES["player"], CATEGORIES["enemy"], CATEGORIES["neutral"])
 end
 
 ---
