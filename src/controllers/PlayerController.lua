@@ -63,10 +63,10 @@ function PlayerController:_process_keyboard(entity, dt)
     end
     self.keys_changed = false
 
-    local velocity = Vector2({0.5, 0})
+    local velocity = Vector2({0.3, 0})
     for key in pairs(self.keys) do
         if self.keys[key] then
-            velocity = velocity + 0.5 * key_table[key]
+            velocity = velocity + 0.7 * key_table[key]
         end
     end
 

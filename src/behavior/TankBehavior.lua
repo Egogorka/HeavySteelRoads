@@ -71,7 +71,10 @@ function TankBehavior:init_ram(entity)
 end
 
 --- Aim block
-local function tower_state(phi)
+local function tower_state(phi, flipped)
+    -- if flipped then
+    --     phi = (Torus(-(phi/2 + 1/2) + 1/2)).a*2 - 1
+    -- end
     if( phi > 7/8 ) then
         return "left"
     end
@@ -123,7 +126,7 @@ function TankBehavior:process(entity, dt)
 
         tank.rotation_angle = Torus(tank.rotation_angle/2 + 1/2).a * 2 - 1
 
-        entity.msprite.sprites.tower.sprite:set(tower_state(tank.rotation_angle))
+        entity.msprite.sprites.tower.sprite:set(tower_state(tank.rotation_angle, entity.msprite.is_flippedH))
     end
 
     -- Command logic

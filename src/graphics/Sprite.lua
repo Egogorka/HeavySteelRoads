@@ -204,15 +204,15 @@ function MSprite:init(o, scale)
 end
 
 function MSprite:flipH()
-    for _, sprite in pairs(self.sprites) do
-        sprite:flipH()
+    for key in pairs(self.sprites) do
+        self.sprites[key].sprite:flipH()
     end
     self.is_flippedH = not self.is_flippedH
 end
 
 function MSprite:flipV()
-    for _, sprite in pairs(self.sprites) do
-        sprite:flipV()
+    for key in pairs(self.sprites) do
+        self.sprites[key].sprite:flipV()
     end
     self.is_flippedV = not self.is_flippedV
 end

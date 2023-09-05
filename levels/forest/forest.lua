@@ -203,7 +203,7 @@ local function load_level()
     cameraRightBlock.fixture:setUserData(UserData(cameraRightBlock))
     CategoryManager.setWall(cameraRightBlock.fixture, "enemy")
     world:addEntity(cameraRightBlock)
-    
+
     AITank.target = player
     AITruck.target = player
 end
@@ -215,6 +215,7 @@ local function enemy_spawn()
     local enemy;
     if type == 0 then
         enemy = PrefabsLoader:fabricate("tanks.player_tank")
+        -- enemy.msprite:flipH()
     else
         enemy = PrefabsLoader:fabricate("tanks.truck")
         enemy.sprite:flipH()
@@ -223,6 +224,7 @@ local function enemy_spawn()
             table.insert(enemy.truck.contents, PrefabsLoader:fabricate("pickups.hp_up"))
         end
     end
+    
 
     local x, y = enemy.body:getPosition()
     local top_left_x, top_left_y, bottom_right_x, bottom_right_y = enemy.shape:computeAABB(0, 0, 0)
@@ -247,7 +249,7 @@ local enemy_timer = Timer(10, function(timer)
         end
         do
             local x, y = enemy.body:getPosition()
-            if x < -50 then
+            if x < -50 + camera.from.pos[1] then
                 tiny.removeEntity(world, enemy)
                 enemies[k] = nil
             end
@@ -304,11 +306,11 @@ function ForestLevel.update(dt)
     -- end
 
     -- TODO: inject some kind dependancy of 0.5 to PlayerController.lua:66 (17.08.2023) velocity
-    cameraTarget.body:setLinearVelocity(player.tank.max_speed * 0.5, 0)
-    cameraLeftBlock.body:setLinearVelocity(player.tank.max_speed * 0.5, 0)
+    cameraTarget.body:setLinearVelocity(player.tank.max_speed * 0.3, 0)
+    cameraLeftBlock.body:setLinearVelocity(player.tank.max_speed * 0.3, 0)
     cameraLeftBlock.body:setPosition(camera.from.pos[1] - 20, camera.from.pos[2])
 
-    cameraRightBlock.body:setLinearVelocity(player.tank.max_speed * 0.5, 0)
+    cameraRightBlock.body:setLinearVelocity(player.tank.max_speed * 0.3, 0)
     cameraRightBlock.body:setPosition(camera.from.pos[1] + camera.from.size[1] +20, camera.from.pos[2])
 
     for i,v in ipairs({roadBottomBlock, roadTopBlock}) do

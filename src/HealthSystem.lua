@@ -34,7 +34,9 @@ function HealthSystem:process(entity, dt)
     end
 
     if health.change and health.change ~= 0 then
-        health.i_timer:start()
+        if health.change < 0 then
+            health.i_timer:start()
+        end
         if behavior then
             entity[behavior].messages:push({"hurt", health.change})
         end
