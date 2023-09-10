@@ -7,6 +7,12 @@
 local Class = require("libs/30log")
 
 -- Real numbers modulo 1
+--- @class Torus
+--- @field a number Number from (0,1]
+--- @operator unm: Torus
+--- @operator add(Torus): Torus
+--- @operator sub(Torus): Torus
+--- @operator mul(Torus|number): Torus
 local Torus = Class("Torus", {0})
 
 function Torus:init(a)

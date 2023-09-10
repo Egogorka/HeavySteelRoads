@@ -4,6 +4,9 @@
 ---
 
 local class = require("libs/30log")
+
+--- @class SensorMask
+--- @field n number The mask itself
 local SensorMask = class("SensorMask")
 
 --- @param n number|table
@@ -25,6 +28,7 @@ function SensorMask:init(n)
     end
 end
 
+--- @param ... integer Category numbers to add (from 1 to 8?)
 function SensorMask:addMask(...)
     local arg = { ... }
     for _, value in pairs(arg) do
@@ -33,6 +37,7 @@ function SensorMask:addMask(...)
     end
 end
 
+--- @param ... integer Category numbers to set (from 1 to 8?)
 function SensorMask:setMask(...)
     local arg = { ... }
     self.n = 0x0000 -- reset mask

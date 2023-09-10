@@ -11,6 +11,7 @@
 -- GLOBAL
 local class = require("libs/30log")
 
+--- @class Stack
 local Stack = class("Stack", {})
 
 -- Create a Table with stack functions
@@ -29,7 +30,7 @@ function Stack:push(...)
     end
 end
 
--- allows to look at last without pop-ing
+-- allows to look at last without popping
 function Stack:lookup()
     return self._et[#self._et]
 end

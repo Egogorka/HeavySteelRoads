@@ -16,16 +16,32 @@ local Vector2, Vector3 = unpack(require("utility/vector"))
 --- z - value of depth
 --- scalable - determines if sprite would be scaled with depth
 ---
+
 local Depth = class("Depth", {
     z = 1,
     scalable = true
 })
 
+--- @class Placement
+--- @field offset Vector2
+--- @field z_index number
 local Placement = class("Placement", {
     offset = Vector2(0,0),
     z_index = 0, -- higher - 'closer' to the screen in terms of order of sprites
 })
 
+--- @class Sprite
+---  @field animations table<string, table> Array listing animations
+---  @field current_animation string 
+---  @field is_flippedH boolean
+---  @field is_flippedV boolean
+---
+---  @field scale number
+---  @field offset Vector2
+---  @field origin Vector2 
+---  @field camera_affected boolean
+---
+---  @field effect Effect
 local Sprite = class("Sprite", {
     animations = {},
     current_animation = "default",
@@ -42,6 +58,15 @@ local Sprite = class("Sprite", {
 })
 
 -- Short for MultipleSprite
+--- @class MSprite 
+---  @field sprites table<string, {sprite: Sprite, placement: Placement}> 
+---  @field sprites_z_order string[]
+---  
+---  @field scale number
+---  @field effect Effect
+---  
+---  @field is_flippedH boolean
+---  @field is_flippedV boolean
 local MSprite = class("MSprite", {
     sprites = {
         default = Sprite(love.graphics.newImage("assets/placeholder.png")),

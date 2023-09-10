@@ -9,6 +9,13 @@ local flux = require("libs/flux")
 
 -- Effect is a class that does some 'effect' on a sprite, like hurt animation
 
+--- @class Effect 
+--- @field is_done boolean Tells if effect is over
+--- @field update function(self: Effect, sprite: Sprite, dt: number):nil
+--- @field beforeDraw function(self: Effect, sprite: Sprite):nil
+--- @field afterDraw function(self: Effect, sprite: Sprite):nil
+---
+--- @field extend function(self: Effect, name: string):Effect - crutch for everything working 
 local Effect = class("Effect", {
     is_done = false,
     update = function(self, sprite, dt) end,
@@ -67,6 +74,7 @@ end
 
 -----------------------------------------------------------
 
+--- @type table<string, Effect>
 local EffectArray = {
     hurt = HurtEffect,
     ram = RamEffect

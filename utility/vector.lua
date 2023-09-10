@@ -6,6 +6,12 @@
 
 local Class = require("libs/30log")
 
+--- @class Vector2
+--- @operator unm: Vector2
+--- @operator add(Vector2|table): Vector2
+--- @operator sub(Vector2|table): Vector2
+--- @operator mul(Vector2|table): Vector2
+--- @operator div(Vector2|table): Vector2
 local Vector2 = Class("Vector2", {0, 0})
 
 function Vector2:init(a, b)
@@ -123,7 +129,12 @@ function Vector2:angle()
 end
 
 
-
+--- @class Vector3
+--- @operator unm: Vector3
+--- @operator add(Vector3|table): Vector3
+--- @operator sub(Vector3|table): Vector3
+--- @operator mul(Vector3|table): Vector3
+--- @operator div(Vector3|table): Vector3
 local Vector3 = Class("Vector3", {0, 0, 0})
 
 function Vector3:init(a, b, c)

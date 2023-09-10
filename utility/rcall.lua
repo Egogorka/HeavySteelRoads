@@ -20,7 +20,7 @@ end
 
 function rcreate(obj, path)
     local split = path / "."
-    operate = obj
+    local operate = obj
     for i, v in ipairs(split) do
         operate[v] = {}
         operate = operate[v]

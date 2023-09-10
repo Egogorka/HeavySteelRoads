@@ -6,6 +6,11 @@
 local class = require("libs/30log")
 local SensorMask = require("src/physics/SensorMask")
 
+--- @class UserData Data that is used by Fixture (at fixture:setUserData)
+--- @field entity table Reference to the entity
+--- @field name string|nil Name of fixture
+--- @field caller string|nil "Owner" of fixture
+--- @field sensor_mask number|SensorMask
 local UserData = class("UserData")
 
 --- @param entity table
