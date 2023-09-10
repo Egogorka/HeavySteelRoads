@@ -7,6 +7,9 @@
 local Stack = require("utility/stack")
 local class = require("libs/30log")
 
+---@class Behavior
+---@field messages Stack
+
 local Behavior = class("Behavior")
 
 function Behavior:onAdd(entity)

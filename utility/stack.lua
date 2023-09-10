@@ -11,6 +11,7 @@
 -- GLOBAL
 local class = require("libs/30log")
 
+--- It would be better to make it @generic, but atm it's WIP and doesn't work
 --- @class Stack
 local Stack = class("Stack", {})
 

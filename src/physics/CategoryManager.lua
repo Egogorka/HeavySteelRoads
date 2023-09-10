@@ -8,6 +8,16 @@
 
 local SensorMask = require("src/physics/SensorMask")
 
+---@alias CategoriesNames
+---| '"player"'
+---| '"player_wall"'
+---| '"enemy"'
+---| '"enemy_wall"'
+---| '"neutral"'
+---| '"neutral_wall"'
+---| '"bulletproof"'
+
+---@enum Categories
 local CATEGORIES = {
     player = 1,
     player_wall = 2,
