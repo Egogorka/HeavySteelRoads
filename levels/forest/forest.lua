@@ -22,6 +22,7 @@ local PhysicsManager = require("src/physics/PhysicsManager")
 
 local SpriteSystem = require("src/graphics/SpriteSystem")()
 local ShapeDebug = require("src/ShapeDebug")
+local debug = true
 local HealthSystem = require("src/HealthSystem")
 
 local TankBehavior = require("src/behavior/TankBehavior")
@@ -271,7 +272,7 @@ function ForestLevel.load()
     load_sprites()
     road_height = sprites.road:size()[2]
 
-    PrefabsLoader:loadPrefabs("prefabs/tanks.json", "tanks")
+    PrefabsLoader:loadPrefabs("prefabs/enemies.json", "tanks")
     PrefabsLoader:loadPrefabs("prefabs/pickups.json", "pickups")
 
     PrefabsLoader:setPhysicsWorld(p_world)
@@ -373,6 +374,14 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
     end
     if key == "p" then
         pause = not pause
+    end
+    if key == "j" then
+        debug = not debug
+        if debug then
+            tiny.addSystem(world, ShapeDebug)
+        else
+            tiny.removeSystem(world, ShapeDebug)
+        end
     end
 
     if not targeting then

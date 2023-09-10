@@ -15,6 +15,7 @@
     "shape" : [25, 10, 50, 20],
     "fixture" : 1
   },
+
   "truck": {
     "sprite": "truck",
     "depth": 1,
@@ -31,5 +32,21 @@
     "body": "dynamic",
     "shape": [25, 10, 50, 20],
     "fixture" : true
+  },
+
+  "drone": {
+    "sprite": "drone",
+    "depth": 1,
+
+    "behavior": "drone",
+    "drone": {},
+
+    "health": {
+      "count" : 10
+    },
+
+    "body": "dynamic",
+    "shape": [0, 0, 23, 21],
+    "fixture": true
   }
 }
