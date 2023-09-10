@@ -10,15 +10,30 @@
         "frames": [1, 1]
       },
       "move" : {
-        "frames": [1, "1-2"]
+        "frames": [1, "1-4"]
       },
       "idle_empty": {
         "frames": [2, 1]
       },
       "move_empty": {
-        "frames": [2, "1-2"]
+        "frames": [2, "1-4"]
       }
     },
     "current_animation": "idle"
+  },
+  {
+    "filename" : "DroneScout1.png",
+    "name" : "drone",
+    "grid" : {
+      "size" : [23, 21]
+    },
+    "animations": {
+      "left": {
+        "frames": [1, 1]
+      },
+      "front": {
+        "frames": [2, 1]
+      }
+    }
   }
 ]
