@@ -28,6 +28,7 @@ local HealthSystem = require("src/HealthSystem")
 local TankBehavior = require("src/behavior/TankBehavior")
 local BulletBehavior = require("src/behavior/BulletBehavior")
 local TruckBehavior = require("src/behavior/TruckBehavior")
+local DroneBehavior = require("src/behavior/DroneBehavior")
 local PickupBehavior = require("src/behavior/PickupBehavior")
 
 local PlayerController = require("src/controllers/PlayerController")
@@ -48,6 +49,7 @@ world:addSystem(TankBehavior)
 world:addSystem(BulletBehavior)
 world:addSystem(TruckBehavior)
 world:addSystem(PickupBehavior)
+world:addSystem(DroneBehavior)
 
 world:addSystem(PlayerController)
 world:addSystem(AITank)
@@ -175,7 +177,7 @@ local function load_level()
     CategoryManager.setWall(roadBottomBlock.fixture, "neutral")
     world:addEntity(roadBottomBlock)
 
-    player = PrefabsLoader:fabricate("tanks.player_tank")
+    player = PrefabsLoader:fabricate("enemies.player_tank")
     player.body:setPosition(100, sprites.road:size()[2] / 2)
     player.player = 1
     player.tank.team = "player"
@@ -212,18 +214,21 @@ end
 local enemies = {}
 
 local function enemy_spawn()
-    local type = math.random(0, 1)
+    local type = math.random(0, 2)
     local enemy;
     if type == 0 then
-        enemy = PrefabsLoader:fabricate("tanks.player_tank")
+        enemy = PrefabsLoader:fabricate("enemies.player_tank")
         -- enemy.msprite:flipH()
-    else
-        enemy = PrefabsLoader:fabricate("tanks.truck")
+    elseif type == 1 then
+        enemy = PrefabsLoader:fabricate("enemies.truck")
         enemy.sprite:flipH()
         local contents_amount = math.random(1, 2)
         for i = 1, contents_amount do
             table.insert(enemy.truck.contents, PrefabsLoader:fabricate("pickups.hp_up"))
         end
+    else
+        enemy = PrefabsLoader:fabricate("enemies.drone")
+        -- enemy.drone.messages:push({"move", Vector2(-0.5, 0)})
     end
     
 
@@ -272,7 +277,7 @@ function ForestLevel.load()
     load_sprites()
     road_height = sprites.road:size()[2]
 
-    PrefabsLoader:loadPrefabs("prefabs/enemies.json", "tanks")
+    PrefabsLoader:loadPrefabs("prefabs/enemies.json", "enemies")
     PrefabsLoader:loadPrefabs("prefabs/pickups.json", "pickups")
 
     PrefabsLoader:setPhysicsWorld(p_world)

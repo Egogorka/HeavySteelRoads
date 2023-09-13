@@ -46,7 +46,7 @@
     },
 
     "body": "dynamic",
-    "shape": [0, 0, 23, 21],
+    "shape": [11.5, 10.5, 23, 21],
     "fixture": true
   }
 }

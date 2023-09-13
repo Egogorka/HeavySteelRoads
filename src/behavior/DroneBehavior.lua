@@ -7,6 +7,7 @@ local class = require("libs/30log")
 local tiny = require("libs/tiny")
 local Timer = require("utility/timer")
 local CategoryManager = require("src/physics/CategoryManager")
+local Effects         = require("src/graphics/Effects")
 
 local Behavior = require("src/behavior/Behavior")
 local DroneBehavior = tiny.processingSystem(Behavior:extend("DroneBehavior"))
@@ -14,8 +15,11 @@ DroneBehavior.filter = tiny.requireAll("drone", "body", "fixture", "sprite")
 
 ---@class Drone
 ---@field shoot_reload_timer Timer
+---
+---@field direction Vector2 Velocity without wiggle
 ---@field wiggle_timer Timer
 ---@field wiggle_amplitude number
+---
 ---@field max_speed number
 ---@field team CategoriesNames
 
@@ -26,6 +30,8 @@ function DroneBehavior:onAdd(entity)
     DroneBehavior.super.onAdd(self, entity)
     fill_table(entity.drone, {
         shoot_reload_timer = Timer(0.5),
+        
+        direction = Vector2(0,0),
         wiggle_timer = Timer(1),
         wiggle_amplitude = 10,
 
@@ -46,7 +52,17 @@ function DroneBehavior:process(entity, dt)
     entity.drone.shoot_reload_timer:update(dt)
     entity.drone.wiggle_timer:update(dt)
 
+    --- Process messages
     DroneBehavior.super.process(self, entity, dt)
+
+    --- Wiggle processing (because it's always there)
+    local wiggle_amplitude = entity.drone.wiggle_amplitude
+    local direction = entity.drone.direction
+    local wiggle = direction:perp()
+    wiggle = wiggle * math.sin(2 * math.pi * entity.drone.wiggle_timer.time)
+
+    local vel = wiggle * wiggle_amplitude + direction * entity.drone.max_speed
+    entity.body:setLinearVelocity(vel:x(), vel:y())
 end
 
 
@@ -58,4 +74,49 @@ function DroneBehavior:move(entity, dt, v)
     if v:magsqr() > 1 then
         v = v / v:mag()
     end
+    local velocity = v * entity.drone.max_speed
+
+    -- select sprite
+    if math.abs(v:x()) < 0.1 then
+        entity.sprite:set("front")
+    else
+        entity.sprite:set("left")
+    end
+
+    if v:x() < 0 and entity.sprite.is_flippedH then
+        entity.sprite:flipH()
+    end
+    if v:x() > 0 and not entity.sprite.is_flippedH then
+        entity.sprite:flipH()
+    end
+
+    entity.drone.direction = v;
 end
+
+---@param entity drone_entity
+---@param dt number
+function DroneBehavior:hurt(entity, dt)
+    if entity.sprite.effect == nil then
+        entity.sprite.effect = Effects.hurt()
+    end
+end
+
+function DroneBehavior:die(entity, dt)
+    local world = self.world
+    tiny.removeEntity(world, entity)
+end
+
+function DroneBehavior:onRemove(entity)
+    entity.body:destroy()
+end
+
+function DroneBehavior:contact(entity, dt, data)
+    local other = data[2]
+    if other.caller ~= nil then return end
+
+    if other.entity.health then
+        other.entity.health.change = -5
+    end
+end
+
+return DroneBehavior
