@@ -6,6 +6,11 @@
 
 require("libs/strong")
 
+--- Recursively calls table by string with '.' separator
+--- Example, table looks like this: 
+--- t = { a: { b: 10 }, c: 5 }
+--- Then rcall would do:
+--- rcall(t, "a.b") -- result: 10
 --- @param obj table
 --- @param path string
 function rcall(obj, path)
@@ -18,6 +23,16 @@ function rcall(obj, path)
 end
 
 
+--- Recursively creates key path in table by path given with '.' separator.
+--- Fills with empty table at the end
+--- Returns the table for convinience
+--- Example: 
+--- path = "i.love.cheese"
+--- t = {}
+--- rcreate(t, path) --- t.i.love.cheese = {}
+---@param obj table
+---@param path string
+---@return table
 function rcreate(obj, path)
     local split = path / "."
     local operate = obj
