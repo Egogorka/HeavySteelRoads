@@ -5,7 +5,7 @@
 ---
 
 local anim8 = require("libs/anim8")
-local tiny = require("libs/tiny")
+local TINY = require("libs/TINY")
 local dump = require("utility/dump")
 local flux = require("libs/flux")
 local UserData = require("src/physics/UserData")
@@ -40,7 +40,7 @@ local ForestLevel = Scene()
 
 local HPBar = require("src/gui/HP_Bar")
 
-local world = tiny.world()
+local world = TINY.world()
 world:addSystem(SpriteSystem)
 world:addSystem(ShapeDebug)
 world:addSystem(HealthSystem)
@@ -256,7 +256,7 @@ local enemy_timer = Timer(10, function(timer)
         do
             local x, y = enemy.body:getPosition()
             if x < -50 + camera.from.pos[1] then
-                tiny.removeEntity(world, enemy)
+                TINY.removeEntity(world, enemy)
                 enemies[k] = nil
             end
         end
@@ -383,9 +383,9 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
     if key == "j" then
         debug = not debug
         if debug then
-            tiny.addSystem(world, ShapeDebug)
+            TINY.addSystem(world, ShapeDebug)
         else
-            tiny.removeSystem(world, ShapeDebug)
+            TINY.removeSystem(world, ShapeDebug)
         end
     end
 

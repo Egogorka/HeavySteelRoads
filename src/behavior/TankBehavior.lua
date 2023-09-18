@@ -19,11 +19,8 @@ local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/physics/CategoryManager")
 local Effects = require("src/graphics/Effects")
 
-local tiny = require("libs/tiny")
-
-
-local TankBehavior = tiny.processingSystem()
-TankBehavior.filter = tiny.requireAll("tank", "body", "msprite")
+local TankBehavior = TINY.processingSystem()
+TankBehavior.filter = TINY.requireAll("tank", "body", "msprite")
 
 TankBehavior.states = {
     ramming = {
@@ -245,7 +242,7 @@ end
 
 function TankBehavior:die(entity, dt)
     local world = self.world
-    tiny.removeEntity(world, entity)
+    TINY.removeEntity(world, entity)
 end
 
 function TankBehavior:onRemove(entity)

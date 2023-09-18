@@ -3,10 +3,9 @@
 --- DateTime: 07.09.2023 0:01
 ---
 
-local tiny = require("libs/tiny")
 
-local ParticleSystem = tiny.processingSystem()
-ParticleSystem.filter = tiny.requireAll("particle_system", "body")
+local ParticleSystem = TINY.processingSystem()
+ParticleSystem.filter = TINY.requireAll("particle_system", "body")
 
 function ParticleSystem:process(entity, dt)
     local x, y = entity.body:getPosition()

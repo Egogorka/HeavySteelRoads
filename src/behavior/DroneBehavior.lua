@@ -4,14 +4,13 @@
 ---
 
 local class = require("libs/30log")
-local tiny = require("libs/tiny")
 local Timer = require("utility/timer")
 local CategoryManager = require("src/physics/CategoryManager")
 local Effects         = require("src/graphics/Effects")
 
 local Behavior = require("src/behavior/Behavior")
-local DroneBehavior = tiny.processingSystem(Behavior:extend("DroneBehavior"))
-DroneBehavior.filter = tiny.requireAll("drone", "body", "fixture", "sprite")
+local DroneBehavior = TINY.processingSystem(Behavior:extend("DroneBehavior"))
+DroneBehavior.filter = TINY.requireAll("drone", "body", "fixture", "sprite")
 
 --- @alias drone_entity {fixture: love.Fixture, body: love.Body, drone: Drone, sprite: Sprite}
 
@@ -93,7 +92,7 @@ end
 
 function DroneBehavior:die(entity, dt)
     local world = self.world
-    tiny.removeEntity(world, entity)
+    TINY.removeEntity(world, entity)
 end
 
 function DroneBehavior:onRemove(entity)

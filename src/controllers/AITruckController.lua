@@ -11,8 +11,8 @@ local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
 
-local AITruck = tiny.processingSystem(class("AITruck"))
-AITruck.filter = tiny.requireAll("truck", "ai")
+local AITruck = TINY.processingSystem(class("AITruck"))
+AITruck.filter = TINY.requireAll("truck", "ai")
 
 function AITruck:init()
     self.target = nil

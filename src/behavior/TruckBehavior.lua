@@ -12,11 +12,9 @@ local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/physics/CategoryManager")
 local Effects = require("src/graphics/Effects")
 
-local tiny = require("libs/tiny")
-
 local Behavior = require("src/behavior/Behavior")
-local TruckBehavior = tiny.processingSystem(Behavior:extend("TruckBehavior"))
-TruckBehavior.filter = tiny.requireAll("truck", "health", "body", "fixture", "sprite")
+local TruckBehavior = TINY.processingSystem(Behavior:extend("TruckBehavior"))
+TruckBehavior.filter = TINY.requireAll("truck", "health", "body", "fixture", "sprite")
 
 function TruckBehavior:onAdd(entity)
     TruckBehavior.super.onAdd(self, entity)
@@ -112,7 +110,7 @@ end
 
 function TruckBehavior:die(entity, dt)
     local world = self.world
-    tiny.removeEntity(world, entity)
+    TINY.removeEntity(world, entity)
 end
 
 function TruckBehavior:onRemove(entity)

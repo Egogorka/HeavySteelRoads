@@ -4,12 +4,11 @@
 --- DateTime: 20.11.2022 1:08
 ---
 
-local tiny = require("libs/tiny")
 local Vector2 = require("utility/vector")[1]
 local dump = require("utility/dump")
 
-local ShapeSystem = tiny.processingSystem()
-ShapeSystem.filter = tiny.requireAll("shape", "body")
+local ShapeSystem = TINY.processingSystem()
+ShapeSystem.filter = TINY.requireAll("shape", "body")
 
 function ShapeSystem:process(entity, dt)
     local r, g, b, a = love.graphics.getColor()

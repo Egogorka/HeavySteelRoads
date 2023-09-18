@@ -14,11 +14,9 @@ local Sprite = require("src/graphics/Sprite")[1]
 local CategoryManager = require("src/physics/CategoryManager")
 local Effects = require("src/graphics/Effects")
 
-local tiny = require("libs/tiny")
-
 local Behavior = require("src/behavior/Behavior")
-local PickupBehavior = tiny.processingSystem(Behavior:extend("PickupBehavior"))
-PickupBehavior.filter = tiny.requireAll("pickup", "body", "fixture", "sprite")
+local PickupBehavior = TINY.processingSystem(Behavior:extend("PickupBehavior"))
+PickupBehavior.filter = TINY.requireAll("pickup", "body", "fixture", "sprite")
 
 function PickupBehavior:onAdd(entity)
     PickupBehavior.super.onAdd(self, entity)
@@ -59,7 +57,7 @@ function PickupBehavior:contact(entity, dt, data)
     end
 
     entity.pickup.on_pickup(entity, other)
-    tiny.removeEntity(self.world, entity)
+    TINY.removeEntity(self.world, entity)
 end
 
 function PickupBehavior:onRemove(entity)

@@ -4,14 +4,13 @@
 --- DateTime: 26.11.2022 23:25
 ---
 
-local tiny = require("libs/tiny")
 local dump = require("utility/dump")
 
 local Timer = require("utility/timer")
 
 -- The purpose of HPSystem is to look out for collisions and
-local HealthSystem = tiny.processingSystem()
-HealthSystem.filter = tiny.requireAll("health", "behavior")
+local HealthSystem = TINY.processingSystem()
+HealthSystem.filter = TINY.requireAll("health", "behavior")
 
 function HealthSystem:onAdd(entity)
     fill_table(entity.health, {

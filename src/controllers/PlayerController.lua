@@ -5,13 +5,12 @@
 ---
 
 local Vector2 = require("utility/vector")[1]
-local tiny = require("libs/tiny")
 
 local dump = require("utility/dump")
 
 
-local PlayerController = tiny.processingSystem()
-PlayerController.filter = tiny.requireAll("tank", "player")
+local PlayerController = TINY.processingSystem()
+PlayerController.filter = TINY.requireAll("tank", "player")
 
 function PlayerController.onAddToWorld(system, world)
     system.keys = {

@@ -5,7 +5,7 @@
 ---
 
 local anim8 = require("libs/anim8")
-local tiny = require("libs/tiny")
+local TINY = require("libs/TINY")
 local loveframes = require("libs/loveframes")
 local dump = require("utility/dump")
 
@@ -19,7 +19,7 @@ local SpriteSystem = require("src/graphics/SpriteSystem")()
 local Scene = require("src/scene/Scene")
 local MainMenu = Scene()
 
-local world = tiny.world()
+local world = TINY.world()
 world:addSystem(SpriteSystem)
 
 local sprites = {}

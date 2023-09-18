@@ -11,8 +11,8 @@ local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
 
-local AITank = tiny.processingSystem(class("AITank"))
-AITank.filter = tiny.requireAll("tank", "ai")
+local AITank = TINY.processingSystem(class("AITank"))
+AITank.filter = TINY.requireAll("tank", "ai")
 
 local Timer = require("utility/timer")
 
