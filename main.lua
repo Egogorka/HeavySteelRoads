@@ -4,6 +4,15 @@
 --- DateTime: 16.10.2022 12:20
 ---
 
+local IS_DEBUG = os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" and arg[2] == "debug"
+if IS_DEBUG then
+	require("lldebugger").start()
+
+	function love.errorhandler(msg)
+		error(msg, 2)
+	end
+end
+
 Vector2, Vector3 = unpack(require("utility/vector"))
 TINY = require("libs/TINY")
 
@@ -15,7 +24,6 @@ function pdump(o, n, i)
     print(dump(o, n or 3, i or 2))
 end
 
-tiny = require("libs/tiny")
 require("libs/strong")
 
 local Camera = require("libs/MyCamera")
@@ -80,11 +88,17 @@ function love.load()
 end
 
 function love.update(dt)
+    if dt > 1 then
+        dt = 1
+    end
     CURRENT_LEVEL.update(dt)
 end
 
 function love.draw()
     local dt = love.timer.getDelta()
+    if dt > 1 then
+        dt = 1
+    end
     CURRENT_LEVEL.draw(dt)
 end
 
