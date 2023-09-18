@@ -5,6 +5,8 @@
 ---
 
 Vector2, Vector3 = unpack(require("utility/vector"))
+TINY = require("libs/TINY")
+
 Stack = require("utility/stack")
 dump = require("utility/dump")
 fill_table = require("utility/settingslike")
