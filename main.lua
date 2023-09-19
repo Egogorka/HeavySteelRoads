@@ -14,7 +14,7 @@ if IS_DEBUG then
 end
 
 Vector2, Vector3 = unpack(require("utility/vector"))
-TINY = require("libs/TINY")
+TINY = require("libs/tiny")
 
 Stack = require("utility/stack")
 dump = require("utility/dump")
