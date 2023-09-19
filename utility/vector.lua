@@ -144,7 +144,7 @@ function Vector2:perp()
     return Vector2(-self[2], self[1])
 end
 
---- @CLASS Vector3
+--- @class Vector3
 --- @operator unm: Vector3
 --- @operator add(Vector3|table): Vector3
 --- @operator sub(Vector3|table): Vector3
