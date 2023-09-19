@@ -3,11 +3,9 @@
 --- DateTime: 26.07.2023 13:18 GTM
 ---
 
-local class = require("libs/30log")
-
 --- @class SensorMask
 --- @field n number The mask itself
-local SensorMask = class("SensorMask")
+local SensorMask = CLASS("SensorMask")
 
 --- @param n number|table
 function SensorMask:init(n)

@@ -8,7 +8,7 @@
 -- Uses a table as stack, use <table>:push(value) and <table>:pop()
 -- Lua 5.1 compatible
 
--- GLOBAL
+
 local class = require("libs/30log")
 
 --- It would be better to make it @generic, but atm it's WIP and doesn't work

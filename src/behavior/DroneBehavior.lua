@@ -3,7 +3,6 @@
 --- DateTime: 10.02.2023 18:31
 ---
 
-local class = require("libs/30log")
 local Timer = require("utility/timer")
 local CategoryManager = require("src/physics/CategoryManager")
 local Effects         = require("src/graphics/Effects")

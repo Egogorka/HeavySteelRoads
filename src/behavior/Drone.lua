@@ -4,7 +4,6 @@
 ---
 
 local Timer = require("utility/timer")
-local class = require("libs/30log")
 
 ---@class Drone
 ---@field shoot_reload_timer Timer
@@ -16,7 +15,7 @@ local class = require("libs/30log")
 ---@field max_speed number
 ---@field team CategoriesNames
 
-local Drone = class("Drone", {
+local Drone = CLASS("Drone", {
     shoot_reload_timer = Timer(0.5),
 
     direction = Vector2(0, 0),
@@ -27,4 +26,6 @@ local Drone = class("Drone", {
 
     team = "enemy"
 })
+
+
 

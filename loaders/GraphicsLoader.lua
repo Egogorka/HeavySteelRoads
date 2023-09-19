@@ -4,14 +4,13 @@
 --- DateTime: 20.11.2022 0:49
 ---
 
-local class = require("libs/30log")
 local json = require("libs/json/json")
 
 require("utility/rcall")
 local anim8 = require("libs/anim8")
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
-local GraphicsLoader = class("GraphicsLoader")
+local GraphicsLoader = CLASS("GraphicsLoader")
 
 function GraphicsLoader:init()
     self.animations = {}

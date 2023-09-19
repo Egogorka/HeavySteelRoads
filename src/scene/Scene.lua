@@ -4,9 +4,7 @@
 --- DateTime: 13.11.2022 1:13
 ---
 
-local class = require("libs/30log")
-
-local Scene = class("Scene", {
+local Scene = CLASS("Scene", {
     load = function()  end,
     update = function(dt)  end,
     draw = function(dt)  end,

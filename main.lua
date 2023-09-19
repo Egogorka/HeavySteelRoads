@@ -4,17 +4,9 @@
 --- DateTime: 16.10.2022 12:20
 ---
 
-local IS_DEBUG = os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" and arg[2] == "debug"
-if IS_DEBUG then
-	require("lldebugger").start()
-
-	function love.errorhandler(msg)
-		error(msg, 2)
-	end
-end
-
 Vector2, Vector3 = unpack(require("utility/vector"))
 TINY = require("libs/TINY")
+CLASS = require("libs/30log")
 
 Stack = require("utility/stack")
 dump = require("utility/dump")
@@ -25,6 +17,17 @@ function pdump(o, n, i)
 end
 
 require("libs/strong")
+
+
+local IS_DEBUG = os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" and arg[2] == "debug"
+if IS_DEBUG then
+	require("lldebugger").start()
+
+	function love.errorhandler(msg)
+		error(msg, 2)
+	end
+end
+
 
 local Camera = require("libs/MyCamera")
 local window_w, window_h, flags = love.window.getMode()

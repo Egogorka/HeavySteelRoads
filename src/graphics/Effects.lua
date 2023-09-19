@@ -4,7 +4,6 @@
 --- DateTime: 02.03.2023 0:03
 ---
 
-local class = require("libs/30log")
 local flux = require("libs/flux")
 
 -- Effect is a class that does some 'effect' on a sprite, like hurt animation
@@ -16,7 +15,7 @@ local flux = require("libs/flux")
 --- @field afterDraw function(self: Effect, sprite: Sprite):nil
 ---
 --- @field extend function(self: Effect, name: string):Effect - crutch for everything working 
-local Effect = class("Effect", {
+local Effect = CLASS("Effect", {
     is_done = false,
     update = function(self, sprite, dt) end,
     beforeDraw = function(self, sprite) end,

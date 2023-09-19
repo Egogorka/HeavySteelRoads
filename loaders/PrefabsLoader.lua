@@ -4,14 +4,13 @@
 --- DateTime: 29.03.2023 13:29
 ---
 
-local class = require("libs/30log")
 local json = require("libs/json/json")
 
 require("utility/rcall")
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
-local PrefabsLoader = class("PrefabsLoader")
+local PrefabsLoader = CLASS("PrefabsLoader")
 local UserData = require("src/physics/UserData")
 
 function PrefabsLoader:init(graphics_loader, physics_world)

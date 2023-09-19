@@ -6,12 +6,11 @@
 
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
-local class = require("libs/30log")
 local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
 
-local AITruck = TINY.processingSystem(class("AITruck"))
+local AITruck = TINY.processingSystem(CLASS("AITruck"))
 AITruck.filter = TINY.requireAll("truck", "ai")
 
 function AITruck:init()

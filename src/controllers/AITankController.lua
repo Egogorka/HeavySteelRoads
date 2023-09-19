@@ -6,12 +6,11 @@
 
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
-local class = require("libs/30log")
 local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
 
-local AITank = TINY.processingSystem(class("AITank"))
+local AITank = TINY.processingSystem(CLASS("AITank"))
 AITank.filter = TINY.requireAll("tank", "ai")
 
 local Timer = require("utility/timer")
@@ -166,7 +165,7 @@ function AITank:action(entity, dt)
     end
 
     -- This one is bad in some sense
-    -- I need to avoid duplication and writing state class code
+    -- I need to avoid duplication and writing state CLASS code
     if ai.in_shoot_range and not (ai.in_ram_range and not entity.tank.ram_reload_timer.is_on) then
         ai.stack:push("action")
     end
