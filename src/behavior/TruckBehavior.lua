@@ -9,23 +9,23 @@ local dump = require("utility/dump")
 local Timer = require("utility/timer")
 
 local Sprite = require("src/graphics/Sprite")[1]
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 local Effects = require("src/graphics/Effects")
 
-local tiny = require("libs/tiny")
-
 local Behavior = require("src/behavior/Behavior")
-local TruckBehavior = tiny.processingSystem(Behavior:extend("Behavior"))
-TruckBehavior.filter = tiny.requireAll("truck", "health", "body", "fixture", "sprite")
+local TruckBehavior = TINY.processingSystem(Behavior:extend("TruckBehavior"))
+TruckBehavior.filter = TINY.requireAll("truck", "health", "body", "fixture", "sprite")
 
 function TruckBehavior:onAdd(entity)
     TruckBehavior.super.onAdd(self, entity)
     fill_table(entity.truck, {
         contents = {},
-        max_velocity = 100,
+        max_speed_empty = 80,
+        max_speed_full = 60,
+        max_speed = 60, -- current speed
 
         -- Default team setting - enemy
-        team = CategoryManager.categories.enemy
+        team = "enemy"
     })
 
     if #entity.truck.contents > 0 then
@@ -55,11 +55,11 @@ function TruckBehavior:onAdd(entity)
 end
 
 --- Move block
----@param vel - Vector2
+---@param vel table - Vector2
 function TruckBehavior:move(entity, dt, vel)
     local v = Vector2(vel)
 
-    local velocity = v * 100
+    local velocity = v * entity.truck.max_speed
     if v:mag() > 1 then
         velocity = velocity / v:mag()
     end
@@ -100,6 +100,7 @@ function TruckBehavior:hurt(entity, dt)
             pdump(v)
         end
         entity.truck.contents = {}
+        entity.truck.max_speed = entity.truck.max_speed_empty
     end
 
     if entity.sprite.effect == nil then
@@ -109,11 +110,20 @@ end
 
 function TruckBehavior:die(entity, dt)
     local world = self.world
-    tiny.removeEntity(world, entity)
+    TINY.removeEntity(world, entity)
 end
 
 function TruckBehavior:onRemove(entity)
     entity.body:destroy()
+end
+
+function TruckBehavior:contact(entity, dt, data)
+    local other = data[2]
+    if other.caller ~= nil then return end
+
+    if other.entity.health then
+        other.entity.health.change = -5
+    end
 end
 
 return TruckBehavior

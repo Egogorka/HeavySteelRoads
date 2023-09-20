@@ -4,10 +4,16 @@
 --- DateTime: 19.03.2023 17:09
 ---
 
-local Class = require("libs/30log")
+local class = require("libs/30log")
 
 -- Real numbers modulo 1
-local Torus = Class("Torus", {0})
+--- @class Torus
+--- @field a number Number from (0,1]
+--- @operator unm: Torus
+--- @operator add(Torus): Torus
+--- @operator sub(Torus): Torus
+--- @operator mul(Torus|number): Torus
+local Torus = class("Torus", {0})
 
 function Torus:init(a)
     if a > 0 then

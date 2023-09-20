@@ -5,13 +5,12 @@
 ---
 
 local Vector2 = require("utility/vector")[1]
-local tiny = require("libs/tiny")
 
 local dump = require("utility/dump")
 
 
-local PlayerController = tiny.processingSystem()
-PlayerController.filter = tiny.requireAll("tank", "player")
+local PlayerController = TINY.processingSystem()
+PlayerController.filter = TINY.requireAll("tank", "player")
 
 function PlayerController.onAddToWorld(system, world)
     system.keys = {
@@ -63,10 +62,10 @@ function PlayerController:_process_keyboard(entity, dt)
     end
     self.keys_changed = false
 
-    local velocity = Vector2()
+    local velocity = Vector2({0.3, 0})
     for key in pairs(self.keys) do
         if self.keys[key] then
-            velocity = velocity + key_table[key]
+            velocity = velocity + 0.7 * key_table[key]
         end
     end
 

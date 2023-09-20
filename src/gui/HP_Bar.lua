@@ -4,9 +4,7 @@
 --- DateTime: 24.04.2023 21:32
 ---
 
-local class = require("libs/30log")
-
-local HPBar = class("Gui.HPBar", {
+local HPBar = CLASS("Gui.HPBar", {
     total = 0,
     current = 0,
 

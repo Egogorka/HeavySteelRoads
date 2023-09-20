@@ -8,9 +8,11 @@
 -- Uses a table as stack, use <table>:push(value) and <table>:pop()
 -- Lua 5.1 compatible
 
--- GLOBAL
+
 local class = require("libs/30log")
 
+--- It would be better to make it @generic, but atm it's WIP and doesn't work
+--- @class Stack
 local Stack = class("Stack", {})
 
 -- Create a Table with stack functions
@@ -29,7 +31,7 @@ function Stack:push(...)
     end
 end
 
--- allows to look at last without pop-ing
+-- allows to look at last without popping
 function Stack:lookup()
     return self._et[#self._et]
 end

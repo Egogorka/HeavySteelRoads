@@ -4,9 +4,15 @@
 --- DateTime: 04.11.2022 0:15
 ---
 
-local Class = require("libs/30log")
+local class = require("libs/30log")
 
-local Vector2 = Class("Vector2", {0, 0})
+--- @class Vector2
+--- @operator unm: Vector2
+--- @operator add(Vector2|table): Vector2
+--- @operator sub(Vector2|table): Vector2
+--- @operator mul(Vector2|table|number): Vector2
+--- @operator div(Vector2|table|number): Vector2
+local Vector2 = class("Vector2", { 0, 0 })
 
 function Vector2:init(a, b)
     if type(a) == "table" then
@@ -34,13 +40,13 @@ function Vector2:init(a, b)
 end
 
 function Vector2.__tostring(v)
-    return 'Vector<'..tostring(v[1])..','..tostring(v[2])..'>'
+    return 'Vector<' .. tostring(v[1]) .. ',' .. tostring(v[2]) .. '>'
 end
 
 function Vector2.fromPolar(r, phi)
     local x = r * math.cos(phi)
     local y = r * math.sin(phi)
-    return Vector2(x,y)
+    return Vector2(x, y)
 end
 
 function Vector2:x()
@@ -82,7 +88,7 @@ function Vector2.__mul(a, b)
         return out
     end
 
-    if( type(a) == "table" ) then
+    if (type(a) == "table") then
         return b * a -- swap order
     end
     -- Multiply by scalar (first argument)
@@ -92,7 +98,7 @@ function Vector2.__mul(a, b)
 end
 
 local function inverse(v)
-    return Vector2(1/v[1], 1/v[2])
+    return Vector2(1 / v[1], 1 / v[2])
 end
 
 function Vector2.__div(a, b)
@@ -100,13 +106,13 @@ function Vector2.__div(a, b)
     if type(b) == "table" then
         inv = inverse(b)
     else
-        inv = 1/b
+        inv = 1 / b
     end
     return a * inv
 end
 
 function Vector2:magsqr()
-    return self[1]*self[1] + self[2]*self[2]
+    return self[1] * self[1] + self[2] * self[2]
 end
 
 function Vector2:mag()
@@ -115,16 +121,36 @@ end
 
 -- Returns the angle from x axis from in range [-pi,pi)
 function Vector2:angle()
-    local phi = math.acos(self[1]/math.sqrt(self:magsqr()))
-    if(self[2] < 0) then
+    local phi = math.acos(self[1] / math.sqrt(self:magsqr()))
+    if (self[2] < 0) then
         phi = -phi
     end
     return phi
 end
 
+---Rotates the vector anti-clockwise (from +x to +y to -x and -y)
+---@param angle number in radians
+---@return Vector2
+function Vector2:rotate(angle)
+    local x = self[1] * math.cos(angle) - self[2] * math.sin(angle)
+    local y = self[1] * math.sin(angle) + self[2] * math.cos(angle)
 
+    return Vector2(x, y)
+end
 
-local Vector3 = Class("Vector3", {0, 0, 0})
+---Returns perpendicular vector
+---@return Vector2
+function Vector2:perp()
+    return Vector2(-self[2], self[1])
+end
+
+--- @CLASS Vector3
+--- @operator unm: Vector3
+--- @operator add(Vector3|table): Vector3
+--- @operator sub(Vector3|table): Vector3
+--- @operator mul(Vector3|table|number): Vector3
+--- @operator div(Vector3|table|number): Vector3
+local Vector3 = CLASS("Vector3", { 0, 0, 0 })
 
 function Vector3:init(a, b, c)
     if type(a) == "table" then
@@ -180,7 +206,7 @@ function Vector3.__mul(a, b)
         return out
     end
 
-    if( type(a) == "table" ) then
+    if (type(a) == "table") then
         return b * a -- swap order
     end
     -- Multiply by scalar (first argument)
@@ -200,4 +226,4 @@ function Vector3:setXY(v)
     self[2] = v[2]
 end
 
-return {Vector2, Vector3}
+return { Vector2, Vector3 }

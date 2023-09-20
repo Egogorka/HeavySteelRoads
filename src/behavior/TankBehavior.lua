@@ -11,19 +11,16 @@
 
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
-local dump = require("utility/dump")
 local Torus = require("utility/torus")
 local Timer = require("utility/timer")
+local UserData = require("src/physics/UserData")
 
 local Sprite = require("src/graphics/Sprite")[1]
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 local Effects = require("src/graphics/Effects")
 
-local tiny = require("libs/tiny")
-
-
-local TankBehavior = tiny.processingSystem()
-TankBehavior.filter = tiny.requireAll("tank", "body", "msprite")
+local TankBehavior = TINY.processingSystem()
+TankBehavior.filter = TINY.requireAll("tank", "body", "msprite")
 
 TankBehavior.states = {
     ramming = {
@@ -36,6 +33,8 @@ function TankBehavior:onAdd(entity)
         messages = Stack(),
         stack = Stack(),
 
+        max_speed = 100,
+
         shoot_reload_timer = Timer(0.8),
 
         aimed = false,
@@ -44,7 +43,7 @@ function TankBehavior:onAdd(entity)
         target_angle = 0,
 
         -- Default team setting - enemy
-        team = CategoryManager.categories.enemy
+        team = "enemy"
     })
 
     self:init_ram(entity)
@@ -69,7 +68,10 @@ function TankBehavior:init_ram(entity)
 end
 
 --- Aim block
-local function tower_state(phi)
+local function tower_state(phi, flipped)
+    -- if flipped then
+    --     phi = (Torus(-(phi/2 + 1/2) + 1/2)).a*2 - 1
+    -- end
     if( phi > 7/8 ) then
         return "left"
     end
@@ -121,7 +123,7 @@ function TankBehavior:process(entity, dt)
 
         tank.rotation_angle = Torus(tank.rotation_angle/2 + 1/2).a * 2 - 1
 
-        entity.msprite.sprites.tower.sprite:set(tower_state(tank.rotation_angle))
+        entity.msprite.sprites.tower.sprite:set(tower_state(tank.rotation_angle, entity.msprite.is_flippedH))
     end
 
     -- Command logic
@@ -165,7 +167,7 @@ end
 function TankBehavior:move(entity, dt, vel)
     local v = Vector2(vel)
 
-    local velocity = v * 100
+    local velocity = v * entity.tank.max_speed
     if v:mag() > 1 then
         velocity = velocity / v:mag()
     end
@@ -211,10 +213,9 @@ function TankBehavior:_bullet(entity)
     bullet.body:setFixedRotation(true)
     bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
     bullet.fixture:setSensor(true)
-    bullet.fixture:setUserData({ entity = bullet })
+    bullet.fixture:setUserData(UserData(bullet))
 
-    -- TODO: This is a bad thing. Need to add category.Team2Bullet, but this looks cleaner now
-    CategoryManager.setBullet(bullet.fixture, entity.tank.team + 1)
+    CategoryManager.setBullet(bullet.fixture, entity.tank.team)
 
     world:addEntity(bullet)
     return bullet
@@ -241,12 +242,25 @@ end
 
 function TankBehavior:die(entity, dt)
     local world = self.world
-    tiny.removeEntity(world, entity)
+    TINY.removeEntity(world, entity)
 end
 
 function TankBehavior:onRemove(entity)
     print("TankRemoved")
     entity.body:destroy()
+end
+
+function TankBehavior:contact(entity, dt, data)
+    local other = data[2]
+    if other.caller ~= nil then return end
+
+    if other.entity.health then
+        if entity.tank.ram_timer.is_on then
+            other.entity.health.change = -20
+        else
+            other.entity.health.change = -5
+        end
+    end
 end
 
 return TankBehavior

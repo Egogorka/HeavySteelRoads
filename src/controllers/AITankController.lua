@@ -6,12 +6,12 @@
 
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
-local class = require("libs/30log")
+local UserData = require("src/physics/UserData")
 
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 
-local AITank = tiny.processingSystem(class("AITank"))
-AITank.filter = tiny.requireAll("tank", "ai")
+local AITank = TINY.processingSystem(CLASS("AITank"))
+AITank.filter = TINY.requireAll("tank", "ai")
 
 local Timer = require("utility/timer")
 
@@ -96,11 +96,7 @@ function AITank:init_ram(entity)
     ram_box.shape = love.physics.newRectangleShape(50/2, 20/2, 100, 20)
     ram_box.fixture = love.physics.newFixture(entity.body, ram_box.shape)
     ram_box.fixture:setSensor(true)
-    ram_box.fixture:setUserData({
-        entity = entity,
-        caller = "ai",
-        name = "ram_box"
-    })
+    ram_box.fixture:setUserData(UserData(entity, "ram_box", "ai"))
     CategoryManager.setObject(ram_box.fixture, entity.tank.team)
 
     fill_table(entity.ai, {
@@ -126,11 +122,7 @@ function AITank:init_shoot(entity)
     shoot_box.shape = love.physics.newRectangleShape(50/2, 20/2, 400, 400)
     shoot_box.fixture = love.physics.newFixture(entity.body, shoot_box.shape)
     shoot_box.fixture:setSensor(true)
-    shoot_box.fixture:setUserData({
-        entity = entity,
-        caller = "ai",
-        name = "shoot_box"
-    })
+    shoot_box.fixture:setUserData(UserData(entity, "shoot_box", "ai"))
     CategoryManager.setObject(shoot_box.fixture, entity.tank.team)
 
     local stare_timer = Timer(1)
@@ -173,7 +165,7 @@ function AITank:action(entity, dt)
     end
 
     -- This one is bad in some sense
-    -- I need to avoid duplication and writing state class code
+    -- I need to avoid duplication and writing state CLASS code
     if ai.in_shoot_range and not (ai.in_ram_range and not entity.tank.ram_reload_timer.is_on) then
         ai.stack:push("action")
     end

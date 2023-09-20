@@ -9,13 +9,19 @@ local Stack = require("utility/stack")
 local dump = require("utility/dump")
 
 local Sprite = require("src/graphics/Sprite")[1]
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 
-local tiny = require("libs/tiny")
 local Behavior = require("src/behavior/Behavior")
 
-local BulletBehavior = tiny.processingSystem(Behavior:extend("BulletBehavior"))
-BulletBehavior.filter = tiny.requireAll("bullet", "body")
+local BulletBehavior = TINY.processingSystem(Behavior:extend("BulletBehavior"))
+BulletBehavior.filter = TINY.requireAll("bullet", "body")
+
+function BulletBehavior:onAdd(entity)
+    BulletBehavior.super.onAdd(self, entity)
+    fill_table(entity.bullet, {
+        damage = 10
+    })
+end
 
 function BulletBehavior:_explosion(entity)
     local p_world = entity.body:getWorld()
@@ -29,7 +35,7 @@ function BulletBehavior:_explosion(entity)
     explosion.body = love.physics.newBody(p_world, x, y, "static")
     animation.animations.default[1].onLoop = function(anim, loops)
         explosion.body:destroy()
-        tiny.removeEntity(world, explosion)
+        TINY.removeEntity(world, explosion)
     end
 
     world:addEntity(explosion)
@@ -41,12 +47,12 @@ function BulletBehavior:contact(entity, dt, data)
     if other.caller ~= nil then return end
 
     if other.entity.health then
-        other.entity.health.change = -10
+        other.entity.health.change = -entity.bullet.damage
     end
 
     local world = self.world
     self:_explosion(entity)
-    tiny.removeEntity(world, entity)
+    TINY.removeEntity(world, entity)
 end
 
 function BulletBehavior:onRemove(entity)

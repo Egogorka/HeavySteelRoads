@@ -5,9 +5,11 @@
 ---
 
 local Stack = require("utility/stack")
-local class = require("libs/30log")
 
-local Behavior = class("Behavior")
+---@class Behavior
+---@field messages Stack
+
+local Behavior = CLASS("Behavior")
 
 function Behavior:onAdd(entity)
     if entity[entity.behavior] == nil then

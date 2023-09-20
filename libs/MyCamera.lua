@@ -51,7 +51,7 @@ local Camera = class("Camera", {
         angle = 0
     },
 
-    deadzone = {
+    deadzone = { --In World-Camera (or Screen-Camera cuz they are identical) coordinates
         center = {screen/2},
         size = {0,0}
     },
@@ -88,15 +88,18 @@ function Camera:init(in_pos, in_origin, out_pos, out_origin)
 end
 
 --- Auto-regulates the output scale so the camera would fit in the box of out_size
----@param in_pos table \ Vector2(number) Camera's position in world_space
 ---@param out_pos table \ Vector2(number) Camera's position in screen_space
----@param in_size table \ Vector2(number) self-explanatory
 ---@param out_size table \ Vector2(number) self-explanatory
+---@param in_pos table \ Vector2(number) Camera's position in world_space
+---@param in_size table \ Vector2(number) self-explanatory
 function Camera:setFromSizes(out_pos, out_size, in_pos, in_size)
     if in_pos then self.from.pos = Vector2(in_pos) end
     if out_pos then self.to.pos = Vector2(out_pos) end
 
-    if in_size then self.from.size = Vector2(in_size) end
+    if in_size then
+        self.from.size = Vector2(in_size)
+        self.from.origin = Vector2(in_size) / 2
+    end
 
     if out_size then
         self.to.size = Vector2(out_size)
@@ -251,21 +254,21 @@ function Camera:draw()
     local color = {love.graphics.getColor()}
 
     do
-        local p1 = self:toScreenCoords(self.from.pos)
-        local p2 = self:toScreenCoords(self.from.pos + self.from.size)
+        local p1 = self.from.pos
+        local p2 = self.from.pos + self.from.size
         local size = p2 - p1
 
-        love.graphics.setColor(255,0,0)
+        love.graphics.setColor(255,128,0)
         love.graphics.rectangle('line', p1[1], p1[2], size[1], size[2])
     end
 
     do
-        local p = self:toScreenCoords(self:wc2w(self.from.origin))
+        local p = self:wc2w(self.from.origin)
         love.graphics.circle('line', p[1], p[2], 5)
     end
 
     do
-        local p1 = self:toScreenCoords(self:wc2w(self.deadzone.center - self.deadzone.size/2))
+        local p1 = self:wc2w(self.deadzone.center - self.deadzone.size/2)
         local size = self.deadzone.size * self.to.scale
 
         love.graphics.setColor(255,255,255)

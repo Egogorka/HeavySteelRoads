@@ -5,28 +5,43 @@
 ---
 
 local anim8 = require("libs/anim8")
-local class = require("libs/30log")
 local Vector2, Vector3 = unpack(require("utility/vector"))
 
 -----------------------------------------
---- Classes
+--- classes
 -----------------------------------------
 
 ---
 --- z - value of depth
 --- scalable - determines if sprite would be scaled with depth
 ---
-local Depth = class("Depth", {
+
+local Depth = CLASS("Depth", {
     z = 1,
     scalable = true
 })
 
-local Placement = class("Placement", {
+--- @class Placement
+--- @field offset Vector2
+--- @field z_index number
+local Placement = CLASS("Placement", {
     offset = Vector2(0,0),
     z_index = 0, -- higher - 'closer' to the screen in terms of order of sprites
 })
 
-local Sprite = class("Sprite", {
+--- @class Sprite
+---  @field animations table<string, table> Array listing animations
+---  @field current_animation string 
+---  @field is_flippedH boolean
+---  @field is_flippedV boolean
+---
+---  @field scale number
+---  @field offset Vector2
+---  @field origin Vector2 
+---  @field camera_affected boolean
+---
+---  @field effect Effect
+local Sprite = CLASS("Sprite", {
     animations = {},
     current_animation = "default",
 
@@ -42,7 +57,16 @@ local Sprite = class("Sprite", {
 })
 
 -- Short for MultipleSprite
-local MSprite = class("MSprite", {
+--- @class MSprite 
+---  @field sprites table<string, {sprite: Sprite, placement: Placement}> 
+---  @field sprites_z_order string[]
+---  
+---  @field scale number
+---  @field effect Effect
+---  
+---  @field is_flippedH boolean
+---  @field is_flippedV boolean
+local MSprite = CLASS("MSprite", {
     sprites = {
         default = Sprite(love.graphics.newImage("assets/placeholder.png")),
     },
@@ -204,15 +228,15 @@ function MSprite:init(o, scale)
 end
 
 function MSprite:flipH()
-    for _, sprite in pairs(self.sprites) do
-        sprite:flipH()
+    for key in pairs(self.sprites) do
+        self.sprites[key].sprite:flipH()
     end
     self.is_flippedH = not self.is_flippedH
 end
 
 function MSprite:flipV()
-    for _, sprite in pairs(self.sprites) do
-        sprite:flipV()
+    for key in pairs(self.sprites) do
+        self.sprites[key].sprite:flipV()
     end
     self.is_flippedV = not self.is_flippedV
 end

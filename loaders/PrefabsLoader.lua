@@ -4,14 +4,14 @@
 --- DateTime: 29.03.2023 13:29
 ---
 
-local class = require("libs/30log")
 local json = require("libs/json/json")
 
 require("utility/rcall")
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
-local PrefabsLoader = class("GraphicsLoader")
+local PrefabsLoader = CLASS("PrefabsLoader")
+local UserData = require("src/physics/UserData")
 
 function PrefabsLoader:init(graphics_loader, physics_world)
     self.physics_world = physics_world
@@ -42,7 +42,7 @@ end
 
 function PrefabsLoader:fabricate(name)
     if not self.physics_world then
-        print("Error: Fabricating "..name.." without physics_world property set")
+        error("Error: Fabricating "..name.." without physics_world property set")
     end
 
     local p = rcopy(rcall(self.prefabs, name))
@@ -76,10 +76,19 @@ function PrefabsLoader:fabricate(name)
             p.shape = love.physics.newRectangleShape(unpack(p.shape))
         end
         if p.fixture then
+            local fname = nil
+            local caller = nil
+            local is_sensor = nil
+            if type(p.fixture) == "table" then
+                fname = p.fixture.name 
+                caller = p.fixture.caller
+                is_sensor = p.fixture.sensor
+            end
             p.fixture = love.physics.newFixture(p.body, p.shape)
-            p.fixture:setUserData({
-                entity = p
-            })
+            if is_sensor then
+                p.fixture:setSensor(true)
+            end
+            p.fixture:setUserData(UserData(p, fname, caller))
         end
     end
     return p

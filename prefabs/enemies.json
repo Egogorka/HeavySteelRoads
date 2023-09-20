@@ -8,13 +8,14 @@
       "aim" : null
     },
     "health" : {
-      "count" : 100
+      "count" : 50
     },
 
     "body": "dynamic",
     "shape" : [25, 10, 50, 20],
     "fixture" : 1
   },
+
   "truck": {
     "sprite": "truck",
     "depth": 1,
@@ -25,11 +26,27 @@
     },
 
     "health": {
-      "count" : 100
+      "count" : 50
     },
 
     "body": "dynamic",
     "shape": [25, 10, 50, 20],
     "fixture" : true
+  },
+
+  "drone": {
+    "sprite": "drone",
+    "depth": 1,
+
+    "behavior": "drone",
+    "drone": {},
+
+    "health": {
+      "count" : 10
+    },
+
+    "body": "dynamic",
+    "shape": [11.5, 10.5, 23, 21],
+    "fixture": true
   }
 }

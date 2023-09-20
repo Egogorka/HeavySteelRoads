@@ -6,12 +6,12 @@
 
 local Vector2 = require("utility/vector")[1]
 local Stack = require("utility/stack")
-local class = require("libs/30log")
+local UserData = require("src/physics/UserData")
 
-local CategoryManager = require("src/CategoryManager")
+local CategoryManager = require("src/physics/CategoryManager")
 
-local AITruck = tiny.processingSystem(class("AITruck"))
-AITruck.filter = tiny.requireAll("truck", "ai")
+local AITruck = TINY.processingSystem(CLASS("AITruck"))
+AITruck.filter = TINY.requireAll("truck", "ai")
 
 function AITruck:init()
     self.target = nil
@@ -57,7 +57,7 @@ function AITruck:idle(entity, dt)
 
     -- Handle state
 
-    entity.truck.messages:push({"move", Vector2({-0.15, 0})})
+    entity.truck.messages:push({ "move", Vector2({ -0.4, 0 }) })
 
     -- State out branches
 
@@ -80,11 +80,7 @@ function AITruck:init_avoid_box(entity)
     avoid_box.shape = love.physics.newRectangleShape(50/2, 20/2, 400, 400)
     avoid_box.fixture = love.physics.newFixture(entity.body, avoid_box.shape)
     avoid_box.fixture:setSensor(true)
-    avoid_box.fixture:setUserData({
-        entity = entity,
-        caller = "ai",
-        name = "avoid_box"
-    })
+    avoid_box.fixture:setUserData(UserData(entity, "avoid_box", "ai"))
     CategoryManager.setObject(avoid_box.fixture, entity.truck.team)
 
     fill_table(entity.ai, {
@@ -101,14 +97,14 @@ function AITruck:action(entity, dt)
     local ai = entity.ai
     local truck = entity.truck
 
-    local d = ai.target_pos - {entity.body:getPosition()}
+    local d = ai.target_pos - { entity.body:getPosition() }
 
     if math.abs(d:y()) < 40 then
-        local dir = 0.3
+        local dir = 0.6
         if d:y() < 0 then dir = -dir end
-        truck.messages:push({"move", {0, -dir}})
+        truck.messages:push({ "move", { 0, -dir } })
     else
-        truck.messages:push({"move", {-0.3, 0}})
+        truck.messages:push({ "move", { -0.6, 0 } })
     end
 
     if ai.in_avoid_box then
