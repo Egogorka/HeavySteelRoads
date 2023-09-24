@@ -59,6 +59,7 @@ function GraphicsLoader:loadAnimations(path, name)
         if v.scale ~= nil then scale = v.scale end
 
         local grid = nil
+        local animations = nil
         if v.grid then
             local offset_x, offset_y
             if v.grid.offset ~= nil then
@@ -72,16 +73,15 @@ function GraphicsLoader:loadAnimations(path, name)
                     offset_x, offset_y,
                     v.grid.border
             )
-        end
-
-        local animations = nil
-        if v.animations and v.grid then
-            animations = {}
-            for k1, anim in pairs(v.animations) do
-                animations[k1] = {
-                    anim8.newAnimation(grid(unpack(anim.frames)), anim.durations or 1),
-                    image
-                }
+        
+            if v.animations then
+                animations = {}
+                for k1, anim in pairs(v.animations) do
+                    animations[k1] = {
+                        anim8.newAnimation(grid(unpack(anim.frames)), anim.durations or 1),
+                        image
+                    }
+                end
             end
         end
 

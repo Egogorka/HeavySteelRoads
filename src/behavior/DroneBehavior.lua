@@ -20,7 +20,7 @@ function DroneBehavior:onAdd(entity)
         shoot_reload_timer = Timer(0.5),
 
         direction = Vector2(0,0),
-        wiggle_timer = Timer(1),
+        wiggle_timer = Timer(1, nil, true),
         wiggle_amplitude = 10,
 
         max_speed = 60,
