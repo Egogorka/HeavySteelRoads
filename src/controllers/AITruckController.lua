@@ -9,8 +9,11 @@ local Stack = require("utility/stack")
 local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
+local StateMachine = require("src/controllers/StateMachine")
 
-local AITruck = TINY.processingSystem(CLASS("AITruck"))
+local DetectorBox = require("src/controllers/DetectorBox")
+
+local AITruck = TINY.processingSystem(StateMachine:extend("AITruck"))
 AITruck.filter = TINY.requireAll("truck", "ai")
 
 function AITruck:init()
@@ -18,34 +21,14 @@ function AITruck:init()
 end
 
 function AITruck:onAdd(entity)
+    AITruck.super.onAdd(self, entity)
+
     fill_table(entity.ai, {
-        messages = Stack(),
-        stack = Stack(),
+        target = self.target,
+        target_pos = nil,
     })
 
-    self:init_avoid_box(entity)
-end
-
-function AITruck:process(entity, dt)
-    local ai = entity.ai
-
-    --- Messages
-    while ai.messages:size() ~= 0 do
-        local message = entity.ai.messages:pop()
-        local command = message[1]
-
-        if self[command] then
-            self[command](self, entity, dt, message[2])
-        end
-    end
-
-    --- Stack-machine stuff
-    if ai.stack:size() == 0 then
-        ai.stack:push("idle")
-    end
-
-    local state = ai.stack:pop()
-    self[state](self, entity, dt)
+    DetectorBox.init(entity, {50/2, 50/2}, {400, 400}, "avoid_box")
 end
 
 -----------------------------------------
@@ -63,35 +46,16 @@ function AITruck:idle(entity, dt)
 
     if ai.in_avoid_box then
         ai.target_pos = Vector2(ai.target.body:getPosition())
-        ai.stack:push("action")
+        ai.states:push("action")
         return
     end
 
-    ai.stack:push("idle") -- refill idle state
+    ai.states:push("idle") -- refill idle state
 end
 
 -----------------------------------------
 --- Action state (shooting, going around the player to go left)
 -----------------------------------------
-
-function AITruck:init_avoid_box(entity)
-    local avoid_box = {}
-
-    avoid_box.shape = love.physics.newRectangleShape(50/2, 20/2, 400, 400)
-    avoid_box.fixture = love.physics.newFixture(entity.body, avoid_box.shape)
-    avoid_box.fixture:setSensor(true)
-    avoid_box.fixture:setUserData(UserData(entity, "avoid_box", "ai"))
-    CategoryManager.setObject(avoid_box.fixture, entity.truck.team)
-
-    fill_table(entity.ai, {
-        avoid_box = avoid_box,
-
-        target = self.target,
-        target_pos = nil,
-
-        in_avoid_box = false,
-    })
-end
 
 function AITruck:action(entity, dt)
     local ai = entity.ai
@@ -108,7 +72,7 @@ function AITruck:action(entity, dt)
     end
 
     if ai.in_avoid_box then
-        ai.stack:push("action")
+        ai.states:push("action")
     end
 end
 
@@ -117,27 +81,12 @@ end
 -----------------------------------------
 
 function AITruck:contact(entity, dt, data)
-    local other = data[2]
-    local this = data[1]
-
-    if this.name == "avoid_box" then
-        if other.entity == entity.ai.target then
-            entity.ai.in_avoid_box = true
-        end
-    end
+    DetectorBox.onContact(entity, data, entity.ai.target, "avoid_box")
 end
 
 function AITruck:endContact(entity, dt, data)
-    local other = data[2]
-    local this = data[1]
-
-    if this.name == "avoid_box" then
-        if other.entity == entity.ai.target then
-            entity.ai.in_avoid_box = false
-        end
-    end
+    DetectorBox.onEndContact(entity, data, entity.ai.target, "avoid_box")
 end
-
 
 return AITruck
 

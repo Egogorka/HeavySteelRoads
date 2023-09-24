@@ -9,8 +9,10 @@ local Stack = require("utility/stack")
 local UserData = require("src/physics/UserData")
 
 local CategoryManager = require("src/physics/CategoryManager")
+local StateMachine = require("src/controllers/StateMachine")
+local DetectorBox = require("src/controllers/DetectorBox")
 
-local AITank = TINY.processingSystem(CLASS("AITank"))
+local AITank = TINY.processingSystem(StateMachine:extend("AITank"))
 AITank.filter = TINY.requireAll("tank", "ai")
 
 local Timer = require("utility/timer")
@@ -20,35 +22,11 @@ function AITank:init()
 end
 
 function AITank:onAdd(entity)
-    fill_table(entity.ai, {
-        messages = Stack(),
-        stack = Stack(),
-    })
+    AITank.super.onAdd(self, entity)
 
+    DetectorBox.init(entity, {50/2, 20/2}, {100, 20}, "ram_box")
+    DetectorBox.init(entity, {50/2, 20/2}, {400, 400}, "shoot_box")
     self:init_shoot(entity)
-    self:init_ram(entity)
-end
-
-function AITank:process(entity, dt)
-    local ai = entity.ai
-
-    --- Messages
-    while ai.messages:size() ~= 0 do
-        local message = entity.ai.messages:pop()
-        local command = message[1]
-
-        if self[command] then
-            self[command](self, entity, dt, message[2])
-        end
-    end
-
-    --- Stack-machine stuff
-    if ai.stack:size() == 0 then
-        ai.stack:push("idle")
-    end
-
-    local state = ai.stack:pop()
-    self[state](self, entity, dt)
 end
 
 -----------------------------------------
@@ -65,21 +43,21 @@ function AITank:idle(entity, dt)
 
     -- State out branches
 
-    if ai.in_ram_range and not entity.tank.ram_reload_timer.is_on then
+    if ai.in_ram_box and not entity.tank.ram_reload_timer.is_on then
         ai.ram_pos = Vector2(ai.target.body:getPosition()) -- State start code
         entity.tank.messages:push({"ram", entity.ai.ram_pos})
-        ai.stack:push("ram")
+        ai.states:push("ram")
         return
     end
 
-    if ai.in_shoot_range then
+    if ai.in_shoot_box then
         ai.stare_timer:start() -- State start code
         ai.target_pos = Vector2(ai.target.body:getPosition())
-        ai.stack:push("action")
+        ai.states:push("action")
         return
     end
 
-    ai.stack:push("idle") -- refill idle state
+    ai.states:push("idle") -- refill idle state
 
     -- Action if no state change
     entity.tank.messages:push({"aim", Vector2(entity.body:getPosition()) + {-10, 0}})
@@ -90,25 +68,10 @@ end
 --- Ram state
 -----------------------------------------
 
-function AITank:init_ram(entity)
-    local ram_box = {}
-
-    ram_box.shape = love.physics.newRectangleShape(50/2, 20/2, 100, 20)
-    ram_box.fixture = love.physics.newFixture(entity.body, ram_box.shape)
-    ram_box.fixture:setSensor(true)
-    ram_box.fixture:setUserData(UserData(entity, "ram_box", "ai"))
-    CategoryManager.setObject(ram_box.fixture, entity.tank.team)
-
-    fill_table(entity.ai, {
-        in_ram_range = false,
-        ram_box = ram_box,
-    })
-end
-
 function AITank:ram(entity, dt)
     -- Needs to be fixed
     if entity.tank.ram_timer.is_on or entity.tank.ram_pre_timer.is_on then
-        entity.ai.stack:push("ram")
+        entity.ai.states:push("ram")
     end
 end
 
@@ -117,26 +80,15 @@ end
 -----------------------------------------
 
 function AITank:init_shoot(entity)
-    local shoot_box = {}
-
-    shoot_box.shape = love.physics.newRectangleShape(50/2, 20/2, 400, 400)
-    shoot_box.fixture = love.physics.newFixture(entity.body, shoot_box.shape)
-    shoot_box.fixture:setSensor(true)
-    shoot_box.fixture:setUserData(UserData(entity, "shoot_box", "ai"))
-    CategoryManager.setObject(shoot_box.fixture, entity.tank.team)
-
     local stare_timer = Timer(1)
     stare_timer.on_end = function(timer)
         entity.tank.messages:push({"shoot"})
     end
 
     fill_table(entity.ai, {
-        shoot_box = shoot_box,
-
         target = self.target,
         target_pos = nil,
 
-        in_shoot_range = false,
         stare_timer = stare_timer
     })
 end
@@ -166,8 +118,8 @@ function AITank:action(entity, dt)
 
     -- This one is bad in some sense
     -- I need to avoid duplication and writing state CLASS code
-    if ai.in_shoot_range and not (ai.in_ram_range and not entity.tank.ram_reload_timer.is_on) then
-        ai.stack:push("action")
+    if ai.in_shoot_box and not (ai.in_ram_box and not entity.tank.ram_reload_timer.is_on) then
+        ai.states:push("action")
     end
 end
 
@@ -176,37 +128,13 @@ end
 -----------------------------------------
 
 function AITank:contact(entity, dt, data)
-    local other = data[2]
-    local this = data[1]
-
-    if this.name == "shoot_box" then
-        if other.entity == entity.ai.target then
-            entity.ai.in_shoot_range = true
-        end
-    end
-
-    if this.name == "ram_box" then
-        if other.entity == entity.ai.target then
-            entity.ai.in_ram_range = true
-        end
-    end
+    DetectorBox.onContact(entity, data, entity.ai.target, "shoot_box")
+    DetectorBox.onContact(entity, data, entity.ai.target, "ram_box")
 end
 
 function AITank:endContact(entity, dt, data)
-    local other = data[2]
-    local this = data[1]
-
-    if this.name == "shoot_box" then
-        if other.entity == entity.ai.target then
-            entity.ai.in_shoot_range = false
-        end
-    end
-
-    if this.name == "ram_box" then
-        if other.entity == entity.ai.target then
-            entity.ai.in_ram_range = false
-        end
-    end
+    DetectorBox.onEndContact(entity, data, entity.ai.target, "shoot_box")
+    DetectorBox.onEndContact(entity, data, entity.ai.target, "ram_box")
 end
 
 
