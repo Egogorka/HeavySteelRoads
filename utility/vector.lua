@@ -150,7 +150,7 @@ end
 --- @operator sub(Vector3|table): Vector3
 --- @operator mul(Vector3|table|number): Vector3
 --- @operator div(Vector3|table|number): Vector3
-local Vector3 = CLASS("Vector3", { 0, 0, 0 })
+local Vector3 = class("Vector3", { 0, 0, 0 })
 
 function Vector3:init(a, b, c)
     if type(a) == "table" then
