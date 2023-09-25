@@ -34,6 +34,7 @@ local PickupBehavior = require("src/behavior/PickupBehavior")
 local PlayerController = require("src/controllers/PlayerController")
 local AITank = require("src/controllers/AITankController")()
 local AITruck = require("src/controllers/AITruckController")()
+local AIDrone = require("src/controllers/AIDroneController")()
 
 local Scene = require("src/scene/Scene")
 local ForestLevel = Scene()
@@ -54,6 +55,7 @@ world:addSystem(DroneBehavior)
 world:addSystem(PlayerController)
 world:addSystem(AITank)
 world:addSystem(AITruck)
+world:addSystem(AIDrone)
 
 local player
 local p_world = love.physics.newWorld(0, 0, true)
@@ -209,6 +211,7 @@ local function load_level()
 
     AITank.target = player
     AITruck.target = player
+    AIDrone.target = player
 end
 
 local enemies = {}

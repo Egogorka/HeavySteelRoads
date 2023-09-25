@@ -5,11 +5,10 @@
 ---
 
 local anim8 = require("libs/anim8")
-local class = require("libs/30log")
 local Vector2, Vector3 = unpack(require("utility/vector"))
 
 -----------------------------------------
---- Classes
+--- classes
 -----------------------------------------
 
 ---
@@ -17,7 +16,7 @@ local Vector2, Vector3 = unpack(require("utility/vector"))
 --- scalable - determines if sprite would be scaled with depth
 ---
 
-local Depth = class("Depth", {
+local Depth = CLASS("Depth", {
     z = 1,
     scalable = true
 })
@@ -25,7 +24,7 @@ local Depth = class("Depth", {
 --- @class Placement
 --- @field offset Vector2
 --- @field z_index number
-local Placement = class("Placement", {
+local Placement = CLASS("Placement", {
     offset = Vector2(0,0),
     z_index = 0, -- higher - 'closer' to the screen in terms of order of sprites
 })
@@ -42,7 +41,7 @@ local Placement = class("Placement", {
 ---  @field camera_affected boolean
 ---
 ---  @field effect Effect
-local Sprite = class("Sprite", {
+local Sprite = CLASS("Sprite", {
     animations = {},
     current_animation = "default",
 
@@ -67,7 +66,7 @@ local Sprite = class("Sprite", {
 ---  
 ---  @field is_flippedH boolean
 ---  @field is_flippedV boolean
-local MSprite = class("MSprite", {
+local MSprite = CLASS("MSprite", {
     sprites = {
         default = Sprite(love.graphics.newImage("assets/placeholder.png")),
     },

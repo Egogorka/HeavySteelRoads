@@ -12,7 +12,7 @@ local class = require("libs/30log")
 ---  @field is_on boolean Tells if timer is on
 ---  @field cycle boolean Tells if timer should cycle after reaching max time
 ---  @field cycle_number integer Amount of cycles since start
----  @field on_end function(self: Timer):nil Callback function called when reaching max time  
+---  @field on_end nil|function(self: Timer):nil Callback function called when reaching max time  
 local Timer = class("Timer", {
     time = 0,
     max = 1,
@@ -26,7 +26,7 @@ local Timer = class("Timer", {
 })
 
 ---@param max number
----@param on_end function(self: Timer):nil
+---@param on_end? function(self: Timer):nil
 ---@param cycle boolean
 function Timer:init(max, on_end, cycle)
     self.max = max

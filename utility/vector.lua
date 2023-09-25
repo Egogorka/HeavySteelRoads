@@ -4,7 +4,7 @@
 --- DateTime: 04.11.2022 0:15
 ---
 
-local Class = require("libs/30log")
+local class = require("libs/30log")
 
 --- @class Vector2
 --- @operator unm: Vector2
@@ -12,7 +12,7 @@ local Class = require("libs/30log")
 --- @operator sub(Vector2|table): Vector2
 --- @operator mul(Vector2|table|number): Vector2
 --- @operator div(Vector2|table|number): Vector2
-local Vector2 = Class("Vector2", { 0, 0 })
+local Vector2 = class("Vector2", { 0, 0 })
 
 function Vector2:init(a, b)
     if type(a) == "table" then
@@ -150,7 +150,7 @@ end
 --- @operator sub(Vector3|table): Vector3
 --- @operator mul(Vector3|table|number): Vector3
 --- @operator div(Vector3|table|number): Vector3
-local Vector3 = Class("Vector3", { 0, 0, 0 })
+local Vector3 = class("Vector3", { 0, 0, 0 })
 
 function Vector3:init(a, b, c)
     if type(a) == "table" then

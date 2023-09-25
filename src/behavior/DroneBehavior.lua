@@ -3,7 +3,6 @@
 --- DateTime: 10.02.2023 18:31
 ---
 
-local class = require("libs/30log")
 local Timer = require("utility/timer")
 local CategoryManager = require("src/physics/CategoryManager")
 local Effects         = require("src/graphics/Effects")
@@ -21,7 +20,7 @@ function DroneBehavior:onAdd(entity)
         shoot_reload_timer = Timer(0.5),
 
         direction = Vector2(0,0),
-        wiggle_timer = Timer(1),
+        wiggle_timer = Timer(1, nil, true),
         wiggle_amplitude = 10,
 
         max_speed = 60,

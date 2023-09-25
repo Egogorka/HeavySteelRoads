@@ -4,13 +4,12 @@
 --- DateTime: 16.10.2022 16:43
 ---
 
-local class = require("libs/30log")
 local flux = require("libs/flux")
 
 local Vector2 = require("utility/vector")[1]
 
-local SpriteSystem = TINY.processingSystem(class("SpriteSystem"))
--- local SpriteSystem = TINY.sortedProcessingSystem(class("SpriteSystem"))
+local SpriteSystem = TINY.processingSystem(CLASS("SpriteSystem"))
+-- local SpriteSystem = TINY.sortedProcessingSystem(CLASS("SpriteSystem"))
 SpriteSystem.filter = TINY.filter('(msprite|sprite)&(body|position)')
 
 function SpriteSystem:init()

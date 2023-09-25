@@ -4,9 +4,7 @@
     "depth": 1,
 
     "behavior" : "tank",
-    "tank" : {
-      "aim" : null
-    },
+    "tank" : {},
     "health" : {
       "count" : 50
     },
