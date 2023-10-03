@@ -218,10 +218,12 @@ local enemies = {}
 
 local function enemy_spawn()
     local type = math.random(0, 2)
+    local offset = 0
     local enemy;
     if type == 0 then
         enemy = PrefabsLoader:fabricate("enemies.player_tank")
         -- enemy.msprite:flipH()
+        world:addEntity(enemy)
     elseif type == 1 then
         enemy = PrefabsLoader:fabricate("enemies.truck")
         enemy.sprite:flipH()
@@ -229,9 +231,12 @@ local function enemy_spawn()
         for i = 1, contents_amount do
             table.insert(enemy.truck.contents, PrefabsLoader:fabricate("pickups.hp_up"))
         end
+        world:addEntity(enemy)
     else
+        offset = -100
         enemy = PrefabsLoader:fabricate("enemies.drone")
-        -- enemy.drone.messages:push({"move", Vector2(-0.5, 0)})
+        world:addEntity(enemy)
+        enemy.drone.max_speed = enemy.drone.max_speed * ( 3.5 + math.random() ) / 4
     end
     
 

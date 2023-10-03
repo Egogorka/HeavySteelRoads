@@ -4,12 +4,18 @@
 ---
 
 local Timer = require("utility/timer")
+local Effects = require("src/graphics/Effects")
+local UserData = require("src/physics/UserData")
+
 local CategoryManager = require("src/physics/CategoryManager")
-local Effects         = require("src/graphics/Effects")
 
 local Behavior = require("src/behavior/Behavior")
 local DroneBehavior = TINY.processingSystem(Behavior:extend("DroneBehavior"))
 DroneBehavior.filter = TINY.requireAll("drone", "body", "fixture", "sprite")
+
+local pixelData = love.image.newImageData(1,1)
+pixelData:setPixel(0, 0, 127, 127, 127, 0.5)
+local pixel = love.graphics.newImage(pixelData)
 
 --- @alias drone_entity {fixture: love.Fixture, body: love.Body, drone: Drone, sprite: Sprite}
 
@@ -21,9 +27,9 @@ function DroneBehavior:onAdd(entity)
 
         direction = Vector2(0,0),
         wiggle_timer = Timer(1, nil, true),
-        wiggle_amplitude = 10,
+        wiggle_amplitude = 20,
 
-        max_speed = 60,
+        max_speed = 80,
 
         team = "enemy"
     })
@@ -79,6 +85,45 @@ function DroneBehavior:move(entity, dt, v)
     end
 
     entity.drone.direction = v;
+end
+
+function DroneBehavior:_bullet(entity)
+    local p_world = entity.body:getWorld()
+    local world = self.world
+    local x, y = entity.body:getPosition()
+
+    local ps = love.graphics.newParticleSystem(pixel, 10)
+    ps:setParticleLifetime(1, 3)
+
+    local bullet = {
+        particles = {
+            ps = ps,
+            emit = 1
+        },
+        shape = love.physics.newRectangleShape(10, 10),
+        bullet = {},
+        behavior = "bullet"
+    }
+    bullet.body = love.physics.newBody(p_world, x + 15, y, "kinematic")
+    bullet.body:setFixedRotation(true)
+    bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
+    bullet.fixture:setSensor(true)
+    bullet.fixture:setUserData(UserData(bullet))
+
+    CategoryManager.setBullet(bullet.fixture, entity.drone.team)
+
+    world:addEntity(bullet)
+    return bullet
+end
+
+---@param entity any
+---@param dt number
+---@param target Vector2
+function DroneBehavior:shoot(entity, dt, target)
+    local pos = target - Vector2(entity.body:getPosition())
+    local vel = 300 * pos/pos:mag()
+    local bullet = DroneBehavior:_bullet(entity)
+    bullet.body:setLinearVelocity(vel[1], vel[2])
 end
 
 ---@param entity drone_entity

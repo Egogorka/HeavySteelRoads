@@ -26,9 +26,9 @@ function Drone.json_decode(str)
     
         direction = Vector2(0, 0),
         wiggle_timer = Timer(1),
-        wiggle_amplitude = 10,
+        wiggle_amplitude = 20,
     
-        max_speed = 60,
+        max_speed = 80,
     
         team = "enemy"
     })
