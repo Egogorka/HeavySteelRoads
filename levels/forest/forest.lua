@@ -20,6 +20,7 @@ local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 local CategoryManager = require("src/physics/CategoryManager")
 local PhysicsManager = require("src/physics/PhysicsManager")
 
+local ParticleSystem = require("src/graphics/ParticleSystem")
 local SpriteSystem = require("src/graphics/SpriteSystem")()
 local ShapeDebug = require("src/ShapeDebug")
 local debug = true
@@ -42,6 +43,7 @@ local ForestLevel = Scene()
 local HPBar = require("src/gui/HP_Bar")
 
 local world = TINY.world()
+world:addSystem(ParticleSystem)
 world:addSystem(SpriteSystem)
 world:addSystem(ShapeDebug)
 world:addSystem(HealthSystem)
@@ -247,11 +249,11 @@ local function enemy_spawn()
     local bottom_dist = bottom_right_y - y
 
     local posY = (0 - top_dist) + (road_height - bottom_dist - 0 + top_dist) * math.random()
+    posY = posY + offset
 
     enemy.body:setPosition(camera.from.pos[1] + camera.from.size[1], posY)
     enemy.ai = {}
     table.insert(enemies, enemy)
-    world:addEntity(enemy)
     return enemy
 end
 
