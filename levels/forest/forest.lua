@@ -20,8 +20,8 @@ local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 local CategoryManager = require("src/physics/CategoryManager")
 local PhysicsManager = require("src/physics/PhysicsManager")
 
-local ParticleSystem = require("src/graphics/ParticleSystem")
 local SpriteSystem = require("src/graphics/SpriteSystem")()
+local ParticleSystem = require("src/graphics/ParticleSystem")
 local ShapeDebug = require("src/ShapeDebug")
 local debug = true
 local HealthSystem = require("src/HealthSystem")
@@ -43,8 +43,8 @@ local ForestLevel = Scene()
 local HPBar = require("src/gui/HP_Bar")
 
 local world = TINY.world()
-world:addSystem(ParticleSystem)
 world:addSystem(SpriteSystem)
+world:addSystem(ParticleSystem)
 world:addSystem(ShapeDebug)
 world:addSystem(HealthSystem)
 
@@ -238,7 +238,7 @@ local function enemy_spawn()
         offset = -100
         enemy = PrefabsLoader:fabricate("enemies.drone")
         world:addEntity(enemy)
-        enemy.drone.max_speed = enemy.drone.max_speed * ( 3.5 + math.random() ) / 4
+        -- enemy.drone.max_speed = enemy.drone.max_speed * ( 3.5 + math.random() ) / 4
     end
     
 

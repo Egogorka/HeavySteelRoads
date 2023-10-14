@@ -41,7 +41,9 @@ function AIDrone:idle(entity, dt)
     -- State out branches
 
     if ai.in_shoot_box then
-        ai.target_pos = Vector2(ai.target.body:getPosition())
+        if not ai.target.body:isDestroyed() then
+            ai.target_pos = Vector2(ai.target.body:getPosition())
+        end
         ai.states:push("action")
         return
     end
@@ -57,8 +59,8 @@ end
 ---@param dt any
 function AIDrone:action(entity, dt)
     local ai = entity.ai
-    
-    local target = Vector2(ai.target.body:getPosition())
+
+    local target = ai.target_pos
     local pos = Vector2(entity.body:getPosition())
     local direction = entity.drone.direction
 
@@ -82,10 +84,16 @@ function AIDrone:action(entity, dt)
     direction = direction + Vector2(5*dt*cap(dist[1]/50), 0)
     entity.drone.messages:push({"move", direction})
 
+    if not entity.drone.shoot_reload_timer.is_on then
+        entity.drone.messages:push({"shoot", target})
+    end
+
     -- State out branches
 
     if ai.in_shoot_box then
-        ai.target_pos = Vector2(ai.target.body:getPosition())
+        if not ai.target.body:isDestroyed() then
+            ai.target_pos = Vector2(ai.target.body:getPosition())
+        end
         ai.states:push("action")
         return
     else

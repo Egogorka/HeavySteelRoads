@@ -92,8 +92,10 @@ function DroneBehavior:_bullet(entity)
     local world = self.world
     local x, y = entity.body:getPosition()
 
-    local ps = love.graphics.newParticleSystem(pixel, 10)
+    local ps = love.graphics.newParticleSystem(pixel, 100)
     ps:setParticleLifetime(1, 3)
+    ps:setLinearAcceleration(-1, -1, 1, 1)
+    ps:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 
     local bullet = {
         particles = {
@@ -116,10 +118,15 @@ function DroneBehavior:_bullet(entity)
     return bullet
 end
 
----@param entity any
+---@param entity drone_entity
 ---@param dt number
 ---@param target Vector2
 function DroneBehavior:shoot(entity, dt, target)
+    if entity.drone.shoot_reload_timer.is_on then
+        return
+    end
+    entity.drone.shoot_reload_timer:start()
+
     local pos = target - Vector2(entity.body:getPosition())
     local vel = 300 * pos/pos:mag()
     local bullet = DroneBehavior:_bullet(entity)

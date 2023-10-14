@@ -5,7 +5,7 @@
 
 
 local ParticleSystem = TINY.processingSystem()
-ParticleSystem.filter = TINY.requireAll("particle_system", "body")
+ParticleSystem.filter = TINY.requireAll("particles", "body")
 
 ---@class ParticleSystem
 ---@field ps love.ParticleSystem
@@ -23,8 +23,9 @@ end
 function ParticleSystem:process(entity, dt)
     local x, y = entity.body:getPosition()
     entity.particles.ps:setPosition(x, y)
-    entity.particles.ps:emit(1)
+    entity.particles.ps:emit(entity.particles.emit)
     entity.particles.ps:update(dt)
+    love.graphics.draw(entity.particles.ps)
 end
 
 return ParticleSystem
