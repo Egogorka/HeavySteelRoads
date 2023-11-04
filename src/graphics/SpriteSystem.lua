@@ -49,8 +49,17 @@ function SpriteSystem:preWrap(dt)
     end
 end
 
+
+---Process sprite
+---@param sprite Sprite
+---@param dt number
+---@param position Vector2
+---@param depth {scalable: boolean, z: number}
+---@param scale number
+---@param angle number
 function SpriteSystem:processSprite(sprite, dt, position, depth, scale, angle)
-    local animation, image = sprite:current()
+    local animation = sprite:current().animation
+    local image = sprite:current().image
     local pos = position + sprite.offset
 
     animation:update(dt)

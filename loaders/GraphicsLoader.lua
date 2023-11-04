@@ -10,14 +10,20 @@ require("utility/rcall")
 local anim8 = require("libs/anim8")
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
-local GraphicsLoader = CLASS("GraphicsLoader")
+--- @class GraphicsLoader
+--- @field sprites table<string,Sprite>
+--- @field animations table<string,Sprite> -- sprites that are animations...
+--- @field msprites table<string,MSprite>
+---
+--- @field loadAnimations fun(self:GraphicsLoader, path:string, destination:string?): table<string,Sprite> 
+--- @field loadSprites fun(self:GraphicsLoader, path:string, destination:string?): table<string,Sprite>
+--- @field loadMSprites fun(self:GraphicsLoader, path:string, destination:string?): table<string,MSprite>
 
-function GraphicsLoader:init()
-    self.animations = {}
-    self.sprites = {}
-    self.msprites = {}
-end
-
+local GraphicsLoader = {
+    animations = {},
+    sprites = {},
+    msprites = {}
+}
 
 --- Function for loading animations from directory
 ---
@@ -25,8 +31,8 @@ end
 --- contains the path to assets directory. This directory must contain da.json file
 --- Example of path - "assets/effects/"
 ---
---- @param name boolean|string
---- if true, then animations are saved in 'animations' property,
+--- @param name string?
+--- if nil, then animations are saved in 'animations' property,
 --- if string - they are saved under 'self.animations[name]'
 ---
 --- @return table
@@ -40,13 +46,11 @@ function GraphicsLoader:loadAnimations(path, name)
     local raw = json.decode(content)
 
     local destination = {}
-    if name then
-        if type(name) == "boolean" then
-            destination = self.animations
-        else
-            self.animations.name = {}
-            destination = self.animations.name
-        end
+    if type(name) == "string" then
+        self.animations.name = {}
+        destination = self.animations.name
+    else
+        destination = self.animations
     end
 
     for k, v in pairs(raw) do
@@ -78,8 +82,8 @@ function GraphicsLoader:loadAnimations(path, name)
                 animations = {}
                 for k1, anim in pairs(v.animations) do
                     animations[k1] = {
-                        anim8.newAnimation(grid(unpack(anim.frames)), anim.durations or 1),
-                        image
+                        animation = anim8.newAnimation(grid(unpack(anim.frames)), anim.durations or 1),
+                        image = image
                     }
                 end
             end
@@ -100,7 +104,7 @@ end
 --- contains the path to assets directory. This directory must contain ds.json file
 --- Example of path - "assets/effects/"
 ---
---- @param name boolean|string
+--- @param name string?
 --- if true, then sprites are saved in 'sprites' property,
 --- if string - they are saved under 'self.sprites[name]'
 ---
@@ -115,13 +119,11 @@ function GraphicsLoader:loadSprites(path, name)
     local raw = json.decode(content)
 
     local destination = {}
-    if name then
-        if type(name) == "boolean" then
-            destination = self.sprites
-        else
-            self.sprites.name = {}
-            destination = self.sprites.name
-        end
+    if type(name) == "string" then
+        self.sprites.name = {}
+        destination = self.sprites.name
+    else
+        destination = self.sprites
     end
 
     for k, v in pairs(raw) do
@@ -150,13 +152,11 @@ function GraphicsLoader:loadMSprites(path, name)
     local raw = json.decode(content)
 
     local destination = {}
-    if name then
-        if type(name) == "boolean" then
-            destination = self.msprites
-        else
-            self.msprites.name = {}
-            destination = self.msprites.name
-        end
+    if type(name) == "string" then
+        self.msprites.name = {}
+        destination = self.msprites.name
+    else
+        destination = self.msprites
     end
 
     for k, v in pairs(raw) do

@@ -32,7 +32,7 @@ end
 local Camera = require("libs/MyCamera")
 local window_w, window_h, flags = love.window.getMode()
 
-GraphicsLoader = require("loaders/GraphicsLoader")()
+GraphicsLoader = require("loaders/GraphicsLoader") --[[@as GraphicsLoader]]
 PrefabsLoader = require("loaders/PrefabsLoader")(GraphicsLoader)
 
 LEVELS = {

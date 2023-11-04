@@ -65,14 +65,14 @@ local p_world = love.physics.newWorld(0, 0, true)
 local gui = {}
 
 local function load_sprites()
-    GraphicsLoader:loadSprites("assets/background/", true)
-    GraphicsLoader:loadSprites("assets/objects/", true)
+    GraphicsLoader:loadSprites("assets/background/")
+    GraphicsLoader:loadSprites("assets/objects/")
 
-    GraphicsLoader:loadAnimations("assets/player/", true)
-    GraphicsLoader:loadMSprites("assets/player/", true)
+    GraphicsLoader:loadAnimations("assets/player/")
+    GraphicsLoader:loadMSprites("assets/player/")
 
-    GraphicsLoader:loadAnimations("assets/entities/enemies/", true)
-    GraphicsLoader:loadAnimations("assets/effects/", true)
+    GraphicsLoader:loadAnimations("assets/entities/enemies/")
+    GraphicsLoader:loadAnimations("assets/effects/")
 
     gui.stats_tab = love.graphics.newImage("assets/gui/PanelInterfaceNew2.png")
 

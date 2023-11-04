@@ -30,7 +30,7 @@ local Placement = CLASS("Placement", {
 })
 
 --- @class Sprite
----  @field animations table<string, table> Array listing animations
+---  @field animations table<string, {animation : table, image : love.Image}> Array listing animations
 ---  @field current_animation string 
 ---  @field is_flippedH boolean
 ---  @field is_flippedV boolean
@@ -129,7 +129,10 @@ function Sprite:init(o, camera_affected, offset, origin, scale)
     if( o["type"] ~= nil and o:type() == "Image") then
         local grid = anim8.newGrid(o:getWidth(), o:getHeight(), o:getWidth(), o:getHeight())
         self.animations = {
-            default = {anim8.newAnimation(grid(1,1), 1), o}
+            default = {
+                animation = anim8.newAnimation(grid(1,1), 1),
+                image = o
+            }
         }
         self.current_animation = "default"
     else
@@ -137,44 +140,58 @@ function Sprite:init(o, camera_affected, offset, origin, scale)
 
         self.animations = {}
         for k, v in pairs(o.animations) do
-            self.animations[k] = {v[1]:clone(), v[2]}
+            self.animations[k] = {
+                animation = v.animation:clone(),
+                image = v.image
+            }
         end
     end
 end
 
+
+---Set the current animation by name
+---@param type string
 function Sprite:set(type)
     if( self.animations[type] == nil or self.current_animation == type) then
         return
     end
-    self:current():gotoFrame(1) -- reset the previous animation
+    self:current().animation:gotoFrame(1) -- reset the previous animation
     self.current_animation = type
 end
 
+
+---Get current animation
+---@return { animation : table, image : love.Image }
 function Sprite:current()
-    local temp = self.animations[self.current_animation]
-    return temp[1], temp[2]
+    return self.animations[self.current_animation]
 end
 
+
 function Sprite:size()
-    local anim = self:current()
+    local anim = self:current().animation
     local w, h = anim:getDimensions()
     return Vector2(w, h)
 end
 
+
 function Sprite:flipH()
     for _, animation in pairs(self.animations) do
-        animation[1]:flipH()
+        animation.animation:flipH()
     end
     self.is_flippedH = not self.is_flippedH
 end
 
+
 function Sprite:flipV()
     for _, animation in pairs(self.animations) do
-        animation[1]:flipV()
+        animation.animation:flipV()
     end
     self.is_flippedV = not self.is_flippedV
 end
 
+
+---Clone sprite
+---@return Sprite
 function Sprite:clone()
     return Sprite(self, self.camera_affected, self.offset, self.origin, self.scale)
 end
@@ -197,9 +214,11 @@ local function my_sort(t, ord)
     return out
 end
 
+
 function MSprite:sort()
     self.sprites_z_order = my_sort(self.sprites, function(a, b) return a.placement.z_index < b.placement.z_index end)
 end
+
 
 function MSprite:init(o, scale)
     if(o["type"] ~= nil and o:type() == "Image") then
@@ -227,12 +246,14 @@ function MSprite:init(o, scale)
     self:sort()
 end
 
+
 function MSprite:flipH()
     for key in pairs(self.sprites) do
         self.sprites[key].sprite:flipH()
     end
     self.is_flippedH = not self.is_flippedH
 end
+
 
 function MSprite:flipV()
     for key in pairs(self.sprites) do
@@ -241,6 +262,9 @@ function MSprite:flipV()
     self.is_flippedV = not self.is_flippedV
 end
 
+
+---Clone MSprite
+---@return MSprite
 function MSprite:clone()
     return MSprite(self, self.scale)
 end

@@ -47,10 +47,10 @@ local function load_sprites()
     animations.button = Sprite({
         animations = {
             to_state1 = {
-                anim8.newAnimation(button_grid(1,'12-1'), 0.2, 'pauseAtEnd'), button_image
+                animation = anim8.newAnimation(button_grid(1,'12-1'), 0.2, 'pauseAtEnd'), image = button_image
             },
             to_state2 = {
-                anim8.newAnimation(button_grid(1, '1-12'), 0.2, 'pauseAtEnd'), button_image
+                animation = anim8.newAnimation(button_grid(1, '1-12'), 0.2, 'pauseAtEnd'), image = button_image
             },
         },
         current_animation = "to_state1"

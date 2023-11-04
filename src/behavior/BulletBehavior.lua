@@ -34,7 +34,7 @@ function BulletBehavior:_explosion(entity)
         sprite = animation
     }
     explosion.body = love.physics.newBody(p_world, x, y, "static")
-    animation.animations.default[1].onLoop = function(anim, loops)
+    animation.animations.default.animation.onLoop = function(anim, loops)
         explosion.body:destroy()
         TINY.removeEntity(world, explosion)
     end
