@@ -8,7 +8,7 @@
 --- Function that recursively fills the first table from the contents of the second if there are no key-value pair at the first one 
 ---@param table table
 ---@param defaults table
----@param seen table Table of seen content to prevent infinite recursion
+---@param seen table|nil Table of seen content to prevent infinite recursion
 local function fill_table(table, defaults, seen)
     local s = seen or {}
     if s[defaults] then return end -- If the table was seen then we already filled it
