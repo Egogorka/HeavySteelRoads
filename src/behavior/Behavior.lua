@@ -6,6 +6,8 @@
 
 local Stack = require("utility/stack")
 
+--- Disclaimer - there is a Behavior-Component and Behavior-System.
+--- The class presented here via Lua-Language-Server is the former, but the code after is for the latter  
 ---@class Behavior
 ---@field messages Stack
 
@@ -17,9 +19,7 @@ function Behavior:onAdd(entity)
         error("Entity has no component with name of behavior", 2)
     end
 
-    fill_table(entity[entity.behavior], {
-        messages = Stack()
-    })
+    entity[entity.behavior].messages = entity[entity.behavior].messages or Stack()
 end
 
 function Behavior:process(entity, dt)
