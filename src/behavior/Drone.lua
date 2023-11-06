@@ -3,11 +3,11 @@
 --- DateTime: 13.09.2023 18:56
 ---
 
+local Stack = require("utility/stack")
 local Timer = require("utility/timer")
-local Compenent = require("src/Component")
-local json      = require("libs/json/json")
+local CategoryManager = require("src/physics/CategoryManager")
 
----@class Drone: Component
+---@class Drone: Behavior
 ---@field shoot_reload_timer Timer
 ---
 ---@field direction Vector2 Velocity without wiggle
@@ -17,22 +17,23 @@ local json      = require("libs/json/json")
 ---@field max_speed number
 ---@field team CategoriesNames
 
-local Drone = Compenent:extend("Drone")
+local function DroneFactory(raw, loader, entity)
+    --- Variables that are present in json and have user type
+    raw.shoot_reload_timer = Timer(raw.shoot_reload_timer)
+    raw.wiggle_timer = Timer(raw.wiggle_timer, nil, true)
 
-function Drone.json_decode(str)
-    local raw = json.decode(str)
-    fill_table(raw, {
-        shoot_reload_timer = Timer(0.5),
-    
-        direction = Vector2(0, 0),
-        wiggle_timer = Timer(1),
-        wiggle_amplitude = 20,
-    
-        max_speed = 80,
-    
-        team = "enemy"
-    })
+    --- Variables that are technical/unnecessary for json
+    if raw.direction then
+        raw.direction = Vector2(raw.direction[0], raw.direction[1])
+    else
+        raw.direction = Vector2(0,0)
+    end
+
+    raw.messages = Stack() --- Because it's behavior (should be DroneB but B is dropped)
+    raw.team = "enemy"
+    CategoryManager.setObject(entity.fixture, raw.team)
+    entity.fixture:setSensor(true)
     return raw
 end
 
-return Drone
+return DroneFactory

@@ -4,7 +4,14 @@
     "depth": 1,
 
     "behavior" : "tank",
-    "tank" : {},
+    "tank" : {
+      "max_speed": 100,
+      "shoot_reload_timer": 0.8,
+      "ram_reload_timer": 2,
+      "ram_pre_timer": 0.5,
+      "ram_distance": 100,
+      "ram_velocity": 500
+    },
     "health" : {
       "count" : 50
     },
@@ -37,7 +44,12 @@
     "depth": 1,
 
     "behavior": "drone",
-    "drone": {},
+    "drone": {
+      "shoot_reload_timer": 0.5,
+      "wiggle_timer": 1,
+      "wiggle_amplitude": 20,
+      "max_speed": 80
+    },
 
     "health": {
       "count" : 10

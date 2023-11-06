@@ -10,14 +10,49 @@ require("utility/rcall")
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
-local PrefabsLoader = CLASS("PrefabsLoader")
+local PrefabsLoader = {}
 local UserData = require("src/physics/UserData")
+
+--- @class PrefabsLoader
+--- @field graphics_loader GraphicsLoader
+--- @field physics_world love.World?
+--- @field prefabs table<string,any>
+--- @field prefabs_decoders table<string,fun(raw:any, loader:PrefabsLoader, current:table):any>
+--- @field components_order table<string,number>
 
 function PrefabsLoader:init(graphics_loader, physics_world)
     self.physics_world = physics_world
     self.graphics_loader = graphics_loader
     --- Contains raw prefabs, should not be accessed directly!
     self.prefabs = {}
+    self.prefabs_decoders = {}
+    self.components_order = {}
+    return self
+end
+
+---Function to register decoder
+---@param name string Name of the field that would be decoded with that decoder
+---@param func fun(raw: any, loader: PrefabsLoader, current: table): any Decoder
+---@param order number Order in which decoders would be called. Higher number - lower priority.
+--- Decoder gets table that was gotten via json.decode + accesing the raw[name]; loader is the PrefabsLoader itself, current is the current raw wholy
+function PrefabsLoader:register(name, order, func)
+    if self.prefabs_decoders[name] then
+        error("Error: Factory for \""..name.."\" is already set.\n", 2)
+    end
+    self.prefabs_decoders[name] = func
+    self.components_order[name] = order
+end
+
+---Function that decodes component_name with provider raw variable
+---@param name string
+---@param raw any
+---@param entity table
+---@return any
+function PrefabsLoader:decode(name, raw, entity)
+    if self.prefabs_decoders[name] then
+        return self.prefabs_decoders[name](raw, self, entity)
+    end
+    return raw
 end
 
 function PrefabsLoader:setPhysicsWorld(physics_world)
@@ -46,51 +81,67 @@ function PrefabsLoader:fabricate(name)
     end
 
     local p = rcopy(rcall(self.prefabs, name))
-    if p.sprite then
-        if self.graphics_loader.sprites[p.sprite] then
-            p.sprite = self.graphics_loader.sprites[p.sprite]:clone()
-        else
-            if self.graphics_loader.animations[p.sprite] then
-                p.sprite = self.graphics_loader.animations[p.sprite]:clone()
-            else
-                print("Error: Trying to fabricate "..name.." without sprite "..p.sprite)
-                pdump(self.graphics_loader.animations)
-                pdump(self.graphics_loader.sprites)
-            end
-        end
+
+    --- Better to move this part to loadPrefabs - no need to sort it each time component is fabricated
+    local component_names_table = {}
+    do
+        for cname in pairs(p) do table.insert(component_names_table, cname) end
+        table.sort(component_names_table, function (name1, name2)
+            local t1 = self.components_order[name1] or 0
+            local t2 = self.components_order[name2] or 0
+            return t1 < t2
+        end)
     end
-    if p.msprite then
-        p.msprite = self.graphics_loader.msprites[p.msprite]:clone()
+
+    for _, cname in ipairs(component_names_table) do
+        p[cname] = self:decode(cname, p[cname], p)
     end
-    if p.depth then
-        if type(p.depth) == "number" then
-            p.depth = Depth(p.depth)
-        else
-            p.depth = Depth(p.depth.z, p.depth.scalable)
-        end
-    end
-    if p.body then
-        p.body = love.physics.newBody(self.physics_world, 0, 0, p.body)
-        p.body:setFixedRotation(true)
-        if p.shape then
-            p.shape = love.physics.newRectangleShape(unpack(p.shape))
-        end
-        if p.fixture then
-            local fname = nil
-            local caller = nil
-            local is_sensor = nil
-            if type(p.fixture) == "table" then
-                fname = p.fixture.name 
-                caller = p.fixture.caller
-                is_sensor = p.fixture.sensor
-            end
-            p.fixture = love.physics.newFixture(p.body, p.shape)
-            if is_sensor then
-                p.fixture:setSensor(true)
-            end
-            p.fixture:setUserData(UserData(p, fname, caller))
-        end
-    end
+
+    -- if p.sprite then
+    --     if self.graphics_loader.sprites[p.sprite] then
+    --         p.sprite = self.graphics_loader.sprites[p.sprite]:clone()
+    --     else
+    --         if self.graphics_loader.animations[p.sprite] then
+    --             p.sprite = self.graphics_loader.animations[p.sprite]:clone()
+    --         else
+    --             print("Error: Trying to fabricate "..name.." without sprite "..p.sprite)
+    --             pdump(self.graphics_loader.animations)
+    --             pdump(self.graphics_loader.sprites)
+    --         end
+    --     end
+    -- end
+    -- if p.msprite then
+    --     p.msprite = self.graphics_loader.msprites[p.msprite]:clone()
+    -- end
+    -- if p.depth then
+    --     if type(p.depth) == "number" then
+    --         p.depth = Depth(p.depth)
+    --     else
+    --         p.depth = Depth(p.depth.z, p.depth.scalable)
+    --     end
+    -- end
+    -- if p.body then
+    --     p.body = love.physics.newBody(self.physics_world, 0, 0, p.body)
+    --     p.body:setFixedRotation(true)
+    --     if p.shape then
+    --         p.shape = love.physics.newRectangleShape(unpack(p.shape))
+    --     end
+    --     if p.fixture then
+    --         local fname = nil
+    --         local caller = nil
+    --         local is_sensor = nil
+    --         if type(p.fixture) == "table" then
+    --             fname = p.fixture.name 
+    --             caller = p.fixture.caller
+    --             is_sensor = p.fixture.sensor
+    --         end
+    --         p.fixture = love.physics.newFixture(p.body, p.shape)
+    --         if is_sensor then
+    --             p.fixture:setSensor(true)
+    --         end
+    --         p.fixture:setUserData(UserData(p, fname, caller))
+    --     end
+    -- end
     return p
 end
 

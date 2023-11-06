@@ -29,40 +29,8 @@ TankBehavior.states = {
 }
 
 function TankBehavior:onAdd(entity)
-    fill_table(entity.tank, {
-        messages = Stack(),
-        stack = Stack(),
-
-        max_speed = 100,
-
-        shoot_reload_timer = Timer(0.8),
-
-        aimed = false,
-        rotation_speed = 1,
-        rotation_angle = 0, -- In units of Pi : Right is 0, Down is 1/2
-        target_angle = 0,
-
-        -- Default team setting - enemy
-        team = "enemy"
-    })
-
-    self:init_ram(entity)
-
     CategoryManager.setObject(entity.fixture, entity.tank.team)
-end
 
-function TankBehavior:init_ram(entity)
-    local settings = {
-        ram_reload_timer = Timer(2),
-        ram_pre_timer = Timer(0.5),
-        ram_pos = nil,
-        ram_distance = 100,
-        ram_velocity = 500,
-        ram_timer = nil,
-    }
-    settings.ram_timer = Timer(settings.ram_distance/settings.ram_velocity)
-
-    fill_table(entity.tank, settings)
     entity.tank.ram_pre_timer.on_end = function(timer) self:_ram(entity) end
     entity.tank.ram_timer.on_end = function(timer) entity.tank.messages:push({"stop"}) end
 end

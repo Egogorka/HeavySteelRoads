@@ -22,21 +22,7 @@ local pixel = love.graphics.newImage(pixelData)
 --- @param entity {fixture: love.Fixture, body: love.Body, drone: Drone, sprite: Sprite}
 function DroneBehavior:onAdd(entity)
     DroneBehavior.super.onAdd(self, entity)
-    fill_table(entity.drone, {
-        shoot_reload_timer = Timer(0.5),
-
-        direction = Vector2(0,0),
-        wiggle_timer = Timer(1, nil, true),
-        wiggle_amplitude = 20,
-
-        max_speed = 80,
-
-        team = "enemy"
-    })
-
     entity.drone.wiggle_timer:start()
-    CategoryManager.setObject(entity.fixture, entity.drone.team)
-    entity.fixture:setSensor(true)
 end
 
 ---
