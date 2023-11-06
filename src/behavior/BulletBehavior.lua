@@ -29,7 +29,7 @@ function BulletBehavior:_explosion(entity)
     local x, y = entity.body:getPosition()
 
     --- Usage of variable outside of current scope, beware!!
-    local animation = GraphicsLoader.animations.explosion:clone()
+    local animation = GRAPHICS_LOADER.animations.explosion:clone()
     local explosion = {
         sprite = animation
     }

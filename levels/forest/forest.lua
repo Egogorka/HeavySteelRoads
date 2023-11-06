@@ -65,14 +65,14 @@ local p_world = love.physics.newWorld(0, 0, true)
 local gui = {}
 
 local function load_sprites()
-    GraphicsLoader:loadSprites("assets/background/")
-    GraphicsLoader:loadSprites("assets/objects/")
+    GRAPHICS_LOADER:loadSprites("assets/background/")
+    GRAPHICS_LOADER:loadSprites("assets/objects/")
 
-    GraphicsLoader:loadAnimations("assets/player/")
-    GraphicsLoader:loadMSprites("assets/player/")
+    GRAPHICS_LOADER:loadAnimations("assets/player/")
+    GRAPHICS_LOADER:loadMSprites("assets/player/")
 
-    GraphicsLoader:loadAnimations("assets/entities/enemies/")
-    GraphicsLoader:loadAnimations("assets/effects/")
+    GRAPHICS_LOADER:loadAnimations("assets/entities/enemies/")
+    GRAPHICS_LOADER:loadAnimations("assets/effects/")
 
     gui.stats_tab = love.graphics.newImage("assets/gui/PanelInterfaceNew2.png")
 
@@ -83,9 +83,9 @@ end
 local background = {}
 local road_height = 0
 
-local sprites = GraphicsLoader.sprites
-local animations = GraphicsLoader.animations
-local msprites = GraphicsLoader.msprites
+local sprites = GRAPHICS_LOADER.sprites
+local animations = GRAPHICS_LOADER.animations
+local msprites = GRAPHICS_LOADER.msprites
 
 local cameraTarget
 local cameraLeftBlock
@@ -181,7 +181,7 @@ local function load_level()
     CategoryManager.setWall(roadBottomBlock.fixture, "neutral")
     world:addEntity(roadBottomBlock)
 
-    player = PrefabsLoader:fabricate("enemies.player_tank")
+    player = PREFABS_LOADER:fabricate("enemies.player_tank")
     player.body:setPosition(100, sprites.road:size()[2] / 2)
     player.player = 1
     player.tank.team = "player"
@@ -223,20 +223,20 @@ local function enemy_spawn()
     local offset = 0
     local enemy;
     if type == 0 then
-        enemy = PrefabsLoader:fabricate("enemies.player_tank")
+        enemy = PREFABS_LOADER:fabricate("enemies.player_tank")
         -- enemy.msprite:flipH()
         world:addEntity(enemy)
     elseif type == 1 then
-        enemy = PrefabsLoader:fabricate("enemies.truck")
+        enemy = PREFABS_LOADER:fabricate("enemies.truck")
         enemy.sprite:flipH()
         local contents_amount = math.random(1, 2)
         for i = 1, contents_amount do
-            table.insert(enemy.truck.contents, PrefabsLoader:fabricate("pickups.hp_up"))
+            table.insert(enemy.truck.contents, PREFABS_LOADER:fabricate("pickups.hp_up"))
         end
         world:addEntity(enemy)
     else
         offset = -100
-        enemy = PrefabsLoader:fabricate("enemies.drone")
+        enemy = PREFABS_LOADER:fabricate("enemies.drone")
         world:addEntity(enemy)
         -- enemy.drone.max_speed = enemy.drone.max_speed * ( 3.5 + math.random() ) / 4
     end
@@ -287,10 +287,10 @@ function ForestLevel.load()
     load_sprites()
     road_height = sprites.road:size()[2]
 
-    PrefabsLoader:loadPrefabs("prefabs/enemies.json", "enemies")
-    PrefabsLoader:loadPrefabs("prefabs/pickups.json", "pickups")
+    PREFABS_LOADER:loadPrefabs("prefabs/enemies.json", "enemies")
+    PREFABS_LOADER:loadPrefabs("prefabs/pickups.json", "pickups")
 
-    PrefabsLoader:setPhysicsWorld(p_world)
+    PREFABS_LOADER:setPhysicsWorld(p_world)
     PhysicsManager.setCallbacks(p_world)
 
     load_level()
