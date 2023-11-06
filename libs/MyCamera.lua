@@ -278,7 +278,7 @@ function Camera:draw()
     love.graphics.setColor(color)
 end
 
----@param
+
 function Camera:follow(vec)
     if vec then
         self.target_previous = self.target or Vector2(vec)
