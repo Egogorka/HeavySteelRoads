@@ -34,6 +34,7 @@ local window_w, window_h, flags = love.window.getMode()
 
 GRAPHICS_LOADER = require("loaders/GraphicsLoader") --[[@as GraphicsLoader]]
 PREFABS_LOADER = require("loaders/PrefabsLoader"):init(GRAPHICS_LOADER)
+require("loaders/di")
 
 LEVELS = {
     forest = require("levels/forest/forest"),
