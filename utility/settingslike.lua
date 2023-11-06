@@ -4,20 +4,24 @@
 --- DateTime: 17.03.2023 23:42
 ---
 
-local function fill_table(table, defaults)
+
+--- Function that recursively fills the first table from the contents of the second if there are no key-value pair at the first one 
+---@param table table
+---@param defaults table
+---@param seen table Table of seen content to prevent infinite recursion
+local function fill_table(table, defaults, seen)
+    local s = seen or {}
+    if s[defaults] then return end -- If the table was seen then we already filled it
+
+    s[defaults] = true
     for k, v in pairs(defaults) do
         if type(table[k]) == "table" and type(v) == "table" then
             if #v ~= 0 then
-                fill_table(table[k], v)
+                fill_table(table[k], v, seen)
             end
         end
 
-        if table[k] ~= nil then
-            goto continue
-        end
-
-        table[k] = v
-        ::continue::
+        table[k] = table[k] or v
     end
 end
 
