@@ -32,8 +32,8 @@ end
 local Camera = require("libs/MyCamera")
 local window_w, window_h, flags = love.window.getMode()
 
-GraphicsLoader = require("loaders/GraphicsLoader") --[[@as GraphicsLoader]]
-PrefabsLoader = require("loaders/PrefabsLoader")(GraphicsLoader)
+GRAPHICS_LOADER = require("loaders/GraphicsLoader") --[[@as GraphicsLoader]]
+PREFABS_LOADER = require("loaders/PrefabsLoader"):init(GRAPHICS_LOADER)
 
 LEVELS = {
     forest = require("levels/forest/forest"),
