@@ -68,3 +68,4 @@ end)
 -- 3 because after fixture
 PREFABS_LOADER:register("drone", 3, require("src/behavior/Drone"))
 PREFABS_LOADER:register("tank", 3, require("src/behavior/Tank"))
+PREFABS_LOADER:register("truck", 3, require("src/behavior/Truck"))

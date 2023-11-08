@@ -18,21 +18,12 @@ TruckBehavior.filter = TINY.requireAll("truck", "health", "body", "fixture", "sp
 
 function TruckBehavior:onAdd(entity)
     TruckBehavior.super.onAdd(self, entity)
-    fill_table(entity.truck, {
-        contents = {},
-        max_speed_empty = 80,
-        max_speed_full = 60,
-        max_speed = 60, -- current speed
-
-        -- Default team setting - enemy
-        team = "enemy"
-    })
 
     if #entity.truck.contents > 0 then
         for k, v in pairs(entity.truck.contents) do
 
             if v.body == nil then
-                print("One of the contents of truck have no body - making default one")
+                print("Warning: One of the contents of truck have no body - making default one")
                 local p_world = entity.body:getWorld()
                 local body = love.physics.newBody(p_world, 0, 0, "static")
                 body:setActive(false)
@@ -43,7 +34,7 @@ function TruckBehavior:onAdd(entity)
             end
 
             if v.fixture == nil then
-                print("One of the contents of truck have no fixture - making default one")
+                print("Warning: One of the contents of truck have no fixture - making default one")
                 local shape = love.physics.newRectangleShape(10,10)
                 local fixture = love.physics.newFixture(v.body, shape)
                 v.fixture = fixture
