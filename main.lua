@@ -60,6 +60,8 @@ end
 
 function love.load()
     print("Love Lua version: ", _VERSION)
+    local t = {love.getVersion()}
+    print("Love version " + t[1] + "." + t[2] + "." + t[3] + " \"" + t[4] + "\"")
     local info = "LuaJIT version: "
 
     if (jit) then

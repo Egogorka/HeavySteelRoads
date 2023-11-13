@@ -1,0 +1,92 @@
+{
+  "tank_enemy1" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy1_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy1_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy2" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy2_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy3_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy3" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy3_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy3_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy4" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy4_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy4_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy5" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy5_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy5_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy6" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy6_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy6_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy7" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy7_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy7_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy8" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy8_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy7_tower",
+      "placement": [-5, -15, 2]
+    }
+  },
+  "tank_enemy9" : {
+    "body" : {
+      "sprite" : "animations.tank_enemy9_body",
+      "placement": [0, 0, 1]
+    },
+    "tower" : {
+      "sprite" : "animations.tank_enemy8_tower",
+      "placement": [-5, -15, 2]
+    }
+  }
+}

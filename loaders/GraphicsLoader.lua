@@ -6,6 +6,7 @@
 
 local json = require("libs/json/json")
 
+require("libs/strong")
 require("utility/rcall")
 local anim8 = require("libs/anim8")
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
@@ -25,6 +26,52 @@ local GraphicsLoader = {
     msprites = {}
 }
 
+local PATH_DELIMITER = "/"
+
+--- Function for loading files, either .json or .lua that 
+--- contain data and returns it.
+--- @param path string --
+--- The format is folowing, it must be 
+--- "path/to/dir/`name`" or "path/to/dir/`name`.lua" or .json if
+--- you want to specify which one. 
+--- Will return nothing in case if both are present and extension is not specified
+--- @return table|nil
+function GraphicsLoader:_loadFile(path)
+    local split = path / PATH_DELIMITER
+    local last = split[#split]
+    if last == "" then
+        return nil -- It means we got string like "blabla/blabla/" <- ends with delimiter
+    end
+    local extension = ""
+    do
+        local t = last / "."
+        if #t > 1 then
+            extension = t[#t]
+        end
+    end
+
+    if extension == "" then
+        local info_lua = love.filesystem.getInfo(path..".lua")
+        local info_json = love.filesystem.getInfo(path..".json")
+        if info_lua ~= nil and info_lua.type == "file" then
+            extension = "lua"
+        elseif info_json ~= nil and info_json.type == "file" then
+            extension = "json"
+        end
+    end
+
+    if extension == "lua" then
+        return dofile(path..".lua")
+    end
+    if extension == "json" then
+        local f = assert(io.open(path..".json", "rb"))
+        local content = f:read("*all")
+        f:close()
+        return json.decode(content)
+    end
+    return nil
+end
+
 --- Function for loading animations from directory
 ---
 --- @param path string
@@ -39,11 +86,10 @@ local GraphicsLoader = {
 --- always returns a table containing loaded animations
 function GraphicsLoader:loadAnimations(path, name)
 
-    local f = assert(io.open(path.."da.json", "rb"))
-    local content = f:read("*all")
-    f:close()
-
-    local raw = json.decode(content)
+    local raw = self:_loadFile(path.."da")
+    if raw == nil then
+        error("No content at provided path", 2)
+    end
 
     local destination = {}
     if type(name) == "string" then
@@ -112,11 +158,10 @@ end
 --- always returns a table containing loaded sprites
 function GraphicsLoader:loadSprites(path, name)
 
-    local f = assert(io.open(path.."ds.json", "rb"))
-    local content = f:read("*all")
-    f:close()
-
-    local raw = json.decode(content)
+    local raw = self:_loadFile(path.."ds")
+    if raw == nil then
+        error("No content at provided path", 2)
+    end
 
     local destination = {}
     if type(name) == "string" then
@@ -145,11 +190,10 @@ end
 
 function GraphicsLoader:loadMSprites(path, name)
 
-    local f = assert(io.open(path.."dms.json", "rb"))
-    local content = f:read("*all")
-    f:close()
-
-    local raw = json.decode(content)
+    local raw = self:_loadFile(path.."dms")
+    if raw == nil then
+        error("No content at provided path", 2)
+    end
 
     local destination = {}
     if type(name) == "string" then
@@ -164,6 +208,9 @@ function GraphicsLoader:loadMSprites(path, name)
         local temp = {}
         for key, data in pairs(v) do
             local sprite = rcall(self, data.sprite)
+            if sprite == nil then
+                error("No sprite present at ", data.sprite)
+            end
             local placement = Placement({data.placement[1], data.placement[2]}, data.placement[3])
 
             temp[key] = {

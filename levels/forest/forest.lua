@@ -72,6 +72,8 @@ local function load_sprites()
     GRAPHICS_LOADER:loadMSprites("assets/player/")
 
     GRAPHICS_LOADER:loadAnimations("assets/entities/enemies/")
+    GRAPHICS_LOADER:loadMSprites("assets/entities/enemies/")
+
     GRAPHICS_LOADER:loadAnimations("assets/effects/")
 
     gui.stats_tab = love.graphics.newImage("assets/gui/PanelInterfaceNew2.png")
@@ -217,6 +219,7 @@ local function load_level()
 end
 
 local enemies = {}
+local tank_msprites = {}
 
 local function enemy_spawn()
     local type = math.random(0, 2)
@@ -225,6 +228,8 @@ local function enemy_spawn()
     if type == 0 then
         enemy = PREFABS_LOADER:fabricate("enemies.player_tank")
         -- enemy.msprite:flipH()
+        local spritetype = math.random(1, 9)
+        enemy.msprite = tank_msprites[spritetype]:clone()
         world:addEntity(enemy)
     elseif type == 1 then
         enemy = PREFABS_LOADER:fabricate("enemies.truck")
@@ -238,9 +243,9 @@ local function enemy_spawn()
         offset = -100
         enemy = PREFABS_LOADER:fabricate("enemies.drone")
         world:addEntity(enemy)
-        -- enemy.drone.max_speed = enemy.drone.max_speed * ( 3.5 + math.random() ) / 4
+        enemy.drone.max_speed = enemy.drone.max_speed * ( 3.5 + math.random() ) / 4
     end
-    
+
 
     local x, y = enemy.body:getPosition()
     local top_left_x, top_left_y, bottom_right_x, bottom_right_y = enemy.shape:computeAABB(0, 0, 0)
@@ -285,6 +290,18 @@ end, true)
 
 function ForestLevel.load()
     load_sprites()
+    tank_msprites = {
+        GRAPHICS_LOADER.msprites["tank_enemy1"],
+        GRAPHICS_LOADER.msprites["tank_enemy2"],
+        GRAPHICS_LOADER.msprites["tank_enemy3"],
+        GRAPHICS_LOADER.msprites["tank_enemy4"],
+        GRAPHICS_LOADER.msprites["tank_enemy5"],
+        GRAPHICS_LOADER.msprites["tank_enemy6"],
+        GRAPHICS_LOADER.msprites["tank_enemy7"],
+        GRAPHICS_LOADER.msprites["tank_enemy8"],
+        GRAPHICS_LOADER.msprites["tank_enemy9"],
+    }
+
     road_height = sprites.road:size()[2]
 
     PREFABS_LOADER:loadPrefabs("prefabs/enemies.json", "enemies")

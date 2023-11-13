@@ -36,5 +36,96 @@
       }
     },
     "current_animation": "left"
+  },
+  {
+    "filename" : "TankBoss1.png",
+    "name" : "tank_boss1_body",
+    "grid" : {
+      "size": [117, 20],
+      "border": 4,
+      "offset": [-4,-4]
+    },
+    "animations" : {
+      "idle" : {
+        "frames": [1, 1]
+      },
+      "move" : {
+        "frames": [1, "1-4"],
+        "durations": 0.2
+      }
+    },
+    "current_animation": "idle"
+  },
+  {
+    "filename" : "TankBossTower1.png",
+    "name": "tank_boss1_tower",
+    "grid": {
+      "size": [123, 53]
+    },
+    "animations" : {
+      "right" :  {
+        "frames": [1, 1]
+      },
+      "right_up" : {
+        "frames": [1, 2]
+      },
+      "up": {
+        "frames": [1, 3]
+      },
+      "left_up": {
+        "frames": [1, 4]
+      },
+      "left": {
+        "frames": [1, 5]
+      },
+      "left_down": {
+        "frames": [1, 6]
+      },
+      "down": {
+        "frames": [1, 7]
+      },
+      "right_down": {
+        "frames": [1, 8]
+      }
+    },
+    "current_animation": "left"
+  },
+  {
+    "filename" : "TankEnemyBody1.png",
+    "name": "tank_enemy1_body",
+    "grid": {
+      "size": [46, 20],
+      "border": 4,
+      "offset": [-4,-4]
+    },
+    "animations": {
+      "idle" : {
+        "frames": [1, 1]
+      },
+      "move" : {
+        "frames": [1, "1-4"],
+        "durations": 0.2
+      }
+    },
+    "current_animation": "idle"
+  },
+  {
+    "filename" : "TankEnemyBody2.png",
+    "name": "tank_enemy2_body",
+    "grid": {
+      "size": [46, 20],
+      "border": 4,
+      "offset": [-4,-4]
+    },
+    "animations": {
+      "idle" : {
+        "frames": [1, 1]
+      },
+      "move" : {
+        "frames": [1, "1-4"],
+        "durations": 0.2
+      }
+    },
+    "current_animation": "idle"
   }
 ]
