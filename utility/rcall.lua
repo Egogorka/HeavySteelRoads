@@ -13,10 +13,18 @@ require("libs/strong")
 --- rcall(t, "a.b") -- result: 10
 --- @param obj table
 --- @param path string
-function rcall(obj, path)
+--- @param omit_skip_errors boolean|nil
+function rcall(obj, path, omit_skip_errors)
     local split = path / "."
     local output = obj
     for i, v in ipairs(split) do
+        if output[v] == nil and not omit_skip_errors then
+            if omit_skip_errors then
+                print("rcall: Warning: Got no object at path "+path+" at point "+v)
+            else
+                error("rcall: Warning: Got no object at path "+path+" at point "+v)
+            end
+        end
         output = output[v]
     end
     return output
