@@ -23,7 +23,6 @@ local PhysicsManager = require("src/physics/PhysicsManager")
 local SpriteSystem = require("src/graphics/SpriteSystem")()
 local ParticleSystem = require("src/graphics/ParticleSystem")
 local ShapeDebug = require("src/ShapeDebug")
-local debug = true
 local HealthSystem = require("src/HealthSystem")
 
 local TankBehavior = require("src/behavior/TankBehavior")
@@ -60,6 +59,9 @@ world:addSystem(AITruck)
 world:addSystem(AIDrone)
 
 local player
+local debug = true
+local debug_breakpoint = false
+
 local p_world = love.physics.newWorld(0, 0, true)
 
 local gui = {}
@@ -70,9 +72,11 @@ local function load_sprites()
 
     GRAPHICS_LOADER:loadAnimations("assets/player/")
     GRAPHICS_LOADER:loadMSprites("assets/player/")
+    GRAPHICS_LOADER:loadSprites("assets/player/")
 
     GRAPHICS_LOADER:loadAnimations("assets/entities/enemies/")
     GRAPHICS_LOADER:loadMSprites("assets/entities/enemies/")
+    GRAPHICS_LOADER:loadSprites("assets/entities/enemies/")
 
     GRAPHICS_LOADER:loadAnimations("assets/effects/")
 
@@ -306,6 +310,7 @@ function ForestLevel.load()
 
     PREFABS_LOADER:loadPrefabs("prefabs/enemies.json", "enemies")
     PREFABS_LOADER:loadPrefabs("prefabs/pickups.json", "pickups")
+    PREFABS_LOADER:loadPrefabs("prefabs/bullets.json", "bullets")
 
     PREFABS_LOADER:setPhysicsWorld(p_world)
     PhysicsManager.setCallbacks(p_world)
@@ -329,6 +334,11 @@ local pause = false
 function ForestLevel.update(dt)
     if pause then
         return
+    end
+
+    if debug_breakpoint then
+        local a = 10
+        print(#enemies)
     end
 
     enemy_timer:update(dt)
@@ -414,6 +424,9 @@ function ForestLevel.keypressed(key, scancode, is_repeat)
         else
             TINY.removeSystem(world, ShapeDebug)
         end
+    end
+    if key == "u" then
+        debug_breakpoint = not debug_breakpoint
     end
 
     if not targeting then
