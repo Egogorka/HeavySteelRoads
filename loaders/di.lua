@@ -65,6 +65,18 @@ PREFABS_LOADER:register("msprite", 1, function (raw, loader)
     return loader.graphics_loader.msprites[raw]:clone()
 end)
 
+PREFABS_LOADER:register("behavior", 4, function (raw, loader, entity)
+    if type(raw) ~= "string" then
+        error("Behavior must be a string")
+    end
+    if entity[raw] == nil then
+        print("Warning: Entity has yet no behavior-like component with name "+raw.behavior+" , creating one")
+        entity[raw] = {}
+    end
+    entity[raw].messages = Stack()
+    return raw
+end)
+
 -- 3 because after fixture
 PREFABS_LOADER:register("drone", 3, require("src/behavior/Drone"))
 PREFABS_LOADER:register("tank", 3, require("src/behavior/Tank"))

@@ -21,7 +21,6 @@ function TruckFabricate(raw, loader, current)
 
     --- Variables that are technical/unnecessary for json
     raw.team = "enemy"
-    raw.messages = Stack()
     raw.contents = {}
 
     return raw

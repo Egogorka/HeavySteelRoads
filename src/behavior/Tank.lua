@@ -43,7 +43,6 @@ function TankFabricate(raw, loader, current)
     raw.ram_pos = nil
     raw.ram_timer = Timer(raw.ram_distance/raw.ram_velocity)
 
-    raw.messages = Stack()
     raw.stack = Stack()
 
     raw.team = "enemy"

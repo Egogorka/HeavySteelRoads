@@ -29,7 +29,6 @@ local function DroneFactory(raw, loader, entity)
         raw.direction = Vector2(0,0)
     end
 
-    raw.messages = Stack() --- Because it's behavior (should be DroneB but B is dropped)
     raw.team = "enemy"
     CategoryManager.setObject(entity.fixture, raw.team)
     entity.fixture:setSensor(true)
