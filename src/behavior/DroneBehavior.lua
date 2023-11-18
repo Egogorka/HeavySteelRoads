@@ -81,22 +81,26 @@ function DroneBehavior:_bullet(entity)
     local ps = love.graphics.newParticleSystem(pixel, 100)
     ps:setParticleLifetime(1, 3)
     ps:setLinearAcceleration(-1, -1, 1, 1)
-    ps:setColors(1, 1, 1, 1, 1, 1, 1, 0)
+    ps:setColors(1, 0.4, 0.4, 1, 1, 1, 1, 0)
 
-    local bullet = {
-        particles = {
-            ps = ps,
-            emit = 1
-        },
-        shape = love.physics.newRectangleShape(10, 10),
-        bullet = {},
-        behavior = "bullet"
-    }
-    bullet.body = love.physics.newBody(p_world, x + 15, y, "kinematic")
-    bullet.body:setFixedRotation(true)
-    bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
-    bullet.fixture:setSensor(true)
-    bullet.fixture:setUserData(UserData(bullet))
+    -- local bullet = {
+    --     particles = {
+    --         ps = ps,
+    --         emit = 1
+    --     },
+    --     shape = love.physics.newRectangleShape(10, 10),
+    --     bullet = {},
+    --     behavior = "bullet"
+    -- }
+    -- bullet.body = love.physics.newBody(p_world, x + 15, y, "kinematic")
+    -- bullet.body:setFixedRotation(true)
+    -- bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
+    -- bullet.fixture:setSensor(true)
+    -- bullet.fixture:setUserData(UserData(bullet))
+
+    local bullet = PREFABS_LOADER:fabricate("bullets.drone_bullet")
+    bullet.body:setPosition(x+15, y)
+    bullet.particles = {ps = ps, emit = 1}
 
     CategoryManager.setBullet(bullet.fixture, entity.drone.team)
 
@@ -113,10 +117,11 @@ function DroneBehavior:shoot(entity, dt, target)
     end
     entity.drone.shoot_reload_timer:start()
 
-    local pos = target - Vector2(entity.body:getPosition())
+    local pos = target - Vector2(entity.body:getPosition()) --[[@as Vector2]]
     local vel = 300 * pos/pos:mag()
     local bullet = DroneBehavior:_bullet(entity)
     bullet.body:setLinearVelocity(vel[1], vel[2])
+    bullet.body:setAngle(pos:angle()+math.pi)
 end
 
 ---@param entity drone_entity

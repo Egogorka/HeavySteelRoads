@@ -171,20 +171,24 @@ function TankBehavior:_bullet(entity)
     local world = self.world
     local x, y = entity.body:getPosition()
 
-    local bullet = {
-        sprite = Sprite(love.graphics.newImage("assets/player/Bullet1.png")),
-        shape = love.physics.newRectangleShape(10, 10),
-        bullet = {},
-        behavior = "bullet"
-    }
-    bullet.body = love.physics.newBody(p_world, x+15, y, "kinematic")
-    bullet.body:setFixedRotation(true)
-    bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
-    bullet.fixture:setSensor(true)
-    bullet.fixture:setUserData(UserData(bullet))
+    -- local bullet = {
+    --     sprite = Sprite(love.graphics.newImage("assets/player/Bullet1.png")),
+    --     shape = love.physics.newRectangleShape(10, 10),
+    --     bullet = {},
+    --     behavior = "bullet",
+    --     damage = 5,
+    -- }
+    -- bullet.body = love.physics.newBody(p_world, x+15, y, "kinematic")
+    -- bullet.body:setFixedRotation(true)
+    -- bullet.fixture = love.physics.newFixture(bullet.body, bullet.shape)
+    -- bullet.fixture:setSensor(true)
+    -- bullet.fixture:setUserData(UserData(bullet))
 
+    -- CategoryManager.setBullet(bullet.fixture, entity.tank.team)
+
+    local bullet = PREFABS_LOADER:fabricate("bullets.default_bullet")
+    bullet.body:setPosition(x+15, y)
     CategoryManager.setBullet(bullet.fixture, entity.tank.team)
-
     world:addEntity(bullet)
     return bullet
 end

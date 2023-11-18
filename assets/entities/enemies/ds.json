@@ -2,5 +2,9 @@
     {
         "filename" : "BulletEnemy1.png",
         "name": "enemy_bullet"
+    },
+    {
+        "filename" : "BulletDrone.png",
+        "name": "drone_bullet"
     }
 ]

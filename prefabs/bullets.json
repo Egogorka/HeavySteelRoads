@@ -6,7 +6,20 @@
         "bullet": true,
 
         "body": "kinematic",
-        "shape": [10, 10, 0, 0],
+        "shape": [10, 10],
+        "fixture": {
+            "type": "bullet",
+            "sensor": true
+        }
+    },
+    "drone_bullet": {
+        "sprite": "drone_bullet",
+
+        "behavior": "bullet",
+        "bullet": 5,
+
+        "body": "kinematic",
+        "shape": [10, 10],
         "fixture": {
             "type": "bullet",
             "sensor": true

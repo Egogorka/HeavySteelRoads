@@ -16,11 +16,24 @@ local Behavior = require("src/behavior/Behavior")
 local BulletBehavior = TINY.processingSystem(Behavior:extend("BulletBehavior"))
 BulletBehavior.filter = TINY.requireAll("bullet", "body")
 
+
+---@param entity {bullet: Bullet}
 function BulletBehavior:onAdd(entity)
-    BulletBehavior.super.onAdd(self, entity)
-    fill_table(entity.bullet, {
-        damage = 10
-    })
+    entity.bullet.lifetime:start()
+end
+
+
+---@param entity {bullet: Bullet}
+---@param dt any
+function BulletBehavior:process(entity, dt)
+    entity.bullet.lifetime:update(dt)
+
+    if not entity.bullet.lifetime.is_on then
+        local world = self.world
+        TINY.removeEntity(world, entity)
+    end
+
+    BulletBehavior.super.process(self, entity, dt)
 end
 
 function BulletBehavior:_explosion(entity)
@@ -42,6 +55,7 @@ function BulletBehavior:_explosion(entity)
     world:addEntity(explosion)
     return explosion
 end
+
 
 function BulletBehavior:contact(entity, dt, data)
     local other = data[2]
