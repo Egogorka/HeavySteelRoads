@@ -6,7 +6,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy1_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy2" : {
@@ -16,7 +16,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy3_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy3" : {
@@ -26,7 +26,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy3_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy4" : {
@@ -36,7 +36,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy4_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy5" : {
@@ -46,7 +46,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy5_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy6" : {
@@ -56,7 +56,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy6_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy7" : {
@@ -66,7 +66,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy7_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy8" : {
@@ -76,7 +76,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy7_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   },
   "tank_enemy9" : {
@@ -86,7 +86,7 @@
     },
     "tower" : {
       "sprite" : "animations.tank_enemy8_tower",
-      "placement": [-5, -15, 2]
+      "placement": [0, -15, 2]
     }
   }
 }
