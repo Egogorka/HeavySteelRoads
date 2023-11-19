@@ -191,6 +191,7 @@ local function load_level()
     player.body:setPosition(100, sprites.road:size()[2] / 2)
     player.player = 1
     player.tank.team = "player"
+    player.health = 100
     world:addEntity(player)
 
     cameraTarget = {

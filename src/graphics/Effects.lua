@@ -24,6 +24,7 @@ local Effect = CLASS("Effect", {
 
 local HurtEffect = Effect:extend("HurtEffect")
 local RamEffect = Effect:extend("RamEffect")
+local HealEffect = Effect:extend("HealEffect")
 
 -----------------------------------------------------------
 --- Hurt Effect
@@ -47,6 +48,30 @@ end
 function HurtEffect:afterDraw(sprite)
     love.graphics.setColor(self.color)
 end
+
+-----------------------------------------------------------
+--- Hurt Effect
+-----------------------------------------------------------
+
+function HealEffect:init(sprite)
+    self.hurt_color = 1
+    flux.to(self, 0.1, { hurt_color = 0.2 })
+        :ease("elasticout")
+        :after(self, 0.1, { hurt_color = 1 })
+        :oncomplete(function()
+        self.is_done = true
+    end)
+end
+
+function HealEffect:beforeDraw(sprite)
+    self.color = {love.graphics.getColor()}
+    love.graphics.setColor(self.hurt_color, 1, self.hurt_color, 1)
+end
+
+function HealEffect:afterDraw(sprite)
+    love.graphics.setColor(self.color)
+end
+
 
 -----------------------------------------------------------
 --- Ram Effect
@@ -76,7 +101,8 @@ end
 --- @type table<string, Effect>
 local EffectArray = {
     hurt = HurtEffect,
-    ram = RamEffect
+    ram = RamEffect,
+    heal = HealEffect
 }
 
 return EffectArray

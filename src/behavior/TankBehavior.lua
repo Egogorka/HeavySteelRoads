@@ -206,9 +206,16 @@ function TankBehavior:shoot(entity, dt)
     bullet.body:setAngle(entity.tank.rotation_angle * math.pi)
 end
 
-function TankBehavior:hurt(entity, dt)
+---@param entity any
+---@param dt number
+---@param change number
+function TankBehavior:hurt(entity, dt, change)
     if entity.msprite.effect == nil then
-        entity.msprite.effect = Effects.hurt()
+        if change < 0 then
+            entity.msprite.effect = Effects.hurt()
+        else
+            entity.msprite.effect = Effects.heal()
+        end
     end
 end
 

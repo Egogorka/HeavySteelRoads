@@ -13,7 +13,7 @@
       "ram_velocity": 500
     },
     "health" : {
-      "count" : 50
+      "count" : 20
     },
 
     "body": "dynamic",
@@ -33,7 +33,7 @@
     },
 
     "health": {
-      "count" : 50
+      "count" : 30
     },
 
     "body": "dynamic",

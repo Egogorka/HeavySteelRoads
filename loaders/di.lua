@@ -3,6 +3,7 @@
 
 local json = require("libs/json/json")
 local UserData = require("src/physics/UserData")
+local Timer = require("utility/timer")
 
 local Sprite, MSprite, Depth, Placement = unpack(require('src/graphics/Sprite'))
 
@@ -63,6 +64,29 @@ end)
 
 PREFABS_LOADER:register("msprite", 1, function (raw, loader)
     return loader.graphics_loader.msprites[raw]:clone()
+end)
+
+PREFABS_LOADER:register("health", 1, function (raw, loader, current)
+    local t = {
+        max_health = 0,
+        count = 0,
+        change = 0,
+        i_time = 0.5
+    }
+    if type(raw) == "number" then
+        t.max_health = raw
+        t.count = raw
+        t.i_timer = Timer(t.i_time)
+        return t
+    end
+    if type(raw) ~= "table" then
+        error("PrefabsLoader: health_factory problem - bad raw: "+raw)
+    end
+    t.max_health = raw.max_health or raw.count or t.max_health
+    t.count = raw.count or raw.max_health or t.count
+    t.i_time = raw.i_time or t.i_time
+    t.i_timer = Timer(t.i_time)
+    return t
 end)
 
 PREFABS_LOADER:register("behavior", 4, function (raw, loader, entity)

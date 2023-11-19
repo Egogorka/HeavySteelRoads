@@ -12,15 +12,6 @@ local Timer = require("utility/timer")
 local HealthSystem = TINY.processingSystem()
 HealthSystem.filter = TINY.requireAll("health", "behavior")
 
-function HealthSystem:onAdd(entity)
-    fill_table(entity.health, {
-        count = 0,
-        change = 0,
-        i_time = 0.5 -- invincibility
-    })
-    entity.health.i_timer = Timer(entity.health.i_time)
-end
-
 function HealthSystem:process(entity, dt)
     local behavior = entity.behavior
     local health = entity.health
